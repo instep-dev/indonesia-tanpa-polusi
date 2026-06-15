@@ -157,29 +157,49 @@ Next.js 16 App Router. File conventions:
 Route structure:
 ```
 app/
-├── layout.tsx                    # Root layout (QueryProvider, fonts, global CSS)
+├── layout.tsx                    # Root layout (ThemeProvider, QueryProvider, fonts, global CSS)
 ├── page.tsx                      # Root → redirects to /en
 ├── global-error.tsx              # Catches errors in root layout (must have <html><body>)
-├── (protected)/                  # Route group — dashboard/admin routes (no locale prefix)
-│   └── layout.tsx                → DashboardLayout
+├── (protected)/                  # Route group — tenant dashboard (URLs: /dashboard, /settings)
+│   └── layout.tsx                → DashboardLayout (TenantProvider + AuthProvider)
+├── (super-admin)/                # Route group — super admin panel (URLs: /super-admin/*)
+│   ├── layout.tsx                → SuperAdminLayout (SuperAdminAuthProvider)
+│   └── super-admin/              # URL prefix: /super-admin
+│       └── dashboard/
+│           └── page.tsx
 ├── [locale]/                     # Locale-based routes (en / id)
 │   ├── layout.tsx                → LocaleLayout (loads i18n dictionary)
 │   └── (marketing)/              # Route group — public marketing pages
 │       └── (home)/
 │           └── page.tsx
-├── auth/                         # Auth routes (no locale, no guard)
+├── auth/                         # Tenant auth routes (bypassed by proxy)
 │   ├── login/
 │   └── logout/
-└── api/                          # API route handlers
+├── super-admin/                  # Super admin auth routes (bypassed by proxy, no layout group)
+│   └── auth/
+│       ├── login/
+│       └── logout/
+└── api/                          # API route handlers (all bypassed by proxy)
+    ├── auth/                     # Tenant auth endpoints
+    │   ├── login/route.ts
+    │   ├── refresh/route.ts
+    │   └── logout/route.ts
+    ├── super-admin/
+    │   └── auth/                 # Super admin auth endpoints
+    │       ├── login/route.ts
+    │       ├── refresh/route.ts
+    │       └── logout/route.ts
     └── [resource]/
         └── route.ts
 ```
 
 **Important routing rules:**
-- Protected pages live under `app/(protected)/` — URL has NO locale prefix (e.g., `/dashboard`)
-- Marketing/public pages live under `app/[locale]/(marketing)/` — URL HAS locale prefix (e.g., `/en/about`)
-- API routes at `app/api/*` — bypassed by proxy, no auth or locale processing
-- Auth routes at `app/auth/*` — bypassed by proxy
+- Tenant dashboard pages → `app/(protected)/` — URL has NO locale prefix (e.g., `/dashboard`)
+- Super admin pages → `app/(super-admin)/super-admin/*` — URL HAS `/super-admin` prefix
+- Super admin auth → `app/super-admin/auth/*` — outside the route group, bypassed by proxy, no layout
+- Marketing/public pages → `app/[locale]/(marketing)/` — URL HAS locale prefix (e.g., `/en/about`)
+- Tenant auth → `app/auth/*` — bypassed by proxy
+- API routes → `app/api/*` — always bypassed by proxy
 
 ### `components/`
 Split into 4 categories:
@@ -244,12 +264,110 @@ layouts/
 ### `libs/`
 Pure TypeScript utility functions. **No React hooks or state.** No `useState`, `useEffect`, `useRouter`, etc. These are plain functions that can run on server or client.
 
-Current:
-- `api.ts` — Axios instance with base URL, credentials, timeout
-- `db.ts` — Prisma client singleton (uses `globalThis` for dev hot-reload safety)
+Current files:
+- `api.ts` — Axios instance + all interceptors (auth header, tenant slug, silent refresh, race condition queue)
+- `db.ts` — Prisma client singleton + `dbForTenant` factory
 - `getBaseApi.ts` — resolves API base URL from env vars
 - `getInitials.ts` — extracts initials from a name string
 - `getTrimText.ts` — trims text with ellipsis
+- `withTenant.ts` — HOF to extract tenant slug and inject `tenantDb` into API route handlers
+- `provisionTenant.ts` — creates PostgreSQL schema + tables for a new tenant
+- `validateToken.ts` — validates opaque access token from Authorization header against DB
+
+**`api.ts` is not just a base Axios setup — it must contain all interceptors.** The file currently at `libs/api.ts` only has the base config and needs to be updated once the stores exist. Full final content:
+
+```ts
+// libs/api.ts
+import axios from 'axios'
+import { authStore } from '@/services/auth/auth.store'
+import { superAdminAuthStore } from '@/services/super-admin/super-admin-auth.store'
+import { tenantStore } from '@/services/tenant/tenant.store'
+
+export const http = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_API,
+  withCredentials: true,
+  timeout: 10_000,
+  headers: { 'Content-Type': 'application/json' },
+})
+
+// 1. Attach access token (tenant user OR super admin — whichever has a token)
+// 2. Attach tenant slug if present
+http.interceptors.request.use((config) => {
+  const token =
+    authStore.getState().accessToken ??
+    superAdminAuthStore.getState().accessToken
+  if (token) config.headers.Authorization = `Bearer ${token}`
+
+  const slug = tenantStore.getState().slug
+  if (slug) config.headers['X-Tenant-Slug'] = slug
+
+  return config
+})
+
+// Silent refresh + race condition queue
+let isRefreshing = false
+let refreshQueue: Array<(token: string) => void> = []
+
+const processQueue = (newToken: string) => {
+  refreshQueue.forEach((cb) => cb(newToken))
+  refreshQueue = []
+}
+
+http.interceptors.response.use(
+  (res) => res,
+  async (error) => {
+    const original = error.config
+    if (error.response?.status !== 401 || original._retry) return Promise.reject(error)
+    original._retry = true
+
+    if (isRefreshing) {
+      return new Promise((resolve) => {
+        refreshQueue.push((token: string) => {
+          original.headers.Authorization = `Bearer ${token}`
+          resolve(http(original))
+        })
+      })
+    }
+
+    isRefreshing = true
+
+    // Determine which auth system to refresh (super admin vs tenant)
+    const isSuperAdmin = !!superAdminAuthStore.getState().accessToken
+    const refreshUrl = isSuperAdmin
+      ? `${process.env.NEXT_PUBLIC_API}/super-admin/auth/refresh`
+      : `${process.env.NEXT_PUBLIC_API}/auth/refresh`
+
+    try {
+      const { data } = await axios.post<{ accessToken: string }>(
+        refreshUrl,
+        {},
+        { withCredentials: true },
+      )
+
+      if (isSuperAdmin) {
+        superAdminAuthStore.getState().setAccessToken(data.accessToken)
+      } else {
+        authStore.getState().setAccessToken(data.accessToken)
+      }
+
+      processQueue(data.accessToken)
+      original.headers.Authorization = `Bearer ${data.accessToken}`
+      return http(original)
+    } catch {
+      if (isSuperAdmin) {
+        superAdminAuthStore.getState().clear()
+        if (typeof window !== 'undefined') window.location.href = '/super-admin/auth/login'
+      } else {
+        authStore.getState().clear()
+        if (typeof window !== 'undefined') window.location.href = '/auth/login'
+      }
+      return Promise.reject(error)
+    } finally {
+      isRefreshing = false
+    }
+  },
+)
+```
 
 ### `messages/`
 Translation JSON files, one per locale.
@@ -651,15 +769,21 @@ export const useProjectActivitySse = (projectId: string) => {
 **Current logic:**
 1. `/api/*` → pass through (no processing)
 2. `/auth/*` → pass through (no processing)
-3. Protected paths (`/dashboard`, `/settings`, etc.) → check `session` cookie → redirect to `/auth/login` if missing
-4. Everything else → check for locale prefix (`/en/`, `/id/`) → redirect to `/{detected-locale}{path}` if missing
+3. `/super-admin/auth/*` → pass through (no processing)
+4. Protected tenant paths (`/dashboard`, `/settings`, etc.) → check `refresh_token` cookie existence → redirect to `/auth/login` if missing
+5. Protected super-admin paths (`/super-admin`, etc.) → check `refresh_token` cookie existence → redirect to `/super-admin/auth/login` if missing
+6. Everything else → check for locale prefix (`/en/`, `/id/`) → redirect to `/{detected-locale}{path}` if missing
 
-**When adding a new protected route**, add the path to `PROTECTED_PATHS` in `proxy.ts`:
+**Why check `refresh_token` and not the access token:**
+The access token lives in Zustand (memory) — it is never in a cookie, so proxy cannot read it. The proxy only checks for `refresh_token` cookie *existence* (not validity). Actual token validation (DB lookup + expiry check) happens inside each API route handler via `validateAccessToken`.
+
+**When adding a new protected route**, add the path to `PROTECTED_PATHS` or `SUPER_ADMIN_PATHS` in `proxy.ts`:
 ```ts
-const PROTECTED_PATHS = ['/dashboard', '/settings', '/profile', '/admin', '/your-new-route']
+const PROTECTED_PATHS = ['/dashboard', '/settings', '/profile', '/your-new-route']
+const SUPER_ADMIN_PATHS = ['/super-admin']
 ```
 
-The cookie name `session` must match what the auth login handler sets.
+The cookie name `refresh_token` must match exactly what `/api/auth/login` and `/api/auth/refresh` set.
 
 ---
 
@@ -750,3 +874,721 @@ docker compose down -v      # Stop and remove volumes (fresh start)
 - pgAdmin server connection: host=`db`, port=`5432`, user=`POSTGRES_USER`, pass=`POSTGRES_PASSWORD`
 
 Docker reads `.env` (not `.env.local`) for `${VAR}` substitution in `compose.yml`.
+
+---
+
+## Multi-Tenant Architecture
+
+**Strategy: PostgreSQL schema-per-tenant.** One database, one `public` schema for global/shared data, one isolated schema per tenant. All tenant business data is completely isolated at the schema level.
+
+### Schema Layout
+
+| Schema | Contents |
+|---|---|
+| `public` | Global: `Tenant` table, `SuperAdmin` table, global migrations |
+| `tenant_acme` | All data for tenant "acme": users, auth tokens, business tables |
+| `tenant_globex` | Same structure, fully isolated from `tenant_acme` |
+
+Tenant slug rules:
+- Slug stored with hyphens in `public.Tenant` table: `acme-corp`
+- Schema name converts hyphens → underscores: `tenant_acme_corp`
+- Schema name must match: `/^[a-z][a-z0-9_]*$/`
+
+```ts
+const toSchemaName = (slug: string) => `tenant_${slug.replace(/-/g, '_')}`
+```
+
+---
+
+### Prisma Per-Tenant Connection
+
+`libs/db.ts` exports a `public`-schema singleton and a per-request factory for tenant schemas. The `@prisma/adapter-pg` `schema` option routes all queries to the correct schema.
+
+```ts
+// libs/db.ts
+import { PrismaClient } from '@prisma/client'
+import { PrismaPg } from '@prisma/adapter-pg'
+
+const createPrismaClient = (schema = 'public') =>
+  new PrismaClient({
+    adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL!, schema }),
+  })
+
+const globalForPrisma = globalThis as unknown as { db?: PrismaClient }
+export const db = (globalForPrisma.db ??= createPrismaClient())
+
+// New connection per request — not cached, not singleton
+export const dbForTenant = (slug: string) =>
+  createPrismaClient(`tenant_${slug.replace(/-/g, '_')}`)
+```
+
+---
+
+### Tenant Resolution (proxy.ts)
+
+The tenant slug comes from the `X-Tenant-Slug` request header. The proxy validates the format; route handlers trust the header is already clean.
+
+```ts
+// proxy.ts — add this before locale/auth logic
+const SLUG_RE = /^[a-z][a-z0-9-]*$/
+
+// Inside proxy():
+const slug = request.headers.get('x-tenant-slug')
+if (slug && !SLUG_RE.test(slug)) {
+  return NextResponse.json({ error: 'Invalid tenant slug' }, { status: 400 })
+}
+```
+
+On the client, the Axios instance reads the slug from `tenantStore` and sets the header on every outgoing request:
+
+```ts
+// libs/api.ts — request interceptor
+http.interceptors.request.use((config) => {
+  const slug = tenantStore.getState().slug
+  if (slug) config.headers['X-Tenant-Slug'] = slug
+  return config
+})
+```
+
+---
+
+### `withTenant` HOF (API Routes)
+
+Wrap every tenant API route with `withTenant` instead of reading the header manually:
+
+```ts
+// libs/withTenant.ts
+import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
+import type { PrismaClient } from '@prisma/client'
+import { dbForTenant } from './db'
+
+type TenantContext = { tenantDb: PrismaClient; slug: string }
+type TenantHandler = (req: NextRequest, ctx: TenantContext) => Promise<NextResponse>
+
+export const withTenant = (handler: TenantHandler) =>
+  async (request: NextRequest): Promise<NextResponse> => {
+    const slug = request.headers.get('x-tenant-slug')
+    if (!slug) return NextResponse.json({ error: 'Tenant required' }, { status: 400 })
+
+    const tenantDb = dbForTenant(slug)
+    return handler(request, { tenantDb, slug })
+  }
+```
+
+Usage:
+
+```ts
+// app/api/users/route.ts
+import { withTenant } from '@/libs/withTenant'
+
+export const GET = withTenant(async (_request, { tenantDb }) => {
+  const users = await tenantDb.user.findMany()
+  return NextResponse.json(users)
+})
+```
+
+---
+
+### Tenant Provisioning
+
+When a new tenant is registered, create their schema and all tenant tables in a single provisioning call. Call this **after** inserting the `Tenant` row in `public`.
+
+```ts
+// libs/provisionTenant.ts
+import { db } from './db'
+
+export const provisionTenant = async (slug: string): Promise<void> => {
+  const schema = `tenant_${slug.replace(/-/g, '_')}`
+
+  await db.$executeRawUnsafe(`CREATE SCHEMA IF NOT EXISTS "${schema}"`)
+
+  // Repeat for each tenant table:
+  await db.$executeRawUnsafe(`
+    CREATE TABLE IF NOT EXISTS "${schema}"."User" (
+      id         TEXT        PRIMARY KEY,
+      email      TEXT        NOT NULL UNIQUE,
+      name       TEXT,
+      "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )
+  `)
+  // AccessToken, RefreshToken, and all business tables follow the same pattern
+}
+```
+
+```ts
+// app/api/tenants/route.ts
+import { db } from '@/libs/db'
+import { provisionTenant } from '@/libs/provisionTenant'
+
+export const POST = async (request: NextRequest): Promise<NextResponse> => {
+  const { name, slug } = await request.json()
+  const tenant = await db.tenant.create({ data: { name, slug } })
+  await provisionTenant(slug)
+  return NextResponse.json(tenant, { status: 201 })
+}
+```
+
+---
+
+### Cross-Tenant Aggregation (Super Admin)
+
+Query `public.Tenant` to get all slugs, then run parallel queries across schemas:
+
+```ts
+const tenants = await db.tenant.findMany({ select: { slug: true } })
+const counts = await Promise.all(
+  tenants.map(({ slug }) => dbForTenant(slug).user.count())
+)
+```
+
+---
+
+### Super Admin Auth
+
+Super admins are a completely separate system from tenant users:
+- Stored in `public."SuperAdmin"` — not in any tenant schema
+- Use the same Opaque Token mechanism with their own token tables in `public` (`AccessToken`, `RefreshToken` mirrored in public schema)
+- Can query any tenant schema via `dbForTenant(slug)`
+- Routes live under `app/(super-admin)/` — a separate route group from `(protected)/`
+- Super admin API routes use `db` (public schema) instead of `withTenant`
+
+**DTO** (`services/super-admin/super-admin-auth.dto.ts`):
+
+```ts
+export type SuperAdminDto = {
+  id: string
+  email: string
+  name: string | null
+  createdAt: string
+}
+
+export type SuperAdminLoginBody = {
+  email: string
+  password: string
+}
+```
+
+**Store** (`services/super-admin/super-admin-auth.store.ts`):
+
+Mirrors `authStore` exactly but scoped to super admin. Kept separate so super admin session and tenant session never mix.
+
+```ts
+// services/super-admin/super-admin-auth.store.ts
+import { create } from 'zustand'
+import type { SuperAdminDto } from './super-admin-auth.dto'
+
+type SuperAdminAuthState = {
+  accessToken: string | null
+  superAdmin: SuperAdminDto | null
+  bootstrapped: boolean
+  setAuth: (payload: { accessToken: string; superAdmin: SuperAdminDto }) => void
+  setAccessToken: (token: string) => void
+  clear: () => void
+  setBootstrapped: (v: boolean) => void
+}
+
+export const superAdminAuthStore = create<SuperAdminAuthState>()((set) => ({
+  accessToken: null,
+  superAdmin: null,
+  bootstrapped: false,
+  setAuth: ({ accessToken, superAdmin }) => set({ accessToken, superAdmin }),
+  setAccessToken: (accessToken) => set({ accessToken }),
+  clear: () => set({ accessToken: null, superAdmin: null }),
+  setBootstrapped: (v) => set({ bootstrapped: v }),
+}))
+```
+
+Access outside React: `superAdminAuthStore.getState().accessToken`
+Access inside React: `superAdminAuthStore((s) => s.superAdmin)`
+
+The Axios interceptor in `libs/api.ts` needs to pick the right store based on context. Since super admin routes never have a tenant slug, the tenant interceptor will be a no-op for them. For the auth header, both stores use the same `accessToken` field — the interceptor reads from whichever store has a non-null token:
+
+```ts
+// libs/api.ts — auth header interceptor (handles both tenant + super admin)
+http.interceptors.request.use((config) => {
+  const token =
+    authStore.getState().accessToken ??
+    superAdminAuthStore.getState().accessToken
+  if (token) config.headers.Authorization = `Bearer ${token}`
+  return config
+})
+```
+
+---
+
+### Tenant Store (`services/tenant/tenant.store.ts`)
+
+Zustand store that holds the active tenant slug. The Axios interceptor reads from here to attach `X-Tenant-Slug` on every request.
+
+```ts
+// services/tenant/tenant.store.ts
+import { create } from 'zustand'
+
+type TenantState = {
+  slug: string | null
+  setSlug: (slug: string) => void
+  clear: () => void
+}
+
+export const tenantStore = create<TenantState>()((set) => ({
+  slug: null,
+  setSlug: (slug) => set({ slug }),
+  clear: () => set({ slug: null }),
+}))
+```
+
+Access outside React: `tenantStore.getState().slug`
+Access inside React: `tenantStore((s) => s.slug)`
+
+---
+
+### Frontend: Subdomain Tenant Detection
+
+The tenant slug is extracted **server-side** from the `host` header in the layout, then passed as a prop to `TenantProvider`. This avoids any client-side delay before the Axios interceptor has the slug.
+
+```ts
+// layouts/DashboardLayout.tsx (server component)
+import { headers } from 'next/headers'
+import TenantProvider from '@/providers/TenantProvider'
+
+const DashboardLayout = async ({ children }: { children: React.ReactNode }) => {
+  const headersList = await headers()
+  const host = headersList.get('host') ?? ''
+  // acme.app.com → 'acme' | acme.localhost:3000 → 'acme'
+  const slug = host.split('.')[0]
+
+  return <TenantProvider slug={slug}>{children}</TenantProvider>
+}
+
+export default DashboardLayout
+```
+
+---
+
+### `TenantProvider` (`providers/TenantProvider.tsx`)
+
+Client component that writes the slug into `tenantStore` synchronously — before children render — so the Axios interceptor has the slug on the very first request.
+
+```ts
+// providers/TenantProvider.tsx
+'use client'
+
+import type { ReactNode } from 'react'
+import { tenantStore } from '@/services/tenant/tenant.store'
+
+const TenantProvider = ({ slug, children }: { slug: string; children: ReactNode }) => {
+  // Set synchronously (not in useEffect) so the slug is available
+  // before the first Axios request fires from any child component
+  tenantStore.setState({ slug })
+
+  return <>{children}</>
+}
+
+export default TenantProvider
+```
+
+The Axios interceptor in `libs/api.ts` reads from `tenantStore`:
+
+```ts
+// libs/api.ts — request interceptor
+import { tenantStore } from '@/services/tenant/tenant.store'
+
+http.interceptors.request.use((config) => {
+  const slug = tenantStore.getState().slug
+  if (slug) config.headers['X-Tenant-Slug'] = slug
+  return config
+})
+
+---
+
+## Opaque Token Auth
+
+This app uses **Opaque Tokens**, not JWT. Tokens are random hex strings — they contain no claims, cannot be decoded, and must be looked up in the database on every request. This enables instant revocation.
+
+### Token Generation
+
+```ts
+import crypto from 'crypto'
+
+const generateToken = () => crypto.randomBytes(32).toString('hex')
+// Produces a 64-character lowercase hex string
+```
+
+### Hashing for DB Storage
+
+Tokens are **never stored in plain text**. Always hash with SHA-256 before writing to the DB:
+
+```ts
+const hashToken = (raw: string) =>
+  crypto.createHash('sha256').update(raw).digest('hex')
+```
+
+The raw token is returned to the client once. The hash is what lives in the DB.
+
+---
+
+### Token Properties
+
+| | Access Token | Refresh Token |
+|---|---|---|
+| TTL | 30 minutes | 30 days |
+| Client storage | Zustand (memory) | httpOnly cookie |
+| DB storage | `sha256(token)` in `AccessToken` table | `sha256(token)` in `RefreshToken` table |
+| Sent on requests | `Authorization: Bearer <raw>` header | Automatic via cookie (`withCredentials`) |
+| Rotates | On every refresh | On every refresh (both rotate together) |
+
+---
+
+### Prisma Token Models
+
+Add to every tenant schema (and to `public` for super admin tokens):
+
+```prisma
+model AccessToken {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model RefreshToken {
+  id           String    @id @default(cuid())
+  tokenHash    String    @unique
+  userId       String
+  replacedById String?   @unique
+  revokedAt    DateTime?
+  expiresAt    DateTime
+  createdAt    DateTime  @default(now())
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+```
+
+---
+
+### Refresh Token Cookie Config
+
+Set this cookie in both `/api/auth/login` and `/api/auth/refresh` responses:
+
+```ts
+response.cookies.set('refresh_token', rawRefreshToken, {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
+  maxAge: 30 * 24 * 60 * 60, // 30 days in seconds
+  path: '/api/auth/refresh',  // Cookie only sent to the refresh endpoint
+})
+```
+
+**SameSite:**
+- `lax` in development — allows cookie to be sent in localhost subdomain scenarios (`acme.localhost`)
+- `strict` in production — cookie only sent on same-site requests, prevents CSRF
+
+---
+
+### Full Token Lifecycle
+
+```
+LOGIN
+  1. Verify credentials
+  2. rawAccess  = generateToken()   rawRefresh = generateToken()
+  3. DB: insert sha256(rawAccess)  in AccessToken  (expiresAt: now + 30 min)
+  4. DB: insert sha256(rawRefresh) in RefreshToken (expiresAt: now + 30 days)
+  5. Set httpOnly cookie: rawRefresh
+  6. Return: { accessToken: rawAccess, user }
+
+CLIENT (on login response)
+  → authStore.setAuth({ accessToken: rawAccess, user })
+  → Axios interceptor attaches it to every request: Authorization: Bearer <rawAccess>
+
+API REQUEST VALIDATION
+  → Extract raw token from Authorization header
+  → sha256(raw) → look up in DB.AccessToken
+  → Check expiresAt > now
+  → Valid: proceed | Expired/missing: return 401
+
+REFRESH (triggered by 401)
+  → POST /api/auth/refresh (cookie sent automatically)
+  → Read rawRefresh from cookie → sha256 → look up in DB.RefreshToken
+  → Check not revoked, expiresAt > now
+  → Generate new rawAccess + new rawRefresh (both rotate)
+  → Delete old AccessToken + old RefreshToken from DB
+  → Insert new hashes in DB
+  → Set new httpOnly cookie: new rawRefresh
+  → Return: { accessToken: newRawAccess }
+  → Axios interceptor: authStore.setAccessToken(newRawAccess) silently
+
+LOGOUT
+  → DELETE /api/auth/logout
+  → DB: delete AccessToken where userId = current user (+ tenant)
+  → DB: delete RefreshToken where userId = current user (+ tenant)
+  → Clear httpOnly cookie (maxAge: 0)
+  → Client: authStore.clear()
+```
+
+---
+
+### Auth Store
+
+```ts
+// services/auth/auth.store.ts
+import { create } from 'zustand'
+import type { UserDto } from './auth.dto'
+
+type AuthState = {
+  accessToken: string | null
+  user: UserDto | null
+  bootstrapped: boolean
+  setAuth: (payload: { accessToken: string; user: UserDto }) => void
+  setAccessToken: (token: string) => void
+  clear: () => void
+  setBootstrapped: (v: boolean) => void
+}
+
+export const authStore = create<AuthState>()((set) => ({
+  accessToken: null,
+  user: null,
+  bootstrapped: false,
+  setAuth: ({ accessToken, user }) => set({ accessToken, user }),
+  setAccessToken: (accessToken) => set({ accessToken }),
+  clear: () => set({ accessToken: null, user: null }),
+  setBootstrapped: (v) => set({ bootstrapped: v }),
+}))
+```
+
+`setAccessToken` exists separately from `setAuth` because silent refresh updates the token without touching `user`.
+
+---
+
+### Axios Interceptors: Silent Refresh + Race Condition Queue
+
+```ts
+// libs/api.ts
+import axios from 'axios'
+import { authStore } from '@/services/auth/auth.store'
+
+export const http = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_API,
+  withCredentials: true, // sends httpOnly refresh_token cookie automatically
+  timeout: 10_000,
+})
+
+// Attach access token on every outgoing request
+http.interceptors.request.use((config) => {
+  const token = authStore.getState().accessToken
+  if (token) config.headers.Authorization = `Bearer ${token}`
+  return config
+})
+
+// Silent refresh + race condition queue
+let isRefreshing = false
+let refreshQueue: Array<(token: string) => void> = []
+
+const processQueue = (newToken: string) => {
+  refreshQueue.forEach((cb) => cb(newToken))
+  refreshQueue = []
+}
+
+http.interceptors.response.use(
+  (res) => res,
+  async (error) => {
+    const original = error.config
+    if (error.response?.status !== 401 || original._retry) return Promise.reject(error)
+    original._retry = true
+
+    if (isRefreshing) {
+      // Queue this request — it will retry once the ongoing refresh completes
+      return new Promise((resolve) => {
+        refreshQueue.push((token: string) => {
+          original.headers.Authorization = `Bearer ${token}`
+          resolve(http(original))
+        })
+      })
+    }
+
+    isRefreshing = true
+
+    try {
+      // Cookie is sent automatically via withCredentials
+      const { data } = await axios.post<{ accessToken: string }>(
+        `${process.env.NEXT_PUBLIC_API}/auth/refresh`,
+        {},
+        { withCredentials: true },
+      )
+
+      authStore.getState().setAccessToken(data.accessToken)
+      processQueue(data.accessToken)
+
+      original.headers.Authorization = `Bearer ${data.accessToken}`
+      return http(original)
+    } catch {
+      authStore.getState().clear()
+      if (typeof window !== 'undefined') window.location.href = '/auth/login'
+      return Promise.reject(error)
+    } finally {
+      isRefreshing = false
+    }
+  },
+)
+```
+
+**How the queue prevents race conditions:**
+1. Requests A, B, C all get 401 simultaneously
+2. A sets `isRefreshing = true`, starts refresh
+3. B and C see `isRefreshing = true`, add their retry callbacks to `refreshQueue`
+4. Refresh completes → `processQueue(newToken)` fires B's and C's callbacks with the new token
+5. B and C retry with the new token — only one refresh ever hits the server
+
+---
+
+### App Bootstrap (Auth Provider)
+
+On first load, attempt a silent refresh using the existing cookie to restore session without requiring login.
+
+**`AuthProvider` does NOT go in root `app/layout.tsx`** — it goes in the protected/dashboard layout only. Marketing pages and auth pages must not trigger a bootstrap call.
+
+```ts
+// providers/AuthProvider.tsx
+'use client'
+
+import { useEffect } from 'react'
+import type { ReactNode } from 'react'
+import { http } from '@/libs/api'
+import { authStore } from '@/services/auth/auth.store'
+import type { UserDto } from '@/services/auth/auth.dto'
+
+type BootstrapResponse = { accessToken: string; user: UserDto }
+
+const AuthProvider = ({ children }: { children: ReactNode }) => {
+  useEffect(() => {
+    const bootstrap = async () => {
+      try {
+        const { data } = await http.post<BootstrapResponse>('/auth/refresh')
+        authStore.getState().setAuth({ accessToken: data.accessToken, user: data.user })
+      } catch {
+        authStore.getState().clear()
+      } finally {
+        authStore.getState().setBootstrapped(true)
+      }
+    }
+
+    bootstrap()
+  }, [])
+
+  return <>{children}</>
+}
+
+export default AuthProvider
+```
+
+Place it in the dashboard layout, wrapping children after `TenantProvider`:
+
+```ts
+// layouts/DashboardLayout.tsx
+import TenantProvider from '@/providers/TenantProvider'
+import AuthProvider from '@/providers/AuthProvider'
+
+const DashboardLayout = async ({ children }: { children: React.ReactNode }) => {
+  // ... slug extraction from host header
+
+  return (
+    <TenantProvider slug={slug}>
+      <AuthProvider>
+        {children}
+      </AuthProvider>
+    </TenantProvider>
+  )
+}
+```
+
+Super admin has its own separate bootstrap that calls a different endpoint:
+
+```ts
+// providers/SuperAdminAuthProvider.tsx
+'use client'
+
+import { useEffect } from 'react'
+import type { ReactNode } from 'react'
+import { http } from '@/libs/api'
+import { superAdminAuthStore } from '@/services/super-admin/super-admin-auth.store'
+import type { SuperAdminDto } from '@/services/super-admin/super-admin-auth.dto'
+
+type BootstrapResponse = { accessToken: string; superAdmin: SuperAdminDto }
+
+const SuperAdminAuthProvider = ({ children }: { children: ReactNode }) => {
+  useEffect(() => {
+    const bootstrap = async () => {
+      try {
+        const { data } = await http.post<BootstrapResponse>('/super-admin/auth/refresh')
+        superAdminAuthStore.getState().setAuth({ accessToken: data.accessToken, superAdmin: data.superAdmin })
+      } catch {
+        superAdminAuthStore.getState().clear()
+      } finally {
+        superAdminAuthStore.getState().setBootstrapped(true)
+      }
+    }
+
+    bootstrap()
+  }, [])
+
+  return <>{children}</>
+}
+
+export default SuperAdminAuthProvider
+```
+
+Place this in `layouts/SuperAdminLayout.tsx` instead of `AuthProvider`.
+
+Gate any protected UI on `bootstrapped === true` to avoid flash of unauthenticated content.
+
+---
+
+### Token Validation Helper (API Routes)
+
+```ts
+// libs/validateToken.ts
+import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
+import crypto from 'crypto'
+import type { PrismaClient } from '@prisma/client'
+
+type ValidResult = { ok: true; userId: string }
+type InvalidResult = { ok: false; response: NextResponse }
+
+export const validateAccessToken = async (
+  request: NextRequest,
+  tenantDb: PrismaClient,
+): Promise<ValidResult | InvalidResult> => {
+  const raw = request.headers.get('authorization')?.replace('Bearer ', '')
+  if (!raw) return { ok: false, response: NextResponse.json({ error: 'Unauthorized' }, { status: 401 }) }
+
+  const tokenHash = crypto.createHash('sha256').update(raw).digest('hex')
+  const token = await tenantDb.accessToken.findUnique({
+    where: { tokenHash },
+    select: { userId: true, expiresAt: true },
+  })
+
+  if (!token || token.expiresAt < new Date()) {
+    return { ok: false, response: NextResponse.json({ error: 'Unauthorized' }, { status: 401 }) }
+  }
+
+  return { ok: true, userId: token.userId }
+}
+```
+
+Combine `withTenant` + `validateAccessToken` in protected routes:
+
+```ts
+// app/api/users/route.ts
+import { withTenant } from '@/libs/withTenant'
+import { validateAccessToken } from '@/libs/validateToken'
+
+export const GET = withTenant(async (request, { tenantDb }) => {
+  const auth = await validateAccessToken(request, tenantDb)
+  if (!auth.ok) return auth.response
+
+  const users = await tenantDb.user.findMany({ where: { id: auth.userId } })
+  return NextResponse.json(users)
+})
