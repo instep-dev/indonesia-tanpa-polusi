@@ -1,13 +1,19 @@
-import React from 'react'
+import Navbar from '@/components/marketing/Navbar'
+import type { Dictionary, Locale } from '@/i18n/getDictionary'
 
 const MarketingLayout = ({
-  children
-} : {
+  children,
+  locale,
+  navDict,
+}: {
   children: React.ReactNode
-}) => {
-  return (
-    <main>{children}</main>
-  )
-}
+  locale: Locale
+  navDict: Dictionary['marketing']['nav']
+}) => (
+  <main>
+    <Navbar currentLocale={locale} dict={navDict} />
+    {children}
+  </main>
+)
 
 export default MarketingLayout

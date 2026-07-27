@@ -1,6 +1,6 @@
-import { getDictionary, type Locale } from "@/i18n/getDictionary";
+import { getDictionary } from "@/i18n/getDictionary";
+import type { Locale } from "@/i18n/getDictionary";
 import MarketingLayout from "@/layouts/MarketingLayout";
-import LangToggle from "@/components/reusable/LangToggle";
 
 const LocaleLayout = async ({
   children,
@@ -14,8 +14,7 @@ const LocaleLayout = async ({
   const dict = await getDictionary(validLocale);
 
   return (
-    <MarketingLayout>
-      <LangToggle currentLocale={validLocale} />
+    <MarketingLayout locale={validLocale} navDict={dict.marketing.nav}>
       {children}
     </MarketingLayout>
   );
