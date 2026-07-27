@@ -18,7 +18,7 @@ const OurStories = ({
         <p className="mt-6 text-base text-brand-navy sm:text-lg">{dict.body}</p>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 sm:gap-6">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
         {cards.map((card, index) => {
           const copy = dict.cards[index]
 

@@ -29,7 +29,7 @@ const Navbar = ({ currentLocale, dict }: NavbarProps) => {
           />
         </Link>
 
-        <nav className="hidden items-center gap-6 text-sm font-medium text-brand-navy lg:flex">
+        <nav className="hidden items-center gap-6 text-sm font-medium text-brand-navy lg:flex dark:text-foreground">
           {navLinks.map((link) => (
             <Link
               key={link.key}
@@ -55,7 +55,7 @@ const Navbar = ({ currentLocale, dict }: NavbarProps) => {
 
         <button
           onClick={() => setOpen((v) => !v)}
-          className="p-2 text-brand-navy lg:hidden"
+          className="p-2 text-brand-navy lg:hidden dark:text-foreground"
           aria-label="Toggle menu"
         >
           {open ? <X size={24} /> : <List size={24} />}
@@ -64,7 +64,7 @@ const Navbar = ({ currentLocale, dict }: NavbarProps) => {
 
       {open && (
         <div className="border-t border-foreground/10 px-6 py-4 lg:hidden">
-          <nav className="flex flex-col gap-4 text-sm font-medium text-brand-navy">
+          <nav className="flex flex-col gap-4 text-sm font-medium text-brand-navy dark:text-foreground">
             {navLinks.map((link) => (
               <Link
                 key={link.key}

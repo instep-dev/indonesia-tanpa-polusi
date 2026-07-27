@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+/* next-themes toggles a `.dark` class on <html> (attribute="class") — tell
+   Tailwind's `dark:` variant to key off that class instead of the default
+   `prefers-color-scheme` media query. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   --background: #ffffff;
   --foreground: #171717;

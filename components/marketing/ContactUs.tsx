@@ -44,13 +44,13 @@ const ContactUs = ({
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className="grid gap-4">
           <div className="aspect-[4/3] w-full bg-neutral-500" />
           <div className="aspect-[4/3] w-full bg-neutral-500" />
           <div className="aspect-[4/3] w-full bg-neutral-500" />
         </div>
-        <div className="h-full w-full bg-neutral-500" />
+        <div className="aspect-[4/3] w-full bg-neutral-500 sm:aspect-auto sm:h-full" />
       </div>
     </div>
   </section>
