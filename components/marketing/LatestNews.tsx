@@ -1,14 +1,16 @@
 import Link from 'next/link'
 import { buttonVariants } from '@/components/reusable/Button'
-import type { Dictionary } from '@/i18n/getDictionary'
+import type { Dictionary, Locale } from '@/i18n/getDictionary'
 import type { NewsCardId } from '@/data/data'
 
 type NewsCard = { id: NewsCardId; href: string }
 
 const LatestNews = ({
+  currentLocale,
   dict,
   items,
 }: {
+  currentLocale: Locale
   dict: Dictionary['marketing']['home']['news']
   items: NewsCard[]
 }) => (
@@ -18,7 +20,10 @@ const LatestNews = ({
         <h2 className="text-3xl font-extrabold text-foreground sm:text-4xl">
           {dict.heading}
         </h2>
-        <Link href="/latest-news" className={buttonVariants({ variant: 'yellow' })}>
+        <Link
+          href={`/${currentLocale}/latest-news`}
+          className={buttonVariants({ variant: 'yellow' })}
+        >
           {dict.viewAllCta}
         </Link>
       </div>
@@ -35,7 +40,7 @@ const LatestNews = ({
               <h3 className="mt-4 text-xl font-bold text-foreground">{copy.title}</h3>
               <p className="mt-2 text-sm text-foreground/70">{copy.excerpt}</p>
               <Link
-                href={item.href}
+                href={`/${currentLocale}${item.href}`}
                 className={`${buttonVariants({ variant: 'yellow' })} mt-4 self-start`}
               >
                 {dict.readCta}

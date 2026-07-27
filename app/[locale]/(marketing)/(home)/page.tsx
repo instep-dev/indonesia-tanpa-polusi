@@ -21,7 +21,7 @@ const Home = async ({
       <Hero dict={homeDict} />
       <AboutUs dict={homeDict.about} />
       <OurStories dict={homeDict.ourStories} cards={homeStoryCards} />
-      <LatestNews dict={homeDict.news} items={homeNewsCards} />
+      <LatestNews currentLocale={validLocale} dict={homeDict.news} items={homeNewsCards} />
       <ContactUs dict={homeDict.contact} contact={contactInfo} />
     </div>
   )
