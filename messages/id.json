@@ -1,8 +1,58 @@
 {
-  "marketing" : {
-    "home" : {
-      "hero" : {
-        "title" : "Hallow Dunia"
+  "marketing": {
+    "nav": {
+      "ourStories": "Cerita Kami",
+      "latestNews": "Berita Terbaru",
+      "sulawesi": "Sulawesi",
+      "malukuUtara": "Maluku Utara",
+      "kalimantanUtara": "Kalimantan Utara",
+      "contactUs": "Hubungi Kami",
+      "searchPlaceholder": "Cari"
+    },
+    "home": {
+      "hero": {
+        "title": "Hentikan PLTU Captive.",
+        "subtitle": "Saatnya Beralih ke Energi Bersih."
+      },
+      "about": {
+        "heading": "Tentang Kami",
+        "body": [
+          "Indonesia Tanpa Polusi adalah koalisi organisasi masyarakat sipil yang mendorong terwujudnya udara bersih dan energi yang berkeadilan di Indonesia. Kami menghadirkan informasi berbasis bukti serta mendorong kebijakan yang melindungi kesehatan masyarakat dan lingkungan.",
+          "Kami terdiri atas tiga koalisi utama yaitu Koalisi Sulawesi Tanpa Polusi (Sulosi), Maluku Utara Tanpa Polusi, dan Kalimantan Utara Tanpa Polusi. Masing-masing koalisi menaungi konsolidasi antarlembaga untuk langkah advokasi yang lebih konkret."
+        ]
+      },
+      "ourStories": {
+        "heading": "Cerita Kami",
+        "body": "Di balik pembangunan industri, ada kisah nyata yang jarang terdengar. Our Stories menghadirkan suara warga yang hidup berdampingan dengan PLTU Captive mulai dari perjuangan menghadapi polusi udara yang memicu ISPA, kehilangan mata pencaharian sebagai petani dan nelayan, hingga kehilangan tanah akibat perampasan lahan. Cerita-cerita ini menjadi pengingat bahwa setiap kebijakan memiliki dampak nyata terhadap kehidupan manusia.",
+        "cards": [
+          { "quote": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua." },
+          { "quote": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua." }
+        ]
+      },
+      "news": {
+        "heading": "Berita Terbaru",
+        "intro": "Temukan informasi lebih lanjut tentang liputan media terbaru, siaran pers, laporan, dan publikasi dari Koalisi Indonesia Tanpa Polusi.",
+        "viewAllCta": "Lihat semua berita",
+        "readCta": "Baca berita",
+        "items": {
+          "sulawesi": {
+            "title": "Sulawesi",
+            "excerpt": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+          },
+          "malukuUtara": {
+            "title": "Maluku Utara",
+            "excerpt": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+          },
+          "kalimantanUtara": {
+            "title": "Kalimantan Utara",
+            "excerpt": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+          }
+        }
+      },
+      "contact": {
+        "heading": "Hubungi kami",
+        "emailLabel": "Email",
+        "socialLabel": "Media Sosial"
       }
     }
   }

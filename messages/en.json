@@ -1,8 +1,58 @@
 {
-  "marketing" : {
-    "home" : {
-      "hero" : {
-        "title" : "Hellow World"
+  "marketing": {
+    "nav": {
+      "ourStories": "Our Stories",
+      "latestNews": "Latest News",
+      "sulawesi": "Sulawesi",
+      "malukuUtara": "North Maluku",
+      "kalimantanUtara": "North Kalimantan",
+      "contactUs": "Contact Us",
+      "searchPlaceholder": "Search"
+    },
+    "home": {
+      "hero": {
+        "title": "Stop Captive Coal-Fired Power Plants",
+        "subtitle": "Time to Switch to Clean Energy."
+      },
+      "about": {
+        "heading": "About Us",
+        "body": [
+          "Indonesia Tanpa Polusi (Indonesia Without Pollution) is a coalition of civil society organizations advocating for clean air and equitable energy in Indonesia. We provide evidence-based information and advocate for policies that protect public health and the environment.",
+          "We comprise three main coalitions: the Sulawesi Tanpa Polusi (Sulosi), Maluku Utara Tanpa Polusi, and Kalimantan Utara Tanpa Polusi. Each coalition oversees inter-institutional consolidation for more concrete advocacy measures."
+        ]
+      },
+      "ourStories": {
+        "heading": "Our Stories",
+        "body": "Behind the industrial development lies a rarely heard true story. Our Stories presents the voices of residents living alongside the Captive Coal-Fired Power Plant, from their struggles with air pollution that triggers acute respiratory infections (ARI), to the loss of livelihoods as farmers and fishermen, to the loss of land due to land grabbing. These stories serve as a reminder that every policy has a real impact on people's lives.",
+        "cards": [
+          { "quote": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua." },
+          { "quote": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua." }
+        ]
+      },
+      "news": {
+        "heading": "Latest News",
+        "intro": "Find more information about the latest media coverage, press releases, reports, and publications from the Indonesia Tanpa Polusi Coalition.",
+        "viewAllCta": "Click to see all news",
+        "readCta": "Click to read news",
+        "items": {
+          "sulawesi": {
+            "title": "Sulawesi",
+            "excerpt": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+          },
+          "malukuUtara": {
+            "title": "North Maluku",
+            "excerpt": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+          },
+          "kalimantanUtara": {
+            "title": "North Kalimantan",
+            "excerpt": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+          }
+        }
+      },
+      "contact": {
+        "heading": "Contact us",
+        "emailLabel": "Email",
+        "socialLabel": "Social Media"
       }
     }
   }
