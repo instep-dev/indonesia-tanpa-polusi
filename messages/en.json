@@ -49,6 +49,41 @@
           }
         }
       },
+      "regions": {
+        "sulawesi": {
+          "heroLabel": "Koalisi Sulawesi Tanpa Polusi",
+          "heroTitle": "Driving clean energy for future",
+          "heroSubtitle": "We empower coastal communities through responsible solutions and collaboration.",
+          "overviewHeading": "Sulawesi without pollution",
+          "overviewText": "Sulawesi communities are organizing to protect coastal ecosystems and public health from polluting power plant projects.",
+          "storiesHeading": "Our Stories",
+          "articleHeading": "Latest News",
+          "articleIntro": "Read the most recent updates from the Sulawesi coalition.",
+          "readCta": "Click to read news"
+        },
+        "malukuUtara": {
+          "heroLabel": "Koalisi Maluku Utara Tanpa Polusi",
+          "heroTitle": "Protecting island communities",
+          "heroSubtitle": "We advocate for fair energy solutions that keep the sea and shorelines healthy.",
+          "overviewHeading": "North Maluku without pollution",
+          "overviewText": "Maluku Utara is focused on defending local fisheries and coastal livelihoods from harmful emissions.",
+          "storiesHeading": "Our Stories",
+          "articleHeading": "Latest News",
+          "articleIntro": "Stay updated on press releases and campaigns from North Maluku.",
+          "readCta": "Click to read news"
+        },
+        "kalimantanUtara": {
+          "heroLabel": "Koalisi Kalimantan Utara Tanpa Polusi",
+          "heroTitle": "Care for forest and community",
+          "heroSubtitle": "We believe in energy justice that preserves clean air and local health.",
+          "overviewHeading": "North Kalimantan without pollution",
+          "overviewText": "Kalimantan Utara stands for sustainable development and protection of forests, rivers, and villages.",
+          "storiesHeading": "Our Stories",
+          "articleHeading": "Latest News",
+          "articleIntro": "Discover the latest actions and stories from North Kalimantan.",
+          "readCta": "Click to read news"
+        }
+      },
       "contact": {
         "heading": "Contact us",
         "emailLabel": "Email",

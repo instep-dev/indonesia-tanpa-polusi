@@ -49,6 +49,41 @@
           }
         }
       },
+      "regions": {
+        "sulawesi": {
+          "heroLabel": "Koalisi Sulawesi Tanpa Polusi",
+          "heroTitle": "Menggerakkan energi bersih untuk masa depan",
+          "heroSubtitle": "Kami memberdayakan komunitas pesisir melalui solusi bertanggung jawab dan kolaborasi.",
+          "overviewHeading": "Sulawesi tanpa polusi",
+          "overviewText": "Komunitas Sulawesi bergerak untuk melindungi ekosistem pesisir dan kesehatan publik dari proyek pembangkit yang mencemari.",
+          "storiesHeading": "Cerita Kami",
+          "articleHeading": "Berita Terbaru",
+          "articleIntro": "Baca perkembangan terbaru dari koalisi Sulawesi.",
+          "readCta": "Klik untuk membaca berita"
+        },
+        "malukuUtara": {
+          "heroLabel": "Koalisi Maluku Utara Tanpa Polusi",
+          "heroTitle": "Melindungi komunitas kepulauan",
+          "heroSubtitle": "Kami mendorong solusi energi yang adil agar laut dan garis pantai tetap sehat.",
+          "overviewHeading": "Maluku Utara tanpa polusi",
+          "overviewText": "Maluku Utara berfokus pada perlindungan perikanan lokal dan mata pencaharian pesisir dari emisi berbahaya.",
+          "storiesHeading": "Cerita Kami",
+          "articleHeading": "Berita Terbaru",
+          "articleIntro": "Tetap mendapat update tentang siaran pers dan kampanye dari Maluku Utara.",
+          "readCta": "Klik untuk membaca berita"
+        },
+        "kalimantanUtara": {
+          "heroLabel": "Koalisi Kalimantan Utara Tanpa Polusi",
+          "heroTitle": "Peduli hutan dan masyarakat",
+          "heroSubtitle": "Kami percaya pada keadilan energi yang menjaga udara bersih dan kesehatan lokal.",
+          "overviewHeading": "Kalimantan Utara tanpa polusi",
+          "overviewText": "Kalimantan Utara berdiri untuk pembangunan berkelanjutan dan perlindungan hutan, sungai, serta desa.",
+          "storiesHeading": "Cerita Kami",
+          "articleHeading": "Berita Terbaru",
+          "articleIntro": "Temukan aksi dan cerita terbaru dari Kalimantan Utara.",
+          "readCta": "Klik untuk membaca berita"
+        }
+      },
       "contact": {
         "heading": "Hubungi kami",
         "emailLabel": "Email",
