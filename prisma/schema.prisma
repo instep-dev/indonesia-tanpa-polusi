@@ -5,3 +5,69 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+// ─── Super admin — seeded manually, no self-signup ──────────────────────────
+
+model SuperAdmin {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String?
+  createdAt DateTime @default(now())
+
+  accessTokens  SuperAdminAccessToken[]
+  refreshTokens SuperAdminRefreshToken[]
+}
+
+model SuperAdminAccessToken {
+  id           String     @id @default(cuid())
+  tokenHash    String     @unique
+  superAdminId String
+  expiresAt    DateTime
+  createdAt    DateTime   @default(now())
+  superAdmin   SuperAdmin @relation(fields: [superAdminId], references: [id], onDelete: Cascade)
+}
+
+model SuperAdminRefreshToken {
+  id           String     @id @default(cuid())
+  tokenHash    String     @unique
+  superAdminId String
+  replacedById String?    @unique
+  revokedAt    DateTime?
+  expiresAt    DateTime
+  createdAt    DateTime   @default(now())
+  superAdmin   SuperAdmin @relation(fields: [superAdminId], references: [id], onDelete: Cascade)
+}
+
+// ─── Journalist — public self-signup ─────────────────────────────────────────
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String?
+  createdAt DateTime @default(now())
+
+  accessTokens  AccessToken[]
+  refreshTokens RefreshToken[]
+}
+
+model AccessToken {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model RefreshToken {
+  id           String    @id @default(cuid())
+  tokenHash    String    @unique
+  userId       String
+  replacedById String?   @unique
+  revokedAt    DateTime?
+  expiresAt    DateTime
+  createdAt    DateTime  @default(now())
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}

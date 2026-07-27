@@ -1,7 +1,9 @@
+name: indonesia-tanpa-polusi
+
 services:
   db:
     image: postgres:16
-    container_name: db_mcu_instep
+    container_name: db_indonesia_tanpa_polusi
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -18,7 +20,7 @@ services:
 
   pgadmin:
     image: dpage/pgadmin4:latest
-    container_name: pg_mcu_instep
+    container_name: pg_indonesia_tanpa_polusi
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}

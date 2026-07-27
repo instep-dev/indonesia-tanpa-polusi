@@ -1,15 +1,9 @@
-import React from 'react'
+import SuperAdminAuthProvider from '@/providers/SuperAdminAuthProvider'
 
-const SuperAdminLayout = ({
-  children
-} : {
-  children: React.ReactNode
-}) => {
-  return (
-    <section>
-      {children}
-    </section>
-  )
-}
+const SuperAdminLayout = ({ children }: { children: React.ReactNode }) => (
+  <SuperAdminAuthProvider>
+    <section>{children}</section>
+  </SuperAdminAuthProvider>
+)
 
 export default SuperAdminLayout

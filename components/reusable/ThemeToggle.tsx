@@ -8,6 +8,7 @@ const ThemeToggle = () => {
   const { theme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- standard next-themes hydration-mismatch guard, not a data sync effect
   useEffect(() => setMounted(true), [])
 
   if (!mounted) return null
@@ -19,15 +20,20 @@ const ThemeToggle = () => {
     // Signal direction BEFORE transition so CSS selector can read it immediately
     document.documentElement.setAttribute('data-theme-next', next)
 
-    if (!('startViewTransition' in document)) {
+    const doc = document as Document & {
+      startViewTransition?: (cb: () => void) => { finished: Promise<void> }
+    }
+
+    if (!doc.startViewTransition) {
       setTheme(next)
       document.documentElement.removeAttribute('data-theme-next')
       return
     }
 
-    const vt = (document as Document & {
-      startViewTransition: (cb: () => void) => { finished: Promise<void> }
-    }).startViewTransition(() => setTheme(next))
+    // Called as doc.startViewTransition(...) — a detached reference would
+    // lose the `this` binding native DOM methods require and throw
+    // "Illegal invocation".
+    const vt = doc.startViewTransition(() => setTheme(next))
 
     vt.finished.then(() =>
       document.documentElement.removeAttribute('data-theme-next')

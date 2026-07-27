@@ -1,13 +1,9 @@
-import React from 'react'
+import AuthProvider from '@/providers/AuthProvider'
 
-const MarketingLayout = ({
-  children
-} : {
-  children: React.ReactNode
-}) => {
-  return (
-    <main>{children}</main>
-  )
-}
+const DashboardLayout = ({ children }: { children: React.ReactNode }) => (
+  <AuthProvider>
+    <div className="min-h-screen">{children}</div>
+  </AuthProvider>
+)
 
-export default MarketingLayout
+export default DashboardLayout

@@ -3,7 +3,7 @@ export const trimText = ({
   maxLength = 50,
 } : {
   value: string | null,
-  maxLength: number
+  maxLength?: number
 }) => {
   const text = (value ?? "").trim()
   if (!text) return "-"
