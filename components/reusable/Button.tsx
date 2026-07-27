@@ -9,6 +9,7 @@ const buttonVariants = cva(
         primary: 'bg-foreground text-background hover:opacity-90',
         white: 'bg-white text-black border border-black/10 hover:bg-black/5',
         black: 'bg-black text-white hover:bg-black/80',
+        yellow: 'bg-brand-yellow text-brand-navy hover:opacity-90',
       },
     },
     defaultVariants: {
@@ -38,3 +39,4 @@ const Button = ({ children, Icon, onClick, variant, disabled, type = 'button' }:
 )
 
 export default Button
+export { buttonVariants }
