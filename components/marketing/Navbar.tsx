@@ -17,7 +17,7 @@ const Navbar = ({ currentLocale, dict }: NavbarProps) => {
   const [open, setOpen] = useState(false)
 
   return (
-    <header className="sticky top-0 z-40 border-b border-foreground/10 bg-background">
+    <header className="sticky top-0 z-40 w-full border-b border-foreground/10 bg-background">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-3 sm:px-10 lg:px-20">
         <Link href={`/${currentLocale}`} className="flex items-center gap-2">
           <Image
