@@ -6,7 +6,7 @@ const AboutUs = ({
   dict: Dictionary['marketing']['home']['about']
 }) => (
   <section className="bg-background px-6 py-16 sm:px-10 lg:px-20">
-    <div className="mx-auto max-w-4xl">
+    <div className="mx-auto max-w-6xl">
       <h2 className="text-3xl font-extrabold text-brand-navy dark:text-foreground sm:text-4xl">
         {dict.heading}
       </h2>

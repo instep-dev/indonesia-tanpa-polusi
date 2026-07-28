@@ -8,7 +8,7 @@ const Hero = ({
   const { title, subtitle } = dict.hero
 
   return (
-    <section className="relative w-full">
+    <section className="relative mx-auto max-w-6xl">
       <div className="relative h-[520px] w-full overflow-hidden bg-neutral-500 sm:h-[600px] lg:h-[680px]">
         <div className="absolute left-4 top-4 sm:left-8 sm:top-6">
           <span className="text-sm font-semibold text-white sm:text-base">
