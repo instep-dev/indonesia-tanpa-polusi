@@ -1,0 +1,125 @@
+'use client'
+
+import Image from 'next/image'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import { useState } from 'react'
+import { List, MagnifyingGlass, X } from '@phosphor-icons/react'
+import LangToggle from '@/components/reusable/LangToggle'
+import { cn } from '@/libs/utils'
+import { navLinks, type NavLinkKey } from '@/data/data'
+import type { Dictionary, Locale } from '@/i18n/getDictionary'
+
+type NavbarProps = {
+  currentLocale: Locale
+  dict: Dictionary['marketing']['nav']
+}
+
+const Navbar = ({ currentLocale, dict }: NavbarProps) => {
+  const [open, setOpen] = useState(false)
+  const pathname = usePathname()
+
+  const isLinkActive = (key: NavLinkKey, href: string): boolean => {
+    const target = `/${currentLocale}${href}`
+    // Next doesn't add a trailing slash to the home route — /en, not /en/.
+    if (href === '/') return pathname === `/${currentLocale}` || pathname === target
+    // Article detail pages live at /news/[slug], not nested under
+    // /latest-news — still highlight "Latest News" while reading one.
+    if (key === 'latestNews' && pathname.startsWith(`/${currentLocale}/news`)) return true
+    return pathname === target || pathname.startsWith(`${target}/`)
+  }
+
+  return (
+    <header className="sticky top-0 z-40 w-full border-b border-foreground/10 bg-background px-6 py-3 sm:px-10 lg:px-20">
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-4">
+        <Link href={`/${currentLocale}`} className="flex items-center gap-2">
+          <Image
+            src="/logo.png"
+            alt="Indonesia Tanpa Polusi"
+            width={36}
+            height={36}
+            className="rounded-full"
+          />
+        </Link>
+
+        <nav className="hidden items-center gap-6 text-sm font-medium text-brand-navy lg:flex dark:text-foreground">
+          {navLinks.map((link) => {
+            const active = isLinkActive(link.key, link.href)
+            return (
+              <Link
+                key={link.key}
+                href={`/${currentLocale}${link.href}`}
+                aria-current={active ? 'page' : undefined}
+                className={cn(
+                  'underline-offset-4',
+                  active
+                    ? 'font-semibold text-blue-600 underline'
+                    : 'hover:opacity-70',
+                )}
+              >
+                {dict[link.key]}
+              </Link>
+            )
+          })}
+        </nav>
+
+        <div className="hidden items-center gap-3 lg:flex">
+          <label className="flex items-center gap-2 rounded-full border border-foreground/10 px-3 py-1.5">
+            <MagnifyingGlass size={16} className="text-foreground/50" />
+            <input
+              type="text"
+              placeholder={dict.searchPlaceholder}
+              className="w-32 bg-transparent text-sm outline-none placeholder:text-foreground/40"
+            />
+          </label>
+          <LangToggle currentLocale={currentLocale} />
+        </div>
+
+        <button
+          onClick={() => setOpen((v) => !v)}
+          className="p-2 text-brand-navy lg:hidden dark:text-foreground"
+          aria-label="Toggle menu"
+        >
+          {open ? <X size={24} /> : <List size={24} />}
+        </button>
+      </div>
+
+      {open && (
+        <div className="border-t border-foreground/10 px-6 py-4 sm:px-10 lg:hidden">
+          <nav className="flex flex-col gap-4 text-sm font-medium text-brand-navy dark:text-foreground">
+            {navLinks.map((link) => {
+              const active = isLinkActive(link.key, link.href)
+              return (
+                <Link
+                  key={link.key}
+                  href={`/${currentLocale}${link.href}`}
+                  onClick={() => setOpen(false)}
+                  aria-current={active ? 'page' : undefined}
+                  className={cn(
+                    'underline-offset-4',
+                    active ? 'font-semibold text-blue-600 underline' : undefined,
+                  )}
+                >
+                  {dict[link.key]}
+                </Link>
+              )
+            })}
+          </nav>
+          <div className="mt-4 flex items-center gap-3">
+            <label className="flex flex-1 items-center gap-2 rounded-full border border-foreground/10 px-3 py-1.5">
+              <MagnifyingGlass size={16} className="text-foreground/50" />
+              <input
+                type="text"
+                placeholder={dict.searchPlaceholder}
+                className="w-full bg-transparent text-sm outline-none placeholder:text-foreground/40"
+              />
+            </label>
+            <LangToggle currentLocale={currentLocale} />
+          </div>
+        </div>
+      )}
+    </header>
+  )
+}
+
+export default Navbar

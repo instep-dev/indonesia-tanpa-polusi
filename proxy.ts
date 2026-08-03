@@ -33,9 +33,11 @@ export const proxy = (request: NextRequest): NextResponse | undefined => {
   // Super admin auth routes — skip all processing (must be checked before SUPER_ADMIN_PATHS)
   if (pathname.startsWith('/super-admin/auth')) return NextResponse.next()
 
-  // Super admin routes — separate auth guard + redirect target
+  // Super admin routes — separate auth guard + redirect target. Uses its own
+  // cookie name (not 'refresh_token') so a journalist session in the same
+  // browser can't collide with a super admin session.
   if (SUPER_ADMIN_PATHS.some((p) => pathname.startsWith(p))) {
-    const refreshToken = request.cookies.get('refresh_token')
+    const refreshToken = request.cookies.get('super_admin_refresh_token')
     if (!refreshToken) {
       return NextResponse.redirect(new URL('/super-admin/auth/login', request.url))
     }
@@ -67,6 +69,6 @@ export const proxy = (request: NextRequest): NextResponse | undefined => {
 
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|.*\\.(?:png|jpg|jpeg|gif|svg|ico|webp|mp4|pdf|woff|woff2|ttf|otf)).*)',
+    '/((?!_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|.*\\.(?:png|jpg|jpeg|gif|svg|ico|webp|mp4|webm|pdf|woff|woff2|ttf|otf)).*)',
   ],
 }

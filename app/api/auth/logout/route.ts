@@ -16,6 +16,6 @@ export const DELETE = async (request: NextRequest): Promise<NextResponse> => {
   }
 
   const response = NextResponse.json({ ok: true })
-  clearRefreshTokenCookie(response, '/api/auth/refresh')
+  clearRefreshTokenCookie(response)
   return response
 }

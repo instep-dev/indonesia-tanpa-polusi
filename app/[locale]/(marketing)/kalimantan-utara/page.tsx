@@ -1,6 +1,6 @@
 import { getDictionary, type Locale } from '@/i18n/getDictionary'
 import RegionPage from '@/components/marketing/RegionPage'
-import { regionPages } from '@/data/data'
+import { regionStories } from '@/data/data'
 
 const KalimantanUtaraPage = async ({ params }: { params: Promise<{ locale: string }> }) => {
   const { locale } = await params
@@ -10,9 +10,10 @@ const KalimantanUtaraPage = async ({ params }: { params: Promise<{ locale: strin
   return (
     <RegionPage
       currentLocale={validLocale}
+      regionSlug="kalimantanUtara"
       dict={dict.marketing.home.regions.kalimantanUtara}
-      stories={regionPages.kalimantanUtara.stories}
-      articles={regionPages.kalimantanUtara.articles}
+      newsListDict={dict.marketing.home.news}
+      stories={regionStories.kalimantanUtara}
     />
   )
 }

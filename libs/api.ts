@@ -6,7 +6,10 @@ import { superAdminAuthStore } from '@/services/super-admin/super-admin-auth.sto
 export const http = axios.create({
   baseURL: getBaseApiUrl(),
   withCredentials: true,
-  timeout: 10_000,
+  // Generous margin for the submit-for-review flow, which now runs real
+  // translation work (LibreTranslate) server-side before responding, plus
+  // Turbopack's on-demand route compile time in dev on a route's first hit.
+  timeout: 30_000,
   headers: { 'Content-Type': 'application/json' },
 })
 
@@ -31,7 +34,16 @@ http.interceptors.response.use(
   (res) => res,
   async (error) => {
     const original = error.config
-    if (error.response?.status !== 401 || original._retry) return Promise.reject(error)
+    const isRefreshCall = original?.url?.includes('/auth/refresh')
+
+    // The refresh endpoints' own 401s are not "an expired access token" —
+    // they mean there's no valid session at all (e.g. AuthProvider's bootstrap
+    // probe on a logged-out visitor). Retrying them here would recursively
+    // call refresh again and, on failure, force-redirect a user who may not
+    // even be trying to be logged in. Let the caller (AuthProvider) handle it.
+    if (error.response?.status !== 401 || original._retry || isRefreshCall) {
+      return Promise.reject(error)
+    }
     original._retry = true
 
     if (isRefreshing) {

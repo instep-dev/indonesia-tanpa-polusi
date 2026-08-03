@@ -3,11 +3,19 @@ import type { NextRequest } from 'next/server'
 import bcrypt from 'bcryptjs'
 import { db } from '@/libs/db'
 import { generateToken, hashToken } from '@/libs/validateToken'
-import { ACCESS_TOKEN_TTL_MS, REFRESH_TOKEN_TTL_MS, setRefreshTokenCookie } from '@/libs/tokenConfig'
+import { parseJsonBody } from '@/libs/parseJsonBody'
+import {
+  ACCESS_TOKEN_TTL_MS,
+  REFRESH_TOKEN_TTL_MS,
+  SUPER_ADMIN_REFRESH_TOKEN_COOKIE,
+  setRefreshTokenCookie,
+} from '@/libs/tokenConfig'
 import type { SuperAdminAuthResponse, SuperAdminLoginBody } from '@/services/super-admin/super-admin-auth.dto'
 
 export const POST = async (request: NextRequest): Promise<NextResponse> => {
-  const { email, password } = (await request.json()) as SuperAdminLoginBody
+  const parsed = await parseJsonBody<SuperAdminLoginBody>(request)
+  if (!parsed.ok) return parsed.response
+  const { email, password } = parsed.body
 
   const superAdmin = await db.superAdmin.findUnique({ where: { email } })
   if (!superAdmin || !(await bcrypt.compare(password, superAdmin.password))) {
@@ -43,6 +51,6 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
     },
   })
 
-  setRefreshTokenCookie(response, rawRefresh, '/api/super-admin/auth/refresh')
+  setRefreshTokenCookie(response, rawRefresh, SUPER_ADMIN_REFRESH_TOKEN_COOKIE)
   return response
 }

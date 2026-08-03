@@ -2,10 +2,10 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { db } from '@/libs/db'
 import { hashToken } from '@/libs/validateToken'
-import { clearRefreshTokenCookie } from '@/libs/tokenConfig'
+import { SUPER_ADMIN_REFRESH_TOKEN_COOKIE, clearRefreshTokenCookie } from '@/libs/tokenConfig'
 
 export const DELETE = async (request: NextRequest): Promise<NextResponse> => {
-  const rawRefresh = request.cookies.get('refresh_token')?.value
+  const rawRefresh = request.cookies.get(SUPER_ADMIN_REFRESH_TOKEN_COOKIE)?.value
 
   if (rawRefresh) {
     const existing = await db.superAdminRefreshToken.findUnique({
@@ -18,6 +18,6 @@ export const DELETE = async (request: NextRequest): Promise<NextResponse> => {
   }
 
   const response = NextResponse.json({ ok: true })
-  clearRefreshTokenCookie(response, '/api/super-admin/auth/refresh')
+  clearRefreshTokenCookie(response, SUPER_ADMIN_REFRESH_TOKEN_COOKIE)
   return response
 }

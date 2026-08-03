@@ -14,7 +14,11 @@ const LocaleLayout = async ({
   const dict = await getDictionary(validLocale);
 
   return (
-    <MarketingLayout locale={validLocale} navDict={dict.marketing.nav}>
+    <MarketingLayout
+      locale={validLocale}
+      navDict={dict.marketing.nav}
+      contactDict={dict.marketing.home.contact}
+    >
       {children}
     </MarketingLayout>
   );

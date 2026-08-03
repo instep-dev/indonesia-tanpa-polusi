@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import bcrypt from 'bcryptjs'
 import { db } from '@/libs/db'
+import { parseJsonBody } from '@/libs/parseJsonBody'
+import { mapUser } from '@/libs/mapUser'
 import type { RegisterBody, UserDto } from '@/services/auth/auth.dto'
 
 const SALT_ROUNDS = 12
@@ -9,7 +11,9 @@ const SALT_ROUNDS = 12
 // Account creation only — no tokens issued here. The signup flow hands the
 // journalist back to /auth/login (see the citizen-journalism UX flow).
 export const POST = async (request: NextRequest): Promise<NextResponse> => {
-  const { email, password, name } = (await request.json()) as RegisterBody
+  const parsed = await parseJsonBody<RegisterBody>(request)
+  if (!parsed.ok) return parsed.response
+  const { email, password, name } = parsed.body
 
   const existing = await db.user.findUnique({ where: { email } })
   if (existing) {
@@ -21,8 +25,5 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
     data: { email, password: hashedPassword, name },
   })
 
-  return NextResponse.json<UserDto>(
-    { id: user.id, email: user.email, name: user.name, createdAt: user.createdAt.toISOString() },
-    { status: 201 },
-  )
+  return NextResponse.json<UserDto>(mapUser(user), { status: 201 })
 }

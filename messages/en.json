@@ -1,6 +1,7 @@
 {
   "marketing": {
     "nav": {
+      "home": "Home",
       "ourStories": "Our Stories",
       "latestNews": "Latest News",
       "sulawesi": "Sulawesi",
@@ -34,6 +35,13 @@
         "intro": "Find more information about the latest media coverage, press releases, reports, and publications from the Indonesia Tanpa Polusi Coalition.",
         "viewAllCta": "Click to see all news",
         "readCta": "Click to read news",
+        "searchPlaceholder": "Search news…",
+        "loading": "Loading news…",
+        "loadingMore": "Loading more…",
+        "empty": "No news published yet.",
+        "noResults": "No news matches your search.",
+        "error": "Couldn't load news. Please try again.",
+        "retry": "Retry",
         "items": {
           "sulawesi": {
             "title": "Sulawesi",
@@ -51,43 +59,111 @@
       },
       "regions": {
         "sulawesi": {
-          "heroLabel": "Koalisi Sulawesi Tanpa Polusi",
-          "heroTitle": "Driving clean energy for future",
-          "heroSubtitle": "We empower coastal communities through responsible solutions and collaboration.",
-          "overviewHeading": "Sulawesi without pollution",
-          "overviewText": "Sulawesi communities are organizing to protect coastal ecosystems and public health from polluting power plant projects.",
-          "storiesHeading": "Our Stories",
-          "articleHeading": "Latest News",
-          "articleIntro": "Read the most recent updates from the Sulawesi coalition.",
-          "readCta": "Click to read news"
+          "hero": {
+            "title": "Stop Captive Coal-Fired Power Plants in Sulawesi",
+            "subtitle": "Time to Switch to Clean Energy."
+          },
+          "about": {
+            "heading": "About Us",
+            "body": ["Koalisi Sulawesi Tanpa Polusi (SULOSI) is a civil society coalition comprising various environmental organizations, legal aid groups, citizen communities, academics, and individuals united by the shared goal of promoting cleaner energy development in Sulawesi.", "The coalition's primary focus is to reduce pollution impacts from coal-fired power plants, particularly \"captive\" plants supplying electricity to nickel processing industrial zones and to advocate for the protection of the rights of affected communities."]
+          },
+          "ourStories": {
+            "heading": "Our Stories",
+            "body": "Behind the industrial development lies a rarely heard true story. Our Stories presents the voices of residents living alongside the Captive Coal-Fired Power Plant, from their struggles with air pollution that triggers acute respiratory infections (ARI), to the loss of livelihoods as farmers and fishermen, to the loss of land due to land grabbing. These stories serve as a reminder that every policy has a real impact on people's lives.",
+            "cards": [
+              { "quote": "They used the pretext of \"greening,\" but I suspect it's actually for \"darkening\"! It might become a new place for the nickel industry." },
+              { "quote": "They claim to be serious about the energy transition. They say they care about the climate. They say they want to protect the forests. Yet, at the same time, coal-fired power plants are still belching smoke." }
+            ]
+          },
+          "news": {
+            "heading": "Latest News",
+            "intro": "Find more information about the latest media coverage, press releases, reports, and publications from the Indonesia Tanpa Polusi Coalition.",
+            "readCta": "Click to read news"
+          }
         },
         "malukuUtara": {
-          "heroLabel": "Koalisi Maluku Utara Tanpa Polusi",
-          "heroTitle": "Protecting island communities",
-          "heroSubtitle": "We advocate for fair energy solutions that keep the sea and shorelines healthy.",
-          "overviewHeading": "North Maluku without pollution",
-          "overviewText": "Maluku Utara is focused on defending local fisheries and coastal livelihoods from harmful emissions.",
-          "storiesHeading": "Our Stories",
-          "articleHeading": "Latest News",
-          "articleIntro": "Stay updated on press releases and campaigns from North Maluku.",
-          "readCta": "Click to read news"
+          "hero": {
+            "title": "Stop Captive Coal-Fired Power Plants in North Maluku",
+            "subtitle": "Time to Switch to Clean Energy."
+          },
+          "about": {
+            "heading": "About Us",
+            "body": ["Koalisi Maluku Utara Tanpa Polusi is a civil society coalition comprising various environmental organizations, legal aid groups, citizen communities, academics, and individuals united by the shared goal of promoting cleaner energy development in Sulawesi.", "The coalition's primary focus is to reduce pollution impacts from coal-fired power plants, particularly \"captive\" plants supplying electricity to nickel processing industrial zones and to advocate for the protection of the rights of affected communities."]
+          },
+          "ourStories": {
+            "heading": "Our Stories",
+            "body": "Behind the industrial development lies a rarely heard true story. Our Stories presents the voices of residents living alongside the Captive Coal-Fired Power Plant, from their struggles with air pollution that triggers acute respiratory infections (ARI), to the loss of livelihoods as farmers and fishermen, to the loss of land due to land grabbing. These stories serve as a reminder that every policy has a real impact on people's lives.",
+            "cards": [
+              { "quote": "Deteriorating air quality, contaminated water sources, and an increased risk of health problems are realities faced by many communities living near industrial zones and extractive activity sites." },
+              { "quote": "When the air being breathed is no longer clean and water sources become increasingly contaminated, the impact is felt directly by residents, especially vulnerable groups such as children, the elderly, and those with respiratory conditions." }
+            ]
+          },
+          "news": {
+            "heading": "Latest News",
+            "intro": "Find more information about the latest media coverage, press releases, reports, and publications from the Indonesia Tanpa Polusi Coalition.",
+            "readCta": "Click to read news"
+          }
         },
         "kalimantanUtara": {
-          "heroLabel": "Koalisi Kalimantan Utara Tanpa Polusi",
-          "heroTitle": "Care for forest and community",
-          "heroSubtitle": "We believe in energy justice that preserves clean air and local health.",
-          "overviewHeading": "North Kalimantan without pollution",
-          "overviewText": "Kalimantan Utara stands for sustainable development and protection of forests, rivers, and villages.",
-          "storiesHeading": "Our Stories",
-          "articleHeading": "Latest News",
-          "articleIntro": "Discover the latest actions and stories from North Kalimantan.",
-          "readCta": "Click to read news"
+          "hero": {
+            "title": "Stop Captive Coal-Fired Power Plants in North Kalimantan",
+            "subtitle": "Time to Switch to Clean Energy."
+          },
+          "about": {
+            "heading": "About Us",
+            "body": ["Koalisi Kalimantan Utara Tanpa Polusi is a civil society coalition comprising various environmental organizations, legal aid groups, citizen communities, academics, and individuals united by the shared goal of promoting cleaner energy development in Sulawesi.", "The coalition's primary focus is to reduce pollution impacts from coal-fired power plants, particularly \"captive\" plants supplying electricity to nickel processing industrial zones and to advocate for the protection of the rights of affected communities."]
+          },
+          "ourStories": {
+            "heading": "Our Stories",
+            "body": "Behind the industrial development lies a rarely heard true story. Our Stories presents the voices of residents living alongside the Captive Coal-Fired Power Plant, from their struggles with air pollution that triggers acute respiratory infections (ARI), to the loss of livelihoods as farmers and fishermen, to the loss of land due to land grabbing. These stories serve as a reminder that every policy has a real impact on people's lives.",
+            "cards": [
+              { "quote": "For the people of North Kalimantan, the sea, forests, and land are not merely natural resources whose economic value can be quantified." },
+              { "quote": "When this living space changes or is destroyed, what is lost is not merely the landscape, but also a way of life that has been built up over decades or even centuries." }
+            ]
+          },
+          "news": {
+            "heading": "Latest News",
+            "intro": "Find more information about the latest media coverage, press releases, reports, and publications from the Indonesia Tanpa Polusi Coalition.",
+            "readCta": "Click to read news"
+          }
         }
       },
       "contact": {
         "heading": "Contact us",
         "emailLabel": "Email",
         "socialLabel": "Social Media"
+      }
+    },
+    "latestNews": {
+      "hero": {
+        "title": "Our Actions & Updates",
+        "subtitle": "Stay informed with the latest news, campaigns, and updates from Indonesia Tanpa Polusi coalition."
+      }
+    },
+    "newsDetail": {
+      "notFoundTitle": "News not found",
+      "notFoundBody": "The article you're looking for doesn't exist or may have been removed.",
+      "backCta": "Back to Latest News",
+      "about": {
+        "heading": "About this News",
+        "description": "We value transparency, accountability, and communication with you, our stakeholders, in this effort to make the best we can for our community.",
+        "cards": [
+          {
+            "title": "Report",
+            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            "cta": "Access the report"
+          },
+          {
+            "title": "Press Release",
+            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            "cta": "Access to the Press Release"
+          },
+          {
+            "title": "Visuals",
+            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            "cta": "Visual Documentations"
+          }
+        ]
       }
     }
   }

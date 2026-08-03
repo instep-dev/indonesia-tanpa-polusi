@@ -29,5 +29,19 @@ services:
     depends_on:
       - db
 
+  libretranslate:
+    image: libretranslate/libretranslate:latest
+    container_name: libretranslate_indonesia_tanpa_polusi
+    environment:
+      # Only load the two language pairs the CMS actually needs — skips
+      # downloading/loading the full model catalog, much faster startup.
+      LT_LOAD_ONLY: en,id
+      LT_DISABLE_WEB_UI: "true"
+    ports:
+      - "5001:5000"
+    volumes:
+      - libretranslate_models:/home/libretranslate/.local
+
 volumes:
   pgdata:
+  libretranslate_models:

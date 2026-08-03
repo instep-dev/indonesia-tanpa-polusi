@@ -2,11 +2,16 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { db } from '@/libs/db'
 import { generateToken, hashToken } from '@/libs/validateToken'
-import { ACCESS_TOKEN_TTL_MS, REFRESH_TOKEN_TTL_MS, setRefreshTokenCookie } from '@/libs/tokenConfig'
+import {
+  ACCESS_TOKEN_TTL_MS,
+  REFRESH_TOKEN_TTL_MS,
+  SUPER_ADMIN_REFRESH_TOKEN_COOKIE,
+  setRefreshTokenCookie,
+} from '@/libs/tokenConfig'
 import type { SuperAdminAuthResponse } from '@/services/super-admin/super-admin-auth.dto'
 
 export const POST = async (request: NextRequest): Promise<NextResponse> => {
-  const rawRefresh = request.cookies.get('refresh_token')?.value
+  const rawRefresh = request.cookies.get(SUPER_ADMIN_REFRESH_TOKEN_COOKIE)?.value
   if (!rawRefresh) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const existing = await db.superAdminRefreshToken.findUnique({
@@ -18,6 +23,13 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 
   const superAdmin = await db.superAdmin.findUnique({ where: { id: existing.superAdminId } })
   if (!superAdmin) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  // Consume the refresh token first, guarding against a concurrent request
+  // that already rotated it (deleteMany doesn't throw on a missing row).
+  const consumed = await db.superAdminRefreshToken.deleteMany({ where: { id: existing.id } })
+  if (consumed.count === 0) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
 
   const rawAccess = generateToken()
   const rawNewRefresh = generateToken()
@@ -31,7 +43,6 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
     },
   })
 
-  await db.superAdminRefreshToken.delete({ where: { id: existing.id } })
   await db.superAdminRefreshToken.create({
     data: {
       tokenHash: hashToken(rawNewRefresh),
@@ -50,6 +61,6 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
     },
   })
 
-  setRefreshTokenCookie(response, rawNewRefresh, '/api/super-admin/auth/refresh')
+  setRefreshTokenCookie(response, rawNewRefresh, SUPER_ADMIN_REFRESH_TOKEN_COOKIE)
   return response
 }

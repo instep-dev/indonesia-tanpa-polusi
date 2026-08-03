@@ -15,8 +15,10 @@ model SuperAdmin {
   name      String?
   createdAt DateTime @default(now())
 
-  accessTokens  SuperAdminAccessToken[]
-  refreshTokens SuperAdminRefreshToken[]
+  accessTokens       SuperAdminAccessToken[]
+  refreshTokens      SuperAdminRefreshToken[]
+  reviewedArticles   Article[]
+  approvedJournalists User[]
 }
 
 model SuperAdminAccessToken {
@@ -48,8 +50,15 @@ model User {
   name      String?
   createdAt DateTime @default(now())
 
+  // Self-registered journalists start unapproved — a SuperAdmin must
+  // approve the account before its owner can create/submit articles.
+  approvedAt   DateTime?
+  approvedById String?
+  approvedBy   SuperAdmin? @relation(fields: [approvedById], references: [id])
+
   accessTokens  AccessToken[]
   refreshTokens RefreshToken[]
+  articles      Article[]
 }
 
 model AccessToken {
@@ -70,4 +79,62 @@ model RefreshToken {
   expiresAt    DateTime
   createdAt    DateTime  @default(now())
   user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ─── CMS: Articles ────────────────────────────────────────────────────────
+
+model Region {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  nameId    String
+  nameEn    String
+  createdAt DateTime @default(now())
+
+  articles Article[]
+}
+
+model Article {
+  id   String @id @default(cuid())
+  slug String @unique
+
+  titleId   String
+  titleEn   String
+  excerptId String
+  excerptEn String
+  contentId Json
+  contentEn Json
+
+  sourceLocale      String
+  translationStatus String @default("PENDING")
+
+  coverImage String?
+
+  status          String    @default("DRAFT")
+  rejectionReason String?
+  publishedAt     DateTime?
+  deletedAt       DateTime?
+
+  regionId String?
+  region   Region? @relation(fields: [regionId], references: [id])
+
+  authorId String
+  author   User   @relation(fields: [authorId], references: [id])
+
+  reviewedById String?
+  reviewedBy   SuperAdmin? @relation(fields: [reviewedById], references: [id])
+
+  images ArticleImage[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ArticleImage {
+  id        String   @id @default(cuid())
+  articleId String
+  article   Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  url       String
+  caption   String?
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
 }

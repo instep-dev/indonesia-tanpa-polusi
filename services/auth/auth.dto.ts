@@ -2,6 +2,7 @@ export type UserDto = {
   id: string
   email: string
   name: string | null
+  approvedAt: string | null
   createdAt: string
 }
 

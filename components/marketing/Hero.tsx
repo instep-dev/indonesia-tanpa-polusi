@@ -10,18 +10,30 @@ const Hero = ({
   return (
     <section className="relative w-full">
       <div className="relative h-[520px] w-full overflow-hidden bg-neutral-500 sm:h-[600px] lg:h-[680px]">
-        <div className="absolute inset-0 mx-auto max-w-6xl pointer-events-none">
-          <div className="absolute left-4 top-4 sm:left-8 sm:top-6 pointer-events-auto">
+        <video
+          className="absolute inset-0 h-full w-full object-cover"
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="auto"
+        >
+          <source src="/heros.compressed.mp4" type="video/mp4" />
+        </video>
+        <div className='bg-black/30 absolute inset-0 z-10'/>
+
+        <div className="absolute inset-0 mx-auto max-w-6xl pointer-events-none z-20">
+          <div className="absolute left-0 top-0 sm:left-0 sm:top-6 pointer-events-auto">
             <span className="text-sm font-semibold text-white sm:text-base">
               Indonesia Tanpa Polusi
             </span>
           </div>
 
-          <div className="absolute bottom-8 left-4 right-4 sm:bottom-12 sm:left-auto sm:right-10 sm:max-w-md lg:right-16 lg:max-w-lg pointer-events-auto">
+          <div className="absolute bottom-12 right-0 pointer-events-auto">
             <h1 className="text-3xl font-extrabold leading-tight text-brand-yellow sm:text-4xl lg:text-5xl">
               {title}
             </h1>
-            <p className="mt-4 text-sm text-white sm:text-base">{subtitle}</p>
+            <p className="mt-4 max-w-2xl text-sm text-white sm:text-base">{subtitle}</p>
           </div>
         </div>
       </div>

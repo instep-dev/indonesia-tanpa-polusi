@@ -3,11 +3,15 @@ import type { NextRequest } from 'next/server'
 import bcrypt from 'bcryptjs'
 import { db } from '@/libs/db'
 import { generateToken, hashToken } from '@/libs/validateToken'
+import { parseJsonBody } from '@/libs/parseJsonBody'
+import { mapUser } from '@/libs/mapUser'
 import { ACCESS_TOKEN_TTL_MS, REFRESH_TOKEN_TTL_MS, setRefreshTokenCookie } from '@/libs/tokenConfig'
 import type { AuthResponse, LoginBody } from '@/services/auth/auth.dto'
 
 export const POST = async (request: NextRequest): Promise<NextResponse> => {
-  const { email, password } = (await request.json()) as LoginBody
+  const parsed = await parseJsonBody<LoginBody>(request)
+  if (!parsed.ok) return parsed.response
+  const { email, password } = parsed.body
 
   const user = await db.user.findUnique({ where: { email } })
   if (!user || !(await bcrypt.compare(password, user.password))) {
@@ -35,9 +39,9 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
 
   const response = NextResponse.json<AuthResponse>({
     accessToken: rawAccess,
-    user: { id: user.id, email: user.email, name: user.name, createdAt: user.createdAt.toISOString() },
+    user: mapUser(user),
   })
 
-  setRefreshTokenCookie(response, rawRefresh, '/api/auth/refresh')
+  setRefreshTokenCookie(response, rawRefresh)
   return response
 }
