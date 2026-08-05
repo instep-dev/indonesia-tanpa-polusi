@@ -30,19 +30,11 @@ const NewsDetailPage = async ({ params }: NewsDetailPageProps) => {
 
   return (
     <div>
-      <section className="relative flex h-screen w-full flex-col overflow-hidden bg-neutral-500">
+      <section id="hero-viewport" className="relative flex h-screen w-full flex-col overflow-hidden bg-neutral-500">
         <div
           className="absolute inset-0 -z-10 bg-cover bg-center"
           style={article.coverImage ? { backgroundImage: `url(${article.coverImage})` } : undefined}
         />
-
-        <div className="px-6 pt-6 sm:px-10 sm:pt-8 lg:px-20">
-          <div className="mx-auto max-w-6xl">
-            <span className="text-sm font-semibold text-white sm:text-base">
-              Indonesia Tanpa Polusi
-            </span>
-          </div>
-        </div>
 
         <div className="mt-auto bg-[#33477d]/85 px-6 py-10 sm:px-10 sm:py-12 lg:px-20 lg:py-16">
           <div className="mx-auto max-w-6xl">

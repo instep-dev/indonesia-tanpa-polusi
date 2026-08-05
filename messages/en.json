@@ -2,7 +2,6 @@
   "marketing": {
     "nav": {
       "home": "Home",
-      "ourStories": "Our Stories",
       "latestNews": "Latest News",
       "sulawesi": "Sulawesi",
       "malukuUtara": "North Maluku",
@@ -13,14 +12,17 @@
     "home": {
       "hero": {
         "title": "Stop Captive Coal-Fired Power Plants",
-        "subtitle": "Time to Switch to Clean Energy."
+        "subtitle": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Rem sed aliquam at optio cumque libero, accusamus eum, nostrum repellat fugit, fuga numquam non facere possimus?",
+        "cta": "Explore more"
       },
       "about": {
-        "heading": "About Us",
+        "label": "About Us",
+        "title": "Indonesia Tanpa Polusi is a coalition of civil society organizations",
         "body": [
           "Indonesia Tanpa Polusi (Indonesia Without Pollution) is a coalition of civil society organizations advocating for clean air and equitable energy in Indonesia. We provide evidence-based information and advocate for policies that protect public health and the environment.",
           "We comprise three main coalitions: the Sulawesi Tanpa Polusi (Sulosi), Maluku Utara Tanpa Polusi, and Kalimantan Utara Tanpa Polusi. Each coalition oversees inter-institutional consolidation for more concrete advocacy measures."
-        ]
+        ],
+        "cta": "Explore more"
       },
       "ourStories": {
         "heading": "Our Stories",
@@ -44,16 +46,16 @@
         "retry": "Retry",
         "items": {
           "sulawesi": {
-            "title": "Sulawesi",
-            "excerpt": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+            "title": "Pushing for Renewable Energy, Yet Still Leaving Room for Coal",
+            "source": "Instagram Walhisultra"
           },
           "malukuUtara": {
-            "title": "North Maluku",
-            "excerpt": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+            "title": "The Environmental Crisis Impact Is Already Here, Not a Future Threat",
+            "source": "Instagram @canga_kawasi collab with @malukuutaratanpapolusi"
           },
           "kalimantanUtara": {
-            "title": "North Kalimantan",
-            "excerpt": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+            "title": "Protecting North Kalimantan Communities' Living Space Through Participation and Ecological Justice",
+            "source": "PLHL documentation"
           }
         }
       },

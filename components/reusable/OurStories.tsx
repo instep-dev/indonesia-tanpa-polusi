@@ -10,7 +10,7 @@ const OurStories = ({
   dict: Dictionary['marketing']['home']['ourStories']
   cards: StoryCard[]
 }) => (
-  <section className="bg-brand-yellow px-6 py-16 sm:px-10 lg:px-20">
+  <section id="stories" className="bg-brand-yellow px-6 py-16 sm:px-10 lg:px-20">
     <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]">
       <div>
         <h2 className="text-3xl font-extrabold text-brand-navy sm:text-4xl">
@@ -28,7 +28,7 @@ const OurStories = ({
           ]
           const image = imageMap[index]
           return (
-            <div key={card.id} className="flex flex-col overflow-hidden rounded-sm">
+            <div key={card.id} className="flex flex-col overflow-hidden rounded-lg">
               <div className="aspect-square w-full bg-neutral-500 relative">
                 <Image src={image} alt={''} fill className='w-full h-full object-cover absolute inset-0 '/>
               </div>

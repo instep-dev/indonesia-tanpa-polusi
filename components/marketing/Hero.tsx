@@ -5,11 +5,11 @@ const Hero = ({
 }: {
   dict: Dictionary['marketing']['home']
 }) => {
-  const { title, subtitle } = dict.hero
+  const { title, subtitle, cta } = dict.hero
 
   return (
     <section className="relative w-full">
-      <div className="relative h-[520px] w-full overflow-hidden bg-neutral-500 sm:h-[600px] lg:h-[680px]">
+      <div id="hero-viewport" className="relative w-full overflow-hidden bg-neutral-500 h-screen">
         <video
           className="absolute inset-0 h-full w-full object-cover"
           autoPlay
@@ -23,17 +23,17 @@ const Hero = ({
         <div className='bg-black/30 absolute inset-0 z-10'/>
 
         <div className="absolute inset-0 mx-auto max-w-6xl pointer-events-none z-20">
-          <div className="absolute left-0 top-0 sm:left-0 sm:top-6 pointer-events-auto">
-            <span className="text-sm font-semibold text-white sm:text-base">
-              Indonesia Tanpa Polusi
-            </span>
-          </div>
-
-          <div className="absolute bottom-12 right-0 pointer-events-auto">
-            <h1 className="text-3xl font-extrabold leading-tight text-brand-yellow sm:text-4xl lg:text-5xl">
+          <div className="absolute bottom-12 left-0 pointer-events-auto sm:bottom-16">
+            <h1 className="text-3xl max-w-2xl font-medium leading-tight text-white sm:text-4xl lg:text-6xl">
               {title}
             </h1>
             <p className="mt-4 max-w-2xl text-sm text-white sm:text-base">{subtitle}</p>
+            <a
+              href="#about"
+              className="mt-6 inline-block rounded-full bg-brand-yellow px-6 py-2.5 text-sm font-semibold text-brand-navy transition hover:opacity-90"
+            >
+              {cta}
+            </a>
           </div>
         </div>
       </div>

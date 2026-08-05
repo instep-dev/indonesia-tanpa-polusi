@@ -2,7 +2,6 @@
   "marketing": {
     "nav": {
       "home": "Home",
-      "ourStories": "Cerita Kami",
       "latestNews": "Berita Terbaru",
       "sulawesi": "Sulawesi",
       "malukuUtara": "Maluku Utara",
@@ -13,21 +12,24 @@
     "home": {
       "hero": {
         "title": "Hentikan PLTU Captive.",
-        "subtitle": "Saatnya Beralih ke Energi Bersih."
+        "subtitle": "Saatnya beralih ke energi bersih. Mari bersama menghentikan pembangunan PLTU captive dan mendorong transisi menuju sumber energi yang lebih sehat, adil, dan berkelanjutan bagi seluruh masyarakat Indonesia.",
+        "cta": "Jelajahi lebih lanjut"
       },
       "about": {
-        "heading": "Tentang Kami",
+        "label": "Tentang Kami",
+        "title": "Indonesia Tanpa Polusi adalah koalisi organisasi masyarakat sipil",
         "body": [
           "Indonesia Tanpa Polusi adalah koalisi organisasi masyarakat sipil yang mendorong terwujudnya udara bersih dan energi yang berkeadilan di Indonesia. Kami menghadirkan informasi berbasis bukti serta mendorong kebijakan yang melindungi kesehatan masyarakat dan lingkungan.",
           "Kami terdiri atas tiga koalisi utama yaitu Koalisi Sulawesi Tanpa Polusi (Sulosi), Maluku Utara Tanpa Polusi, dan Kalimantan Utara Tanpa Polusi. Masing-masing koalisi menaungi konsolidasi antarlembaga untuk langkah advokasi yang lebih konkret."
-        ]
+        ],
+        "cta": "Jelajahi lebih lanjut"
       },
       "ourStories": {
         "heading": "Cerita Kami",
         "body": "Di balik pembangunan industri, ada kisah nyata yang jarang terdengar. Our Stories menghadirkan suara warga yang hidup berdampingan dengan PLTU Captive mulai dari perjuangan menghadapi polusi udara yang memicu ISPA, kehilangan mata pencaharian sebagai petani dan nelayan, hingga kehilangan tanah akibat perampasan lahan. Cerita-cerita ini menjadi pengingat bahwa setiap kebijakan memiliki dampak nyata terhadap kehidupan manusia.",
         "cards": [
-          { "quote": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua." },
-          { "quote": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua." }
+          { "quote": "Mengapa kami harus sakit untuk listrik yang tak kami nikmati?" },
+          { "quote": "Saat laut tercemar, hidup ikut terenggut." }
         ]
       },
       "news": {
@@ -44,16 +46,16 @@
         "retry": "Coba lagi",
         "items": {
           "sulawesi": {
-            "title": "Sulawesi",
-            "excerpt": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+            "title": "Mendorong Energi Terbarukan, tetapi Masih Memberi Ruang bagi Batu Bara",
+            "source": "Instagram Walhisultra"
           },
           "malukuUtara": {
-            "title": "Maluku Utara",
-            "excerpt": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+            "title": "Dampak Krisis Lingkungan Sudah Terjadi, Bukan Ancaman di Masa Depan",
+            "source": "Instagram @canga_kawasi colab with @malukuutaratanpapolusi"
           },
           "kalimantanUtara": {
-            "title": "Kalimantan Utara",
-            "excerpt": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+            "title": "Menjaga Ruang Hidup Masyarakat Kalimantan Utara Melalui Partisipasi dan Keadilan Ekologis",
+            "source": "dokumentasi PLHL"
           }
         }
       },

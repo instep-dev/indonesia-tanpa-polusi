@@ -1,23 +1,15 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { buttonVariants } from '@/components/reusable/Button'
+import { homeNewsCards } from '@/data/data'
 import type { Dictionary, Locale } from '@/i18n/getDictionary'
-import type { NewsCardId } from '@/data/data'
-import type { ArticleDto } from '@/services/article/article.dto'
-
-type RegionNewsItem = {
-  id: NewsCardId
-  href: string
-  article: ArticleDto | null
-}
 
 const LatestNews = ({
   currentLocale,
   dict,
-  items,
 }: {
   currentLocale: Locale
   dict: Dictionary['marketing']['home']['news']
-  items: RegionNewsItem[]
 }) => (
   <section className="bg-background px-6 py-16 sm:px-10 lg:px-20">
     <div className="mx-auto max-w-6xl">
@@ -36,28 +28,33 @@ const LatestNews = ({
       <p className="mt-4 max-w-2xl text-base text-foreground/70">{dict.intro}</p>
 
       <div className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-        {items.map(({ id, href, article }) => {
-          const fallback = dict.items[id]
-          const title = article ? (currentLocale === 'id' ? article.titleId : article.titleEn) : fallback.title
-          const excerpt = article
-            ? currentLocale === 'id' ? article.excerptId : article.excerptEn
-            : fallback.excerpt
-          const linkHref = article ? `/${currentLocale}/news/${article.slug}` : `/${currentLocale}${href}`
+        {homeNewsCards.map(({ id, href, image }) => {
+          const copy = dict.items[id]
 
           return (
             <div key={id} className="flex flex-col">
-              <div
-                className="aspect-video w-full bg-neutral-500 bg-cover bg-center"
-                style={article?.coverImage ? { backgroundImage: `url(${article.coverImage})` } : undefined}
-              />
-              <h3 className="mt-4 text-xl font-bold text-foreground">{title}</h3>
-              <p className="mt-2 line-clamp-3 text-sm text-foreground/70">{excerpt}</p>
-              <Link
-                href={linkHref}
-                className={`${buttonVariants({ variant: 'yellow' })} mt-4 self-start`}
-              >
-                {dict.readCta}
-              </Link>
+              <div className="relative aspect-video w-full overflow-hidden rounded-lg">
+                <Image
+                  src={image}
+                  alt={copy.title}
+                  fill
+                  className="object-cover"
+                />
+              </div>
+              <div className="flex flex-1 flex-col justify-between">
+                <div>
+                  <span className="mt-3 block text-xs font-medium uppercase tracking-wide text-foreground/50">
+                    {copy.source}
+                  </span>
+                  <h3 className="mt-1 text-xl font-bold text-foreground">{copy.title}</h3>
+                </div>
+                <Link
+                  href={`/${currentLocale}${href}`}
+                  className={`${buttonVariants({ variant: 'yellow' })} mt-4 self-start`}
+                >
+                  {dict.readCta}
+                </Link>
+              </div>
             </div>
           )
         })}

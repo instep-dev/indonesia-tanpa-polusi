@@ -3,9 +3,7 @@ import Hero from '@/components/marketing/Hero'
 import AboutUs from '@/components/reusable/AboutUs'
 import OurStories from '@/components/reusable/OurStories'
 import LatestNews from '@/components/marketing/LatestNews'
-import { homeStoryCards, homeNewsCards } from '@/data/data'
-import { db } from '@/libs/db'
-import { mapArticle, articleInclude } from '@/libs/mapArticle'
+import { homeStoryCards } from '@/data/data'
 
 const Home = async ({
   params,
@@ -17,23 +15,12 @@ const Home = async ({
   const dict = await getDictionary(validLocale)
   const homeDict = dict.marketing.home
 
-  const newsItems = await Promise.all(
-    homeNewsCards.map(async (card) => {
-      const record = await db.article.findFirst({
-        where: { status: 'PUBLISHED', deletedAt: null, region: { slug: card.id } },
-        include: articleInclude,
-        orderBy: { publishedAt: 'desc' },
-      })
-      return { id: card.id, href: card.href, article: record ? mapArticle(record) : null }
-    }),
-  )
-
   return (
     <div>
       <Hero dict={homeDict} />
       <AboutUs dict={homeDict.about} />
       <OurStories dict={homeDict.ourStories} cards={homeStoryCards} />
-      <LatestNews currentLocale={validLocale} dict={homeDict.news} items={newsItems} />
+      <LatestNews currentLocale={validLocale} dict={homeDict.news} />
     </div>
   )
 }

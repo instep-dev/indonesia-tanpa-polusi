@@ -118,7 +118,7 @@ const LatestNewsList = ({
             return (
               <article key={article.id} className="flex flex-col">
                 <div
-                  className="aspect-video w-full bg-neutral-500 bg-cover bg-center"
+                  className="aspect-video w-full rounded-lg bg-neutral-500 bg-cover bg-center"
                   style={article.coverImage ? { backgroundImage: `url(${article.coverImage})` } : undefined}
                 />
                 <div className="mt-4 flex flex-1 flex-col">

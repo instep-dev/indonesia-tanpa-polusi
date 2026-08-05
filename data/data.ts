@@ -1,5 +1,4 @@
 export type NavLinkKey =
-  | 'ourStories'
   | 'latestNews'
   | 'sulawesi'
   | 'malukuUtara'
@@ -8,7 +7,6 @@ export type NavLinkKey =
 
 export const navLinks = [
   { key: 'home', href: '/' },
-  { key: 'ourStories', href: '/' },
   { key: 'latestNews', href: '/latest-news' },
   { key: 'sulawesi', href: '/sulawesi' },
   { key: 'malukuUtara', href: '/maluku-utara' },
@@ -23,10 +21,10 @@ export const homeStoryCards = [
 export type NewsCardId = 'sulawesi' | 'malukuUtara' | 'kalimantanUtara'
 
 export const homeNewsCards = [
-  { id: 'sulawesi', href: '/sulawesi' },
-  { id: 'malukuUtara', href: '/maluku-utara' },
-  { id: 'kalimantanUtara', href: '/kalimantan-utara' },
-] satisfies { id: NewsCardId; href: string }[]
+  { id: 'sulawesi', href: '/sulawesi', image: '/news1.jpg' },
+  { id: 'malukuUtara', href: '/maluku-utara', image: '/news2.jpg' },
+  { id: 'kalimantanUtara', href: '/kalimantan-utara', image: '/news3.jpeg' },
+] satisfies { id: NewsCardId; href: string; image: string }[]
 
 export type RegionKey = 'sulawesi' | 'malukuUtara' | 'kalimantanUtara'
 

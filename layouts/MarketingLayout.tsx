@@ -14,7 +14,7 @@ const MarketingLayout = ({
   navDict: Dictionary['marketing']['nav']
   contactDict: Dictionary['marketing']['home']['contact']
 }) => (
-  <main>
+  <main className="relative">
     <Navbar currentLocale={locale} dict={navDict} />
     {children}
     <ContactUs dict={contactDict} contact={contactInfo} />
