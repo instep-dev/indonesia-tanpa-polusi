@@ -3,9 +3,9 @@ import type { NextRequest } from 'next/server'
 import { db } from '@/libs/db'
 import { validateAccessToken } from '@/libs/validateToken'
 import { uploadImageToR2 } from '@/libs/r2'
+import { MAX_UPLOAD_SIZE_BYTES, MAX_UPLOAD_SIZE_MB } from '@/libs/uploadLimits'
 
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
-const MAX_SIZE_BYTES = 8 * 1024 * 1024 // 8MB
 
 // POST /api/upload — journalist uploads an image (cover or article gallery
 // photo) to R2. Returns the public URL to store on the Article/ArticleImage.
@@ -25,8 +25,8 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
       { status: 400 },
     )
   }
-  if (file.size > MAX_SIZE_BYTES) {
-    return NextResponse.json({ error: 'File exceeds 8MB limit' }, { status: 400 })
+  if (file.size > MAX_UPLOAD_SIZE_BYTES) {
+    return NextResponse.json({ error: `File exceeds ${MAX_UPLOAD_SIZE_MB}MB limit` }, { status: 400 })
   }
 
   const buffer = Buffer.from(await file.arrayBuffer())

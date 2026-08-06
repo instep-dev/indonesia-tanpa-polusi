@@ -2,10 +2,12 @@
 
 import { useRef } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
+import { toast } from 'vibe-toast'
 import { X, Plus } from '@phosphor-icons/react'
 import { useUploadImage } from '@/services/upload/upload.queries'
 import { articleApi } from '@/services/article/article.api'
 import { articleKeys } from '@/services/article/article.queries'
+import { MAX_UPLOAD_SIZE_BYTES, MAX_UPLOAD_SIZE_MB } from '@/libs/uploadLimits'
 import type { ArticleImageDto } from '@/services/article/article.dto'
 
 type ArticleGalleryProps = {
@@ -24,9 +26,20 @@ const ArticleGallery = ({ articleId, images, editable }: ArticleGalleryProps) =>
     e.target.value = ''
     if (!file) return
 
-    const { url } = await uploadImage.mutateAsync(file)
-    await articleApi.addImage(articleId, { url, order: images.length })
-    qc.invalidateQueries({ queryKey: articleKeys.detail(articleId) })
+    if (file.size > MAX_UPLOAD_SIZE_BYTES) {
+      toast.error(`Image is too large. Maximum size is ${MAX_UPLOAD_SIZE_MB}MB.`)
+      return
+    }
+
+    const { url } = await uploadImage.mutateAsync(file).catch(() => ({ url: null }))
+    if (!url) return // Error toast is already shown by useUploadImage's onError.
+
+    try {
+      await articleApi.addImage(articleId, { url, order: images.length })
+      qc.invalidateQueries({ queryKey: articleKeys.detail(articleId) })
+    } catch {
+      toast.error('Image uploaded but failed to attach it to the article. Please try again.')
+    }
   }
 
   const handleRemove = async (imageId: string) => {

@@ -5,6 +5,7 @@ import StarterKit from '@tiptap/starter-kit'
 import Image from '@tiptap/extension-image'
 import Placeholder from '@tiptap/extension-placeholder'
 import { useEffect, useRef, useState } from 'react'
+import { toast } from 'vibe-toast'
 import {
   TextB,
   TextItalic,
@@ -17,6 +18,7 @@ import {
   Quotes,
 } from '@phosphor-icons/react'
 import { useUploadImage } from '@/services/upload/upload.queries'
+import { MAX_UPLOAD_SIZE_BYTES, MAX_UPLOAD_SIZE_MB } from '@/libs/uploadLimits'
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -116,8 +118,17 @@ const TiptapEditor = ({ content, onChange, placeholder }: TiptapEditorProps) => 
     e.target.value = ''
     if (!file || !editor) return
 
-    const { url } = await uploadImage.mutateAsync(file)
-    editor.chain().focus().setImage({ src: url }).run()
+    if (file.size > MAX_UPLOAD_SIZE_BYTES) {
+      toast.error(`Image is too large. Maximum size is ${MAX_UPLOAD_SIZE_MB}MB.`)
+      return
+    }
+
+    try {
+      const { url } = await uploadImage.mutateAsync(file)
+      editor.chain().focus().setImage({ src: url }).run()
+    } catch {
+      // Error toast is already shown by useUploadImage's onError.
+    }
   }
 
   const openLinkDialog = () => {

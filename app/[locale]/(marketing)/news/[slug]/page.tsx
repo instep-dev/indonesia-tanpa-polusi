@@ -9,6 +9,12 @@ type NewsDetailPageProps = {
   params: Promise<{ locale: string; slug: string }>
 }
 
+// This route queries Prisma directly with no generateStaticParams — without
+// this, Next.js's Full Route Cache serves whatever HTML was rendered on the
+// very first visit indefinitely, so edits made after that (e.g. adding a
+// cover image after publishing) never show up on the public page.
+export const dynamic = 'force-dynamic'
+
 const cardIcons = [Stack, HourglassMedium, Aperture]
 
 const NewsDetailPage = async ({ params }: NewsDetailPageProps) => {

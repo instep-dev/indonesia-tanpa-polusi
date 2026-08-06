@@ -1,8 +1,10 @@
 'use client'
 
 import { useRef } from 'react'
+import { toast } from 'vibe-toast'
 import { X, ImageSquare } from '@phosphor-icons/react'
 import { useUploadImage } from '@/services/upload/upload.queries'
+import { MAX_UPLOAD_SIZE_BYTES, MAX_UPLOAD_SIZE_MB } from '@/libs/uploadLimits'
 
 type CoverImageUploaderProps = {
   value: string | null
@@ -18,8 +20,17 @@ const CoverImageUploader = ({ value, onChange }: CoverImageUploaderProps) => {
     e.target.value = ''
     if (!file) return
 
-    const { url } = await uploadImage.mutateAsync(file)
-    onChange(url)
+    if (file.size > MAX_UPLOAD_SIZE_BYTES) {
+      toast.error(`Image is too large. Maximum size is ${MAX_UPLOAD_SIZE_MB}MB.`)
+      return
+    }
+
+    try {
+      const { url } = await uploadImage.mutateAsync(file)
+      onChange(url)
+    } catch {
+      // Error toast is already shown by useUploadImage's onError.
+    }
   }
 
   if (value) {
