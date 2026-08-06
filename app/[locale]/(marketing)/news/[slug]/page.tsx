@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation'
+import Image from 'next/image'
 import { Aperture, HourglassMedium, Stack } from '@phosphor-icons/react/dist/ssr'
 import { getDictionary, type Locale } from '@/i18n/getDictionary'
 import { db } from '@/libs/db'
@@ -37,10 +38,16 @@ const NewsDetailPage = async ({ params }: NewsDetailPageProps) => {
   return (
     <div>
       <section id="hero-viewport" className="relative flex h-screen w-full flex-col overflow-hidden bg-neutral-500">
-        <div
-          className="absolute inset-0 -z-10 bg-cover bg-center"
-          style={article.coverImage ? { backgroundImage: `url(${article.coverImage})` } : undefined}
-        />
+        {article.coverImage && (
+          <Image
+            src={article.coverImage}
+            alt={title}
+            fill
+            priority
+            sizes="100vw"
+            className="-z-10 object-cover"
+          />
+        )}
 
         <div className="mt-auto bg-[#33477d]/85 px-6 py-10 sm:px-10 sm:py-12 lg:px-20 lg:py-16">
           <div className="mx-auto max-w-6xl">

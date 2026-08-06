@@ -10,7 +10,10 @@ const nextConfig: NextConfig = {
     removeConsole: process.env.NODE_ENV === "production" ? { exclude: ["error", "warn"] } : false,
   },
   images: {
-    remotePatterns: [],
+    // Article cover/gallery images are uploaded to R2 and served from the
+    // R2_PUBLIC_URL custom domain — next/image refuses to optimize any
+    // remote host not explicitly allow-listed here.
+    remotePatterns: [{ protocol: "https", hostname: "indonesiatanpapolusi.org", pathname: "/articles/**" }],
   },
 };
 
