@@ -116,6 +116,17 @@ const Navbar = ({ currentLocale, dict }: NavbarProps) => {
               <MagnifyingGlass size={18} />
             </button>
             <LangToggle currentLocale={currentLocale} />
+            <Link
+              href="/auth/login"
+              className={cn(
+                'rounded-lg px-4 py-2.5 text-sm font-semibold transition-colors',
+                overHero
+                  ? 'bg-white/20 text-white backdrop-blur-sm hover:bg-white/30'
+                  : 'bg-brand-navy text-white hover:bg-brand-navy/90',
+              )}
+            >
+              {dict.login}
+            </Link>
           </div>
 
           <button
@@ -157,6 +168,13 @@ const Navbar = ({ currentLocale, dict }: NavbarProps) => {
                 <MagnifyingGlass size={18} />
               </button>
               <LangToggle currentLocale={currentLocale} />
+              <Link
+                href="/auth/login"
+                onClick={() => setOpen(false)}
+                className="rounded-lg bg-white/20 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-white/30"
+              >
+                {dict.login}
+              </Link>
             </div>
           </div>
         )}

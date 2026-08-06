@@ -26,11 +26,21 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/libs/utils'
 import ArticleStatusBadge from '@/components/dashboard/ArticleStatusBadge'
 import { useRegions } from '@/services/region/region.queries'
-import type { ArticleDto } from '@/services/article/article.dto'
+import type { ArticleDto, ArticleStatus } from '@/services/article/article.dto'
 
 const NO_REGION = 'none'
 const ALL_REGIONS = 'all'
+const ALL_STATUSES = 'all'
+const DELETED_STATUS = 'deleted'
 type SortOrder = 'newest' | 'oldest'
+
+const STATUS_OPTIONS: { value: ArticleStatus | typeof DELETED_STATUS; label: string }[] = [
+  { value: 'DRAFT', label: 'Draft' },
+  { value: 'PENDING_REVIEW', label: 'Pending Review' },
+  { value: 'PUBLISHED', label: 'Published' },
+  { value: 'REJECTED', label: 'Rejected' },
+  { value: DELETED_STATUS, label: 'Deleted' },
+]
 
 type ArticleTableProps = {
   articles: ArticleDto[]
@@ -58,22 +68,30 @@ const ArticleTable = ({
   const router = useRouter()
   const [search, setSearch] = useState('')
   const [regionFilter, setRegionFilter] = useState<string>(ALL_REGIONS)
+  const [statusFilter, setStatusFilter] = useState<string>(ALL_STATUSES)
   const [sortOrder, setSortOrder] = useState<SortOrder>('newest')
   const { data: regions } = useRegions()
 
   const processedArticles = useMemo(() => {
-    const filtered =
+    const byRegion =
       regionFilter === ALL_REGIONS
         ? articles
         : articles.filter((article) =>
             regionFilter === NO_REGION ? !article.regionId : article.regionId === regionFilter,
           )
 
-    return [...filtered].sort((a, b) => {
+    const byStatus =
+      statusFilter === ALL_STATUSES
+        ? byRegion
+        : byRegion.filter((article) =>
+            statusFilter === DELETED_STATUS ? !!article.deletedAt : article.status === statusFilter && !article.deletedAt,
+          )
+
+    return [...byStatus].sort((a, b) => {
       const diff = new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
       return sortOrder === 'newest' ? diff : -diff
     })
-  }, [articles, regionFilter, sortOrder])
+  }, [articles, regionFilter, statusFilter, sortOrder])
 
   const columns = useMemo<ColumnDef<ArticleDto>[]>(
     () => [
@@ -175,7 +193,7 @@ const ArticleTable = ({
   useEffect(() => {
     table.setPageIndex(0)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [regionFilter, sortOrder, search])
+  }, [regionFilter, statusFilter, sortOrder, search])
 
   if (isLoading) {
     return (
@@ -226,6 +244,26 @@ const ArticleTable = ({
               {regions?.map((region) => (
                 <SelectItem key={region.id} value={region.id}>
                   {region.nameEn}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v ?? ALL_STATUSES)}>
+            <SelectTrigger className="h-9 w-full bg-background text-xs sm:w-40">
+              <SelectValue placeholder="Status">
+                {(v: string | null) =>
+                  v === ALL_STATUSES || v == null
+                    ? 'All statuses'
+                    : (STATUS_OPTIONS.find((option) => option.value === v)?.label ?? v)
+                }
+              </SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={ALL_STATUSES}>All statuses</SelectItem>
+              {STATUS_OPTIONS.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
                 </SelectItem>
               ))}
             </SelectContent>

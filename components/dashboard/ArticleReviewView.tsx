@@ -54,13 +54,23 @@ const ArticleReviewView = ({ articleId }: { articleId: string }) => {
   }
 
   const handleApprove = async () => {
-    await reviewArticle.mutateAsync({ action: 'approve' })
-    router.push('/super-admin/dashboard')
+    try {
+      await reviewArticle.mutateAsync({ action: 'approve' })
+      toast.success('Article approved and published')
+      router.push('/super-admin/dashboard')
+    } catch {
+      toast.error('Failed to approve article')
+    }
   }
 
   const handleReject = async () => {
-    await reviewArticle.mutateAsync({ action: 'reject', rejectionReason })
-    router.push('/super-admin/dashboard')
+    try {
+      await reviewArticle.mutateAsync({ action: 'reject', rejectionReason })
+      toast.success('Article rejected')
+      router.push('/super-admin/dashboard')
+    } catch {
+      toast.error('Failed to reject article')
+    }
   }
 
   const confirmDelete = () => {

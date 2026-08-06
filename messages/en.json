@@ -7,12 +7,13 @@
       "malukuUtara": "North Maluku",
       "kalimantanUtara": "North Kalimantan",
       "contactUs": "Contact Us",
-      "searchPlaceholder": "Search"
+      "searchPlaceholder": "Search",
+      "login": "Login"
     },
     "home": {
       "hero": {
-        "title": "Stop Captive Coal-Fired Power Plants",
-        "subtitle": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Rem sed aliquam at optio cumque libero, accusamus eum, nostrum repellat fugit, fuga numquam non facere possimus?",
+        "title": "Stop Captive Coal-Fired Power Plants.",
+        "subtitle": "It's time to switch to clean energy. Together, let's stop the development of captive coal-fired power plants and push for a transition toward healthier, fairer, and more sustainable energy sources for all of Indonesia's people.",
         "cta": "Explore more"
       },
       "about": {
@@ -28,8 +29,8 @@
         "heading": "Our Stories",
         "body": "Behind the industrial development lies a rarely heard true story. Our Stories presents the voices of residents living alongside the Captive Coal-Fired Power Plant, from their struggles with air pollution that triggers acute respiratory infections (ARI), to the loss of livelihoods as farmers and fishermen, to the loss of land due to land grabbing. These stories serve as a reminder that every policy has a real impact on people's lives.",
         "cards": [
-          { "quote": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua." },
-          { "quote": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua." }
+          { "quote": "Why must we fall ill for electricity we don't even get to enjoy?" },
+          { "quote": "When the sea is polluted, life itself is taken away." }
         ]
       },
       "news": {

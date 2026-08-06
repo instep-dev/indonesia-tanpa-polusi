@@ -16,7 +16,7 @@ const LABELS: Record<ArticleStatus, string> = {
   REJECTED: 'Rejected',
 }
 
-const DELETED_STYLE = 'bg-[#F2F1EE] text-[#787774] hover:bg-[#F2F1EE]'
+const DELETED_STYLE = 'bg-[#FDEBEC] text-[#9F2F2D] hover:bg-[#FDEBEC]'
 
 type ArticleStatusBadgeProps = {
   status: ArticleStatus

@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "type-check": "tsc --noEmit",
+    "test": "jest",
     "postinstall": "prisma generate"
   },
   "dependencies": {
@@ -53,6 +54,7 @@
     "@tailwindcss/typography": "^0.5.20",
     "@types/bcryptjs": "^3.0.0",
     "@types/dompurify": "^3.2.0",
+    "@types/jest": "^30.0.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
@@ -60,6 +62,10 @@
     "dotenv": "^17.4.2",
     "eslint": "^9",
     "eslint-config-next": "16.2.7",
+    "jest": "^30.4.2",
+    "jest-environment-node": "^30.4.1",
+    "jest-html-reporter": "^4.4.0",
+    "jest-mock-extended": "^4.0.1",
     "prisma": "^7.8.0",
     "tailwindcss": "^4",
     "typescript": "^5"
