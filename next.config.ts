@@ -14,6 +14,11 @@ const nextConfig: NextConfig = {
     // R2_PUBLIC_URL custom domain — next/image refuses to optimize any
     // remote host not explicitly allow-listed here.
     remotePatterns: [{ protocol: "https", hostname: "indonesiatanpapolusi.org", pathname: "/articles/**" }],
+    // Next's image optimizer defaults to Content-Disposition: attachment as
+    // a security precaution — some mobile Chromium builds (Android
+    // Chrome/Brave) then refuse to paint the response inline inside <img>,
+    // even though the request itself succeeds. This is the documented fix.
+    contentDispositionType: "inline",
   },
 };
 
