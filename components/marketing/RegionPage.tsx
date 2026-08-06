@@ -1,6 +1,7 @@
 import type { Dictionary, Locale } from '@/i18n/getDictionary'
 import type { RegionKey, RegionStoryCard } from '@/data/data'
 import HeroRegion from './HeroRegion'
+import AboutRegion from './AboutRegion'
 import OurStories from '@/components/reusable/OurStories'
 import LatestNewsList from './LatestNewsList'
 
@@ -15,6 +16,7 @@ type RegionPageProps = {
 const RegionPage = ({ currentLocale, regionSlug, dict, newsListDict, stories }: RegionPageProps) => (
   <div>
     <HeroRegion dict={dict} />
+    <AboutRegion dict={dict.about} />
     <OurStories dict={dict.ourStories} cards={stories} />
 
     <section className="bg-background px-6 py-16 sm:px-10 lg:px-20">
