@@ -23,7 +23,7 @@ const Hero = ({
         <div className='bg-black/30 absolute inset-0 z-10'/>
 
         <div className="absolute inset-0 mx-auto max-w-6xl pointer-events-none z-20">
-          <div className="absolute bottom-12 left-0 right-0 px-6 pointer-events-auto sm:bottom-16 sm:px-10 lg:px-20">
+          <div className="absolute bottom-12 left-0 right-0 px-6 pointer-events-auto sm:bottom-16 sm:px-10 lg:px-20 xl:px-0">
             <h1 className="text-3xl max-w-2xl font-medium leading-tight text-white sm:text-4xl lg:text-6xl">
               {title}
             </h1>
