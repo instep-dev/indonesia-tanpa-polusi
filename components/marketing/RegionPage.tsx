@@ -5,6 +5,12 @@ import AboutRegion from './AboutRegion'
 import OurStories from '@/components/reusable/OurStories'
 import LatestNewsList from './LatestNewsList'
 
+const REGION_HERO_IMAGES: Record<RegionKey, string> = {
+  sulawesi: '/sulawesi.jpg',
+  malukuUtara: '/maluku_utara.jpg',
+  kalimantanUtara: '/kaltara.jpeg',
+}
+
 type RegionPageProps = {
   currentLocale: Locale
   regionSlug: RegionKey
@@ -15,7 +21,7 @@ type RegionPageProps = {
 
 const RegionPage = ({ currentLocale, regionSlug, dict, newsListDict, stories }: RegionPageProps) => (
   <div>
-    <HeroRegion dict={dict} />
+    <HeroRegion dict={dict} image={REGION_HERO_IMAGES[regionSlug]} />
     <AboutRegion dict={dict.about} />
     <OurStories dict={dict.ourStories} cards={stories} />
 

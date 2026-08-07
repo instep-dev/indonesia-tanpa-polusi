@@ -39,17 +39,18 @@ const NewsDetailPage = async ({ params }: NewsDetailPageProps) => {
     <div>
       <section id="hero-viewport" className="relative flex h-screen w-full flex-col overflow-hidden bg-neutral-500">
         {article.coverImage && (
-          <Image
+           <Image
             src={article.coverImage}
             alt={title}
             fill
             priority
             sizes="100vw"
-            className="-z-10 object-cover"
+            className=" absolute inset-0 w-full h-full object-cover"
           />
         )}
 
-        <div className="mt-auto bg-[#33477d]/85 px-6 py-10 sm:px-10 sm:py-12 lg:px-20 lg:py-16">
+
+        <div className="mt-auto bg-[#33477d]/85 px-6 py-10 sm:px-10 sm:py-12 lg:px-20 lg:py-16 z-20">
           <div className="mx-auto max-w-6xl">
             <h1 className="text-3xl font-extrabold leading-tight text-brand-yellow sm:text-4xl">
               {title}
