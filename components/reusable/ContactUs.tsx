@@ -48,17 +48,17 @@ const ContactUs = ({
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className="grid gap-4">
           <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg bg-neutral-500">
-            <Image src={'/footer.jpeg'} alt={''} fill className='w-full h-full object-cover absolute inset-0 '/>
+            <Image src={'/footer.jpeg'} alt={''} fill className='w-full h-full object-cover absolute inset-0 ' />
           </div>
           <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg bg-neutral-500">
-            <Image src={'/portrait1.jpeg'} alt={''} fill className='w-full h-full object-cover absolute inset-0 '/>
+            <Image src={'/portrait.jpeg'} alt={''} fill className='w-full h-full object-cover absolute inset-0 ' />
           </div>
           <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg bg-neutral-500">
-            <Image src={'/maluku.jpg'} alt={''} fill className='w-full h-full object-cover absolute inset-0 '/>
+            <Image src={'/maluku.jpg'} alt={''} fill className='w-full h-full object-cover absolute inset-0 ' />
           </div>
         </div>
         <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg bg-neutral-500 sm:aspect-auto sm:h-full" >
-          <Image src={'/portrait.jpeg'} alt={''} fill className='w-full h-full object-cover absolute inset-0 '/>
+          <Image src={'/portrait1.jpeg'} alt={''} fill className='w-full h-full object-cover absolute inset-0 ' />
         </div>
       </div>
     </div>

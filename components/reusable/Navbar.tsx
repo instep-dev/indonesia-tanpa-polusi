@@ -48,8 +48,7 @@ const Navbar = ({ currentLocale, dict }: NavbarProps) => {
     const target = `/${currentLocale}${href}`
     // Next doesn't add a trailing slash to the home route — /en, not /en/.
     if (href === '/') return pathname === `/${currentLocale}` || pathname === target
-    // Article detail pages live at /news/[slug], not nested under
-    // /latest-news — still highlight "Latest News" while reading one.
+    // Both the list page and detail pages live under /news.
     if (key === 'latestNews' && pathname.startsWith(`/${currentLocale}/news`)) return true
     return pathname === target || pathname.startsWith(`${target}/`)
   }
@@ -78,7 +77,7 @@ const Navbar = ({ currentLocale, dict }: NavbarProps) => {
 
           <nav
             className={cn(
-              'hidden items-center gap-6 text-sm font-medium transition-colors lg:flex',
+              'hidden items-center gap-6 text-lg font-bold transition-colors lg:flex',
               overHero ? 'text-white' : 'text-brand-navy',
             )}
           >
@@ -92,7 +91,7 @@ const Navbar = ({ currentLocale, dict }: NavbarProps) => {
                   className={cn(
                     'underline-offset-4',
                     active
-                      ? 'font-semibold text-brand-yellow underline'
+                      ? 'text-brand-yellow underline'
                       : 'hover:opacity-80',
                   )}
                 >
@@ -140,7 +139,7 @@ const Navbar = ({ currentLocale, dict }: NavbarProps) => {
 
         {open && (
           <div className="mt-4 rounded-lg bg-brand-navy/90 px-6 py-4 backdrop-blur-sm sm:px-10 lg:hidden">
-            <nav className="flex flex-col gap-4 text-sm font-medium text-white">
+            <nav className="flex flex-col gap-4 text-lg font-bold text-white">
               {navLinks.map((link) => {
                 const active = isLinkActive(link.key, link.href)
                 return (
@@ -151,7 +150,7 @@ const Navbar = ({ currentLocale, dict }: NavbarProps) => {
                     aria-current={active ? 'page' : undefined}
                     className={cn(
                       'underline-offset-4',
-                      active ? 'font-semibold text-brand-yellow underline' : undefined,
+                      active ? 'text-brand-yellow underline' : undefined,
                     )}
                   >
                     {dict[link.key]}

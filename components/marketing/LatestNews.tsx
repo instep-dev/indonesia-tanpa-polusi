@@ -18,7 +18,7 @@ const LatestNews = ({
           {dict.heading}
         </h2>
         <Link
-          href={`/${currentLocale}/latest-news`}
+          href={`/${currentLocale}/news`}
           className={buttonVariants({ variant: 'yellow' })}
         >
           {dict.viewAllCta}

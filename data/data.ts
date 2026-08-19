@@ -7,10 +7,10 @@ export type NavLinkKey =
 
 export const navLinks = [
   { key: 'home', href: '/' },
-  { key: 'latestNews', href: '/latest-news' },
   { key: 'sulawesi', href: '/sulawesi' },
   { key: 'malukuUtara', href: '/maluku-utara' },
   { key: 'kalimantanUtara', href: '/kalimantan-utara' },
+  { key: 'latestNews', href: '/news' },
 ] satisfies { key: NavLinkKey; href: string }[]
 
 export const homeStoryCards = [

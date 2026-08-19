@@ -2,8 +2,8 @@ import { db } from '@/libs/db'
 
 const regions = [
   { slug: 'sulawesi', nameId: 'Sulawesi', nameEn: 'Sulawesi' },
-  { slug: 'malukuUtara', nameId: 'Maluku Utara', nameEn: 'North Maluku' },
-  { slug: 'kalimantanUtara', nameId: 'Kalimantan Utara', nameEn: 'North Kalimantan' },
+  { slug: 'maluku-utara', nameId: 'Maluku Utara', nameEn: 'North Maluku' },
+  { slug: 'kalimantan-utara', nameId: 'Kalimantan Utara', nameEn: 'North Kalimantan' },
 ]
 
 const seedRegions = async () => {

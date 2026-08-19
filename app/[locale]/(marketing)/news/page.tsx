@@ -2,11 +2,11 @@ import { getDictionary, type Locale } from '@/i18n/getDictionary'
 import HeroLatestNews from '@/components/marketing/HeroLatestNews'
 import LatestNewsList from '@/components/marketing/LatestNewsList'
 
-type LatestNewsPageProps = {
+type NewsPageProps = {
   params: Promise<{ locale: string }>
 }
 
-const LatestNewsPage = async ({ params }: LatestNewsPageProps) => {
+const NewsPage = async ({ params }: NewsPageProps) => {
   const { locale } = await params
   const validLocale: Locale = locale === 'en' ? 'en' : 'id'
   const dict = await getDictionary(validLocale)
@@ -34,4 +34,4 @@ const LatestNewsPage = async ({ params }: LatestNewsPageProps) => {
   )
 }
 
-export default LatestNewsPage
+export default NewsPage
