@@ -4,6 +4,7 @@ import { db } from '@/libs/db'
 import { validateAccessToken } from '@/libs/validateToken'
 import { uploadImageToR2 } from '@/libs/r2'
 import { MAX_UPLOAD_SIZE_BYTES, MAX_UPLOAD_SIZE_MB } from '@/libs/uploadLimits'
+import { Jimp } from 'jimp'
 
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
 
@@ -45,27 +46,23 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
     let buffer = rawBuffer
     let contentType = file.type
     if (file.type !== 'image/gif') {
-      let sharpInstance: any
       try {
-        const sharpModule = await import('sharp')
-        sharpInstance = sharpModule.default
-      } catch (err: any) {
-        console.error('Failed to load sharp module:', err)
-        return NextResponse.json(
-          { error: `Image processor (sharp) failed to initialize: ${err.message}. Please check if ignoreScripts in package.json is blocking production install.` },
-          { status: 500 },
-        )
-      }
+        const image = await Jimp.read(rawBuffer)
+        const { width, height } = image.bitmap
 
-      try {
-        buffer = await sharpInstance(rawBuffer)
-          .rotate() // apply EXIF orientation before stripping it
-          .resize({ width: MAX_DIMENSION_PX, height: MAX_DIMENSION_PX, fit: 'inside', withoutEnlargement: true })
-          .jpeg({ quality: JPEG_QUALITY })
-          .toBuffer()
+        if (width > MAX_DIMENSION_PX || height > MAX_DIMENSION_PX) {
+          if (width > height) {
+            image.resize({ w: MAX_DIMENSION_PX })
+          } else {
+            image.resize({ h: MAX_DIMENSION_PX })
+          }
+        }
+
+        const jimpBuffer = await image.getBuffer('image/jpeg', { quality: JPEG_QUALITY })
+        buffer = Buffer.from(jimpBuffer)
         contentType = 'image/jpeg'
       } catch (err: any) {
-        console.error('Sharp processing error:', err)
+        console.error('Jimp processing error:', err)
         return NextResponse.json({ error: `Could not process image: ${err.message}` }, { status: 400 })
       }
     }
