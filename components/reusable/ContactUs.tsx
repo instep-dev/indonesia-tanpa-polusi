@@ -18,7 +18,7 @@ const ContactUs = ({
   <section className="bg-brand-yellow px-6 py-16 sm:px-10 lg:px-20">
     <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]">
       <div>
-        <h2 className="text-3xl font-extrabold text-[#4E88C9] font-stretch-50% sm:text-4xl">
+        <h2 className="text-3xl font-tilt-warp text-[#4E88C9] font-stretch-50% sm:text-4xl">
           {dict.heading}
         </h2>
 
@@ -63,7 +63,7 @@ const ContactUs = ({
             </div>
           </div>
         </div>
-        <div className="flex rounded-sm border-1 shadow-md sm:h-full">
+        <div className="flex rounded-sm border-1 shadow-md/20 sm:h-full">
           <div className="relative aspect-[4/3] w-full flex-1 overflow-hidden rounded-sm bg-neutral-500 sm:aspect-auto">
             <Image src={'/portrait1.jpeg'} alt={''} fill className="object-cover" />
           </div>

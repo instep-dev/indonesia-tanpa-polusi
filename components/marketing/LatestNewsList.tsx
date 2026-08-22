@@ -117,10 +117,12 @@ const LatestNewsList = ({
 
             return (
               <article key={article.id} className="flex flex-col">
-                <div
-                  className="aspect-video w-full rounded-lg bg-neutral-500 bg-cover bg-center"
-                  style={article.coverImage ? { backgroundImage: `url(${article.coverImage})` } : undefined}
-                />
+                <div className="rounded-sm border-1 shadow-md/20">
+                  <div
+                    className="aspect-video w-full rounded-sm bg-neutral-500 bg-cover bg-center"
+                    style={article.coverImage ? { backgroundImage: `url(${article.coverImage})` } : undefined}
+                  />
+                </div>
                 <div className="mt-4 flex flex-1 flex-col">
                   <h3 className="text-lg font-bold text-foreground">{title}</h3>
                   <p className="mt-2 line-clamp-3 text-sm text-foreground/70">{excerpt}</p>

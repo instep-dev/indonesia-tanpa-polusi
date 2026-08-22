@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { toast } from 'vibe-toast'
 import { SignOut } from '@phosphor-icons/react'
@@ -29,9 +30,14 @@ const DashboardTopbar = () => {
     <header className="sticky top-0 z-40 border-b bg-background/85 backdrop-blur-sm">
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6 sm:px-8">
         <Link href="/dashboard" className="flex items-center gap-2.5">
-          <span className="flex size-6 items-center justify-center rounded-[4px] bg-primary font-mono text-[10px] font-medium text-primary-foreground">
-            ITP
-          </span>
+          <Image
+            src="/logo-blue.png"
+            alt="Indonesia Tanpa Polusi"
+            width={143}
+            height={48}
+            className="h-7 w-auto"
+            priority
+          />
           <span className="font-mono text-xs tracking-[0.08em] text-muted-foreground uppercase">
             Newsroom
           </span>

@@ -62,8 +62,22 @@ const Navbar = ({ currentLocale, dict }: NavbarProps) => {
         transition={{ type: 'spring', bounce: 0.5, duration: 0.6 }}
       />
 
-      <div className="relative px-6 py-4 sm:px-10 lg:px-20">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4">
+      <div
+        className={cn(
+          "relative transition-all duration-300",
+          overHero
+            ? "px-6 pt-6 pb-2 sm:px-10 lg:px-20"
+            : "px-6 py-4 sm:px-10 lg:px-20"
+        )}
+      >
+        <div
+          className={cn(
+            "mx-auto flex max-w-6xl items-center justify-between gap-4 w-full transition-all duration-300",
+            overHero
+              ? "bg-white/15 border border-white/20 backdrop-blur-md shadow-lg rounded-2xl px-6 py-3"
+              : "bg-transparent border border-transparent shadow-none rounded-none px-0 py-0"
+          )}
+        >
           <Link href={`/${currentLocale}`} className="flex items-center gap-2">
             <Image
               src={overHero ? '/logo-white.png' : '/logo-blue.png'}
@@ -89,10 +103,10 @@ const Navbar = ({ currentLocale, dict }: NavbarProps) => {
                   href={`/${currentLocale}${link.href}`}
                   aria-current={active ? 'page' : undefined}
                   className={cn(
-                    'underline-offset-4',
+                    'underline-offset-8 decoration-2',
                     active
                       ? 'text-brand-yellow underline'
-                      : 'hover:opacity-80',
+                      : 'hover:text-brand-yellow',
                   )}
                 >
                   {dict[link.key]}
@@ -106,10 +120,8 @@ const Navbar = ({ currentLocale, dict }: NavbarProps) => {
               type="button"
               aria-label={dict.searchPlaceholder}
               className={cn(
-                'rounded-lg p-2.5 backdrop-blur-sm transition-colors',
-                overHero
-                  ? 'bg-white/20 text-white hover:bg-white/30'
-                  : 'bg-brand-navy/10 text-brand-navy hover:bg-brand-navy/20',
+                "flex h-10 w-10 items-center justify-center rounded-lg text-brand-navy transition-colors hover:bg-brand-navy/10",
+                overHero ? "bg-brand-navy/10" : "bg-brand-navy/10"
               )}
             >
               <MagnifyingGlass size={18} />
@@ -117,12 +129,7 @@ const Navbar = ({ currentLocale, dict }: NavbarProps) => {
             <LangToggle currentLocale={currentLocale} />
             <Link
               href="/auth/login"
-              className={cn(
-                'rounded-lg px-4 py-2.5 text-sm font-semibold transition-colors',
-                overHero
-                  ? 'bg-white/20 text-white backdrop-blur-sm hover:bg-white/30'
-                  : 'bg-brand-navy text-white hover:bg-brand-navy/90',
-              )}
+              className="rounded-lg bg-brand-navy px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-navy/90"
             >
               {dict.login}
             </Link>
@@ -149,7 +156,7 @@ const Navbar = ({ currentLocale, dict }: NavbarProps) => {
                     onClick={() => setOpen(false)}
                     aria-current={active ? 'page' : undefined}
                     className={cn(
-                      'underline-offset-4',
+                      'underline-offset-8 decoration-2',
                       active ? 'text-brand-yellow underline' : undefined,
                     )}
                   >

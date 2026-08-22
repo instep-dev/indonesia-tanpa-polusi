@@ -15,10 +15,10 @@ const HeroRegion = ({ dict, image }: HeroRegionProps) => (
       <div className='w-full h-1/2 absolute bottom-0 left-0 right-0 bg-[#33477d]/70 z-10'/>
       <div className="absolute inset-0 mx-auto max-w-6xl pointer-events-none z-20">
         <div className="absolute bottom-12 left-0 right-0 px-6 sm:bottom-16 sm:px-10 lg:px-20 xl:px-0 pointer-events-auto z-30">
-          <h1 className="text-3xl font-extrabold leading-tight text-brand-yellow sm:text-4xl lg:text-5xl">
+          <h1 className="text-3xl max-w-2xl font-tilt-warp leading-tight text-brand-yellow sm:text-5xl lg:text-6xl">
             {dict.hero.title}
           </h1>
-          <p className="mt-4 max-w-2xl text-sm text-white sm:text-base">{dict.hero.subtitle}</p>
+          <p className="mt-4 max-w-2xl text-sm text-white sm:text-lg">{dict.hero.subtitle}</p>
         </div>
       </div>
     </div>

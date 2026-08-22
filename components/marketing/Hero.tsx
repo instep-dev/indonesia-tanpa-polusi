@@ -20,14 +20,14 @@ const Hero = ({
         >
           <source src="/heros.compressed.mp4" type="video/mp4" />
         </video>
-        <div className='bg-black/30 absolute inset-0 z-10'/>
+        <div className='bg-black/30 absolute inset-0 z-10' />
 
         <div className="absolute inset-0 mx-auto max-w-6xl pointer-events-none z-20">
           <div className="absolute bottom-12 left-0 right-0 px-6 pointer-events-auto sm:bottom-16 sm:px-10 lg:px-20 xl:px-0">
-            <h1 className="text-3xl max-w-2xl font-medium leading-tight text-white sm:text-4xl lg:text-6xl">
+            <h1 className="text-3xl max-w-2xl font-tilt-warp leading-tight text-white sm:text-5xl lg:text-6xl">
               {title}
             </h1>
-            <p className="mt-4 max-w-2xl text-sm text-white sm:text-base">{subtitle}</p>
+            <p className="mt-4 max-w-2xl text-sm text-white sm:text-lg">{subtitle}</p>
             <a
               href="#about"
               className="mt-6 inline-block rounded-full bg-brand-yellow px-6 py-2.5 text-sm font-semibold text-brand-navy transition hover:opacity-90"

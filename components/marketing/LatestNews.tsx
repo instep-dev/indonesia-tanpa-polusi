@@ -14,7 +14,7 @@ const LatestNews = ({
   <section className="bg-background px-6 py-16 sm:px-10 lg:px-20">
     <div className="mx-auto max-w-6xl">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <h2 className="text-3xl font-extrabold text-foreground sm:text-4xl">
+        <h2 className="text-3xl font-tilt-warp text-brand-navy sm:text-4xl">
           {dict.heading}
         </h2>
         <Link
@@ -33,13 +33,15 @@ const LatestNews = ({
 
           return (
             <div key={id} className="flex flex-col">
-              <div className="relative aspect-video w-full overflow-hidden rounded-lg">
-                <Image
-                  src={image}
-                  alt={copy.title}
-                  fill
-                  className="object-cover"
-                />
+              <div className="rounded-sm border-1 shadow-md/20">
+                <div className="relative aspect-video w-full overflow-hidden rounded-sm">
+                  <Image
+                    src={image}
+                    alt={copy.title}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
               </div>
               <div className="flex flex-1 flex-col justify-between">
                 <div>

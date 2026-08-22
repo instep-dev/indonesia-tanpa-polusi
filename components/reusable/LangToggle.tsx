@@ -20,7 +20,7 @@ const LangToggle = ({ currentLocale }: { currentLocale: Locale }) => {
   return (
     <button
       onClick={handleSwitch}
-      className="rounded-lg bg-brand-navy px-3 py-2.5 text-sm font-semibold uppercase text-white transition-colors hover:bg-brand-navy/90"
+      className="rounded-lg bg-brand-navy px-3 py-2.5 text-sm font-semibold uppercase text-white transition-colors hover:bg-brand-navy/90 cursor-pointer"
       aria-label={`Switch to ${nextLocale}`}
     >
       {currentLocale}

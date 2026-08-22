@@ -19,7 +19,7 @@ const NewsPage = async ({ params }: NewsPageProps) => {
       <section className="bg-background px-6 py-16 sm:px-10 lg:px-20">
         <div className="mx-auto max-w-6xl">
           <div className="mb-10 max-w-4xl">
-            <h2 className="text-3xl font-extrabold text-foreground sm:text-4xl">
+            <h2 className="text-3xl font-tilt-warp text-foreground sm:text-4xl">
               {pageDict.heading}
             </h2>
             <p className="mt-4 text-base text-foreground/70">

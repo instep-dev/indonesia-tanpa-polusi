@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Manrope, Geist_Mono, Instrument_Serif } from "next/font/google";
+import { Manrope, Geist_Mono, Instrument_Serif, Tilt_Warp } from "next/font/google";
 import "../styles/globals.css"
 import QueryProvider from "@/providers/QueryProviders";
 import ToastProvider from "@/providers/ToastProvider";
@@ -21,6 +21,11 @@ const instrumentSerif = Instrument_Serif({
   subsets: ["latin"],
 });
 
+const tiltWarp = Tilt_Warp({
+  variable: "--font-tilt-warp",
+  subsets: ["latin"],
+});
+
 export const metadata: Metadata = {
   title: "Indonesia Tanpa Polusi",
   description: "Indonesia Tanpa Polusi",
@@ -30,7 +35,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => (
   <html
     lang="en"
     suppressHydrationWarning
-    className={`${manrope.variable} ${geistMono.variable} ${instrumentSerif.variable} h-full antialiased`}
+    className={`${manrope.variable} ${geistMono.variable} ${instrumentSerif.variable} ${tiltWarp.variable} h-full antialiased`}
   >
     <body className="min-h-full flex flex-col">
       <QueryProvider>
