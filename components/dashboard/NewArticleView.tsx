@@ -29,6 +29,9 @@ const NewArticleView = () => {
   const [excerpt, setExcerpt] = useState('')
   const [regionId, setRegionId] = useState<string | null>(null)
   const [content, setContent] = useState<unknown>({})
+  const [reportUrl, setReportUrl] = useState('')
+  const [pressReleaseUrl, setPressReleaseUrl] = useState('')
+  const [visualUrl, setVisualUrl] = useState('')
 
   const isApproved = !!user?.approvedAt
 
@@ -69,6 +72,9 @@ const NewArticleView = () => {
       contentId: sourceLocale === 'id' ? content : undefined,
       contentEn: sourceLocale === 'en' ? content : undefined,
       regionId,
+      reportUrl: reportUrl || null,
+      pressReleaseUrl: pressReleaseUrl || null,
+      visualUrl: visualUrl || null,
     })
 
     router.push(`/dashboard/articles/${article.id}`)
@@ -138,6 +144,36 @@ const NewArticleView = () => {
             <div className="space-y-2">
               <Label>Region</Label>
               <RegionSelect value={regionId} onChange={setRegionId} />
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-3">
+              <div className="space-y-2">
+                <Label htmlFor="reportUrl">Report Link (PDF)</Label>
+                <Input
+                  id="reportUrl"
+                  value={reportUrl}
+                  onChange={(e) => setReportUrl(e.target.value)}
+                  placeholder="https://..."
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="pressReleaseUrl">Press Release Link</Label>
+                <Input
+                  id="pressReleaseUrl"
+                  value={pressReleaseUrl}
+                  onChange={(e) => setPressReleaseUrl(e.target.value)}
+                  placeholder="https://..."
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="visualUrl">Visual Gallery Link</Label>
+                <Input
+                  id="visualUrl"
+                  value={visualUrl}
+                  onChange={(e) => setVisualUrl(e.target.value)}
+                  placeholder="https://..."
+                />
+              </div>
             </div>
 
             <div className="space-y-2">

@@ -34,6 +34,9 @@ export type ArticleDto = {
   sourceLocale: SourceLocale
   translationStatus: TranslationStatus
   coverImage: string | null
+  reportUrl: string | null
+  pressReleaseUrl: string | null
+  visualUrl: string | null
   status: ArticleStatus
   rejectionReason: string | null
   publishedAt: string | null
@@ -70,6 +73,9 @@ export type CreateArticleBody = {
   sourceLocale: SourceLocale
   regionId?: string | null
   coverImage?: string | null
+  reportUrl?: string | null
+  pressReleaseUrl?: string | null
+  visualUrl?: string | null
 }
 
 export type UpdateArticleBody = Partial<CreateArticleBody>

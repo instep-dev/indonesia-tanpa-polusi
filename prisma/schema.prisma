@@ -109,6 +109,10 @@ model Article {
 
   coverImage String?
 
+  reportUrl       String?
+  pressReleaseUrl String?
+  visualUrl       String?
+
   status          String    @default("DRAFT")
   rejectionReason String?
   publishedAt     DateTime?

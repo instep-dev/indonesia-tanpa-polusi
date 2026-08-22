@@ -310,7 +310,10 @@ const ArticleTable = ({
               {headerGroup.headers.map((header) => (
                 <TableHead
                   key={header.id}
-                  className="h-10 font-mono text-[10px] tracking-[0.06em] text-muted-foreground uppercase"
+                  className={cn(
+                    "h-10 font-mono text-[10px] tracking-[0.06em] text-muted-foreground uppercase",
+                    header.id === 'title' && "w-[50%]"
+                  )}
                 >
                   {header.isPlaceholder
                     ? null
@@ -338,7 +341,13 @@ const ArticleTable = ({
                   {pageIndex * pageSize + i + 1}
                 </TableCell>
                 {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id} className="py-3">
+                  <TableCell
+                    key={cell.id}
+                    className={cn(
+                      "py-3",
+                      cell.column.id === 'title' && "w-[50%] max-w-[350px] truncate"
+                    )}
+                  >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </TableCell>
                 ))}

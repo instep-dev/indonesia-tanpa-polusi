@@ -84,6 +84,9 @@ export const PATCH = async (request: NextRequest, { params }: RouteContext): Pro
       ...(body.sourceLocale !== undefined ? { sourceLocale: body.sourceLocale } : {}),
       ...(body.regionId !== undefined ? { regionId: body.regionId } : {}),
       ...(body.coverImage !== undefined ? { coverImage: body.coverImage } : {}),
+      ...(body.reportUrl !== undefined ? { reportUrl: body.reportUrl } : {}),
+      ...(body.pressReleaseUrl !== undefined ? { pressReleaseUrl: body.pressReleaseUrl } : {}),
+      ...(body.visualUrl !== undefined ? { visualUrl: body.visualUrl } : {}),
       // Editing a REJECTED article resets it back to DRAFT for a fresh review cycle.
       ...(article.status === 'REJECTED' ? { status: 'DRAFT', rejectionReason: null } : {}),
     },

@@ -18,7 +18,7 @@ const ContactUs = ({
   <section className="bg-brand-yellow px-6 py-16 sm:px-10 lg:px-20">
     <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]">
       <div>
-        <h2 className="text-3xl font-extrabold text-brand-navy sm:text-4xl">
+        <h2 className="text-3xl font-extrabold text-[#4E88C9] font-stretch-50% sm:text-4xl">
           {dict.heading}
         </h2>
 
@@ -34,7 +34,7 @@ const ContactUs = ({
               <li key={social.handle}>
                 <Link
                   href={social.href}
-                  className="flex items-center gap-2 text-brand-navy hover:opacity-70"
+                  className="flex items-center gap-2 text-brand-navy hover:text-[#4E88C9]"
                 >
                   <InstagramLogo size={18} weight="fill" />
                   <span>{social.handle}</span>
@@ -47,18 +47,26 @@ const ContactUs = ({
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className="grid gap-4">
-          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg bg-neutral-500">
-            <Image src={'/footer.jpeg'} alt={''} fill className='w-full h-full object-cover absolute inset-0 ' />
+          <div className="rounded-sm border-1 shadow-md/20">
+            <div className="relative aspect-[4/3] w-full overflow-hidden rounded-sm bg-neutral-500">
+              <Image src={'/footer.jpeg'} alt={''} fill className="object-cover" />
+            </div>
           </div>
-          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg bg-neutral-500">
-            <Image src={'/portrait.jpeg'} alt={''} fill className='w-full h-full object-cover absolute inset-0 ' />
+          <div className="rounded-sm border-1 shadow-md/20">
+            <div className="relative aspect-[4/3] w-full overflow-hidden rounded-sm bg-neutral-500">
+              <Image src={'/portrait.jpeg'} alt={''} fill className="object-cover" />
+            </div>
           </div>
-          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg bg-neutral-500">
-            <Image src={'/maluku.jpg'} alt={''} fill className='w-full h-full object-cover absolute inset-0 ' />
+          <div className="rounded-sm border-1 shadow-md/20">
+            <div className="relative aspect-[4/3] w-full overflow-hidden rounded-sm bg-neutral-500">
+              <Image src={'/maluku.jpg'} alt={''} fill className="object-cover" />
+            </div>
           </div>
         </div>
-        <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg bg-neutral-500 sm:aspect-auto sm:h-full" >
-          <Image src={'/portrait1.jpeg'} alt={''} fill className='w-full h-full object-cover absolute inset-0 ' />
+        <div className="flex rounded-sm border-1 shadow-md sm:h-full">
+          <div className="relative aspect-[4/3] w-full flex-1 overflow-hidden rounded-sm bg-neutral-500 sm:aspect-auto">
+            <Image src={'/portrait1.jpeg'} alt={''} fill className="object-cover" />
+          </div>
         </div>
       </div>
     </div>

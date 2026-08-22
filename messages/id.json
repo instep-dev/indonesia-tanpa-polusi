@@ -29,8 +29,12 @@
         "heading": "Cerita Kami",
         "body": "Di balik pembangunan industri, ada kisah nyata yang jarang terdengar. Our Stories menghadirkan suara warga yang hidup berdampingan dengan PLTU Captive mulai dari perjuangan menghadapi polusi udara yang memicu ISPA, kehilangan mata pencaharian sebagai petani dan nelayan, hingga kehilangan tanah akibat perampasan lahan. Cerita-cerita ini menjadi pengingat bahwa setiap kebijakan memiliki dampak nyata terhadap kehidupan manusia.",
         "cards": [
-          { "quote": "Mengapa kami harus sakit untuk listrik yang tak kami nikmati?" },
-          { "quote": "Saat laut tercemar, hidup ikut terenggut." }
+          {
+            "quote": "Mengapa kami harus sakit untuk listrik yang tak kami nikmati?"
+          },
+          {
+            "quote": "Saat laut tercemar, hidup ikut terenggut."
+          }
         ]
       },
       "news": {
@@ -68,14 +72,21 @@
           },
           "about": {
             "heading": "Tentang Kami",
-            "body": ["Koalisi Sulawesi Tanpa Polusi (SULOSI) adalah koalisi masyarakat sipil yang terdiri dari berbagai organisasi lingkungan, organisasi bantuan hukum, komunitas warga, akademisi, dan individu yang memiliki tujuan bersama untuk mendorong pembangunan energi yang lebih bersih di Sulawesi.", "Fokus utama koalisi ini adalah mengurangi dampak pencemaran dari Pembangkit Listrik Tenaga Uap (PLTU), khususnya PLTU Captive yang memasok listrik bagi kawasan industri pengolahan nikel, serta mengadvokasi perlindungan hak-hak masyarakat yang terdampak."]
+            "body": [
+              "Koalisi Sulawesi Tanpa Polusi (SULOSI) adalah koalisi masyarakat sipil yang terdiri dari berbagai organisasi lingkungan, organisasi bantuan hukum, komunitas warga, akademisi, dan individu yang memiliki tujuan bersama untuk mendorong pembangunan energi yang lebih bersih di Sulawesi.",
+              "Fokus utama koalisi ini adalah mengurangi dampak pencemaran dari Pembangkit Listrik Tenaga Uap (PLTU), khususnya PLTU Captive yang memasok listrik bagi kawasan industri pengolahan nikel, serta mengadvokasi perlindungan hak-hak masyarakat yang terdampak."
+            ]
           },
           "ourStories": {
             "heading": "Cerita Kami",
             "body": "Di balik pembangunan industri, ada kisah nyata yang jarang terdengar. Our Stories menghadirkan suara warga yang hidup berdampingan dengan PLTU Captive mulai dari perjuangan menghadapi polusi udara yang memicu ISPA, kehilangan mata pencaharian sebagai petani dan nelayan, hingga kehilangan tanah akibat perampasan lahan. Cerita-cerita ini menjadi pengingat bahwa setiap kebijakan memiliki dampak nyata terhadap kehidupan manusia.",
             "cards": [
-              { "quote": "Dong pe alasan untuk penghijauan. Tapi tong curiga penghitaman. Kan tong tara tahu, mungkin jadi tempat kasih turun baru atau ore nikel..." },
-              { "quote": "Katanya lagi serius transisi energi. Katanya peduli iklim. Katanya mau lindungi hutan. Tapi di saat yang sama, PLTU batu bara masih ngebul." }
+              {
+                "quote": "Dong pe alasan untuk penghijauan. Tapi tong curiga penghitaman. Kan tong tara tahu, mungkin jadi tempat kasih turun baru atau ore nikel..."
+              },
+              {
+                "quote": "Katanya lagi serius transisi energi. Katanya peduli iklim. Katanya mau lindungi hutan. Tapi di saat yang sama, PLTU batu bara masih ngebul."
+              }
             ]
           },
           "news": {
@@ -91,14 +102,21 @@
           },
           "about": {
             "heading": "Tentang Kami",
-            "body": ["Koalisi Maluku Utara Tanpa Polusi adalah koalisi masyarakat sipil yang terdiri dari berbagai organisasi lingkungan, organisasi bantuan hukum, komunitas warga, akademisi, dan individu yang memiliki tujuan bersama untuk mendorong pembangunan energi yang lebih bersih di Sulawesi.", "Fokus utama koalisi ini adalah mengurangi dampak pencemaran dari Pembangkit Listrik Tenaga Uap (PLTU), khususnya PLTU Captive yang memasok listrik bagi kawasan industri pengolahan nikel, serta mengadvokasi perlindungan hak-hak masyarakat yang terdampak."]
+            "body": [
+              "Koalisi Maluku Utara Tanpa Polusi adalah koalisi masyarakat sipil yang terdiri dari berbagai organisasi lingkungan, organisasi bantuan hukum, komunitas warga, akademisi, dan individu yang memiliki tujuan bersama untuk mendorong pembangunan energi yang lebih bersih di Sulawesi.",
+              "Fokus utama koalisi ini adalah mengurangi dampak pencemaran dari Pembangkit Listrik Tenaga Uap (PLTU), khususnya PLTU Captive yang memasok listrik bagi kawasan industri pengolahan nikel, serta mengadvokasi perlindungan hak-hak masyarakat yang terdampak."
+            ]
           },
           "ourStories": {
             "heading": "Cerita Kami",
             "body": "Di balik pembangunan industri, ada kisah nyata yang jarang terdengar. Our Stories menghadirkan suara warga yang hidup berdampingan dengan PLTU Captive mulai dari perjuangan menghadapi polusi udara yang memicu ISPA, kehilangan mata pencaharian sebagai petani dan nelayan, hingga kehilangan tanah akibat perampasan lahan. Cerita-cerita ini menjadi pengingat bahwa setiap kebijakan memiliki dampak nyata terhadap kehidupan manusia.",
             "cards": [
-              { "quote": "Penurunan kualitas udara, tercemarnya sumber air, hingga meningkatnya risiko gangguan kesehatan menjadi realitas yang dihadapi oleh banyak komunitas yang hidup di sekitar kawasan industri dan aktivitas ekstraktif." },
-              { "quote": "Ketika udara yang dihirup tidak lagi bersih dan sumber air semakin terkontaminasi, dampaknya dirasakan langsung oleh warga, terutama kelompok rentan seperti anak-anak, lansia, dan mereka yang memiliki penyakit pernapasan." }
+              {
+                "quote": "Penurunan kualitas udara, tercemarnya sumber air, hingga meningkatnya risiko gangguan kesehatan menjadi realitas yang dihadapi oleh banyak komunitas yang hidup di sekitar kawasan industri dan aktivitas ekstraktif."
+              },
+              {
+                "quote": "Ketika udara yang dihirup tidak lagi bersih dan sumber air semakin terkontaminasi, dampaknya dirasakan langsung oleh warga, terutama kelompok rentan seperti anak-anak, lansia, dan mereka yang memiliki penyakit pernapasan."
+              }
             ]
           },
           "news": {
@@ -114,14 +132,21 @@
           },
           "about": {
             "heading": "Tentang Kami",
-            "body": ["Koalisi Kalimantan Utara Tanpa Polusi adalah koalisi masyarakat sipil yang terdiri dari berbagai organisasi lingkungan, organisasi bantuan hukum, komunitas warga, akademisi, dan individu yang memiliki tujuan bersama untuk mendorong pembangunan energi yang lebih bersih di Sulawesi.", "Fokus utama koalisi ini adalah mengurangi dampak pencemaran dari Pembangkit Listrik Tenaga Uap (PLTU), khususnya PLTU Captive yang memasok listrik bagi kawasan industri pengolahan nikel, serta mengadvokasi perlindungan hak-hak masyarakat yang terdampak."]
+            "body": [
+              "Koalisi Kalimantan Utara Tanpa Polusi adalah koalisi masyarakat sipil yang terdiri dari berbagai organisasi lingkungan, organisasi bantuan hukum, komunitas warga, akademisi, dan individu yang memiliki tujuan bersama untuk mendorong pembangunan energi yang lebih bersih di Sulawesi.",
+              "Fokus utama koalisi ini adalah mengurangi dampak pencemaran dari Pembangkit Listrik Tenaga Uap (PLTU), khususnya PLTU Captive yang memasok listrik bagi kawasan industri pengolahan nikel, serta mengadvokasi perlindungan hak-hak masyarakat yang terdampak."
+            ]
           },
           "ourStories": {
             "heading": "Cerita Kami",
             "body": "Di balik pembangunan industri, ada kisah nyata yang jarang terdengar. Our Stories menghadirkan suara warga yang hidup berdampingan dengan PLTU Captive mulai dari perjuangan menghadapi polusi udara yang memicu ISPA, kehilangan mata pencaharian sebagai petani dan nelayan, hingga kehilangan tanah akibat perampasan lahan. Cerita-cerita ini menjadi pengingat bahwa setiap kebijakan memiliki dampak nyata terhadap kehidupan manusia.",
             "cards": [
-              { "quote": "Bagi masyarakat Kalimantan Utara, laut, hutan, dan tanah bukan sekadar sumber daya alam yang dapat dihitung nilai ekonominya." },
-              { "quote": "Ketika ruang hidup ini berubah atau rusak, yang hilang bukan hanya bentang alam, tetapi juga cara hidup yang telah terbangun selama puluhan bahkan ratusan tahun." }
+              {
+                "quote": "Bagi masyarakat Kalimantan Utara, laut, hutan, dan tanah bukan sekadar sumber daya alam yang dapat dihitung nilai ekonominya."
+              },
+              {
+                "quote": "Ketika ruang hidup ini berubah atau rusak, yang hilang bukan hanya bentang alam, tetapi juga cara hidup yang telah terbangun selama puluhan bahkan ratusan tahun."
+              }
             ]
           },
           "news": {
@@ -153,18 +178,18 @@
         "cards": [
           {
             "title": "Laporan",
-            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            "description": "Berita ini kami sadur dari sumber laporan terkait yang dapat dipercaya. Akses laporan langsung dari sumbernya disini.",
             "cta": "Akses laporan"
           },
           {
             "title": "Siaran Pers",
-            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            "description": "Tim kami mendapatkan bahan berita ini dari hasil distribusi siaran pers. Untuk lebih lengkapnya, akses siaran pers disini.",
             "cta": "Akses Siaran Pers"
           },
           {
             "title": "Visual",
-            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-            "cta": "Dokumentasi Visual"
+            "description": "Berbagai foto dan serta dokumentasi visual lain yang terkait berita ini. Akses visual terkait berita ini disini.",
+            "cta": "Akses Dokumentasi"
           }
         ]
       }

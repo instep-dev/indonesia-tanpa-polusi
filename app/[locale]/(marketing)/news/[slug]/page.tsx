@@ -5,6 +5,7 @@ import { getDictionary, type Locale } from '@/i18n/getDictionary'
 import { db } from '@/libs/db'
 import { mapArticle, articleInclude } from '@/libs/mapArticle'
 import ArticleContentPreview from '@/components/dashboard/ArticleContentPreview'
+import { cn } from '@/libs/utils'
 
 type NewsDetailPageProps = {
   params: Promise<{ locale: string; slug: string }>
@@ -35,11 +36,17 @@ const NewsDetailPage = async ({ params }: NewsDetailPageProps) => {
   const excerpt = validLocale === 'id' ? article.excerptId : article.excerptEn
   const content = validLocale === 'id' ? article.contentId : article.contentEn
 
+  const cards = [
+    { ...newsDetail.about.cards[0], url: article.reportUrl, Icon: Stack },
+    { ...newsDetail.about.cards[1], url: article.pressReleaseUrl, Icon: HourglassMedium },
+    { ...newsDetail.about.cards[2], url: article.visualUrl, Icon: Aperture },
+  ].filter((c): c is typeof c & { url: string } => !!c.url)
+
   return (
     <div>
       <section id="hero-viewport" className="relative flex h-screen w-full flex-col overflow-hidden bg-neutral-500">
         {article.coverImage && (
-           <Image
+          <Image
             src={article.coverImage}
             alt={title}
             fill
@@ -55,7 +62,7 @@ const NewsDetailPage = async ({ params }: NewsDetailPageProps) => {
             <h1 className="text-3xl font-extrabold leading-tight text-brand-yellow sm:text-4xl">
               {title}
             </h1>
-            <p className="mt-4 max-w-2xl text-sm text-white sm:text-base">{excerpt}</p>
+            <p className="mt-4 max-w-4xl text-base text-white sm:text-2xl">{excerpt}</p>
           </div>
         </div>
       </section>
@@ -66,39 +73,54 @@ const NewsDetailPage = async ({ params }: NewsDetailPageProps) => {
         </div>
       </section>
 
-      <section className="bg-brand-yellow px-6 py-16 sm:px-10 lg:px-20">
-        <div className="mx-auto max-w-6xl">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-            <h2 className="text-3xl font-extrabold text-brand-navy sm:text-4xl">
-              {newsDetail.about.heading}
-            </h2>
-            <p className="max-w-md text-base text-brand-navy sm:text-lg">
-              {newsDetail.about.description}
-            </p>
-          </div>
+      {cards.length > 0 && (
+        <section className="bg-slate-100 px-6 py-16 sm:px-10 lg:px-20">
+          <div className="mx-auto max-w-6xl">
+            <div className="flex flex-col gap-2">
+              <h2 className="text-xl font-extrabold text-brand-navy sm:text-2xl">
+                {newsDetail.about.heading}
+              </h2>
+              <p className="max-w-full text-sm text-brand-navy/70 sm:text-base">
+                {newsDetail.about.description}
+              </p>
+            </div>
 
-          <div className="mt-10 grid gap-6 sm:grid-cols-3">
-            {newsDetail.about.cards.map((card, index) => {
-              const Icon = cardIcons[index] ?? Stack
-              return (
-                <div key={card.title} className="flex flex-col rounded-sm bg-white p-6 shadow-sm">
-                  <Icon size={40} weight="duotone" className="text-brand-navy/50" />
-                  <h3 className="mt-4 text-lg font-bold text-brand-navy">{card.title}</h3>
-                  <p className="mt-2 flex-1 text-sm leading-6 text-brand-navy/70">
-                    {card.description}
-                  </p>
-                  <button
-                    type="button"
-                    className="mt-6 w-full rounded-md bg-neutral-200 px-4 py-2 text-sm font-medium text-brand-navy hover:bg-neutral-300"
-                  >
-                    {card.cta}
-                  </button>
-                </div>
-              )
-            })}
+            <div
+              className={cn(
+                'mt-10 grid gap-6',
+                cards.length === 1
+                  ? 'sm:grid-cols-1 max-w-md mx-auto'
+                  : cards.length === 2
+                    ? 'sm:grid-cols-2 max-w-2xl mx-auto'
+                    : 'sm:grid-cols-3',
+              )}
+            >
+              {cards.map((card) => {
+                const Icon = card.Icon
+                return (
+                  <div key={card.title} className="flex flex-col rounded-sm bg-white p-6 shadow-sm">
+                    <div className="flex items-center gap-3">
+                      <Icon size={24} weight="duotone" className="text-[#4E88C9] shrink-0" />
+                      <h3 className="text-lg font-bold text-brand-navy">{card.title}</h3>
+                    </div>
+                    <p className="mt-4 flex-1 text-sm leading-6 text-brand-navy/70">
+                      {card.description}
+                    </p>
+                    <a
+                      href={card.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-6 w-full rounded-md bg-neutral-200 px-4 py-2 text-center text-sm font-bold text-brand-navy hover:bg-neutral-300 transition-colors"
+                    >
+                      {card.cta}
+                    </a>
+                  </div>
+                )
+              })}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
     </div>
   )
 }
