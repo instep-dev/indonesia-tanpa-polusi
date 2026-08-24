@@ -13,7 +13,10 @@ const nextConfig: NextConfig = {
     // Article cover/gallery images are uploaded to R2 and served from the
     // R2_PUBLIC_URL custom domain — next/image refuses to optimize any
     // remote host not explicitly allow-listed here.
-    remotePatterns: [{ protocol: "https", hostname: "indonesiatanpapolusi.org", pathname: "/articles/**" }],
+    remotePatterns: [
+      { protocol: "https", hostname: "indonesiatanpapolusi.org", pathname: "/articles/**" },
+      { protocol: "https", hostname: "media.indonesiatanpapolusi.org", pathname: "/articles/**" },
+    ],
     // Next's image optimizer defaults to Content-Disposition: attachment as
     // a security precaution — some mobile Chromium builds (Android
     // Chrome/Brave) then refuse to paint the response inline inside <img>,
