@@ -11,4 +11,9 @@ export const userApi = {
     const res = await http.post<UserDto>(`/users/${id}/approve`)
     return res.data
   },
+
+  deactivate: async (id: string): Promise<UserDto> => {
+    const res = await http.delete<UserDto>(`/users/${id}/approve`)
+    return res.data
+  },
 }

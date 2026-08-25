@@ -95,7 +95,7 @@ const NewArticleView = () => {
           }
         />
         <p className="font-mono text-xs tracking-[0.08em] text-muted-foreground uppercase">Compose</p>
-        <h1 className="mt-1.5 font-editorial text-4xl tracking-tight text-foreground">New Article</h1>
+        <h1 className="mt-1.5 font-tilt-warp text-4xl tracking-tight text-foreground">New Article</h1>
         <p className="mt-2 text-sm text-muted-foreground">Write a new article for the coalition.</p>
       </div>
 

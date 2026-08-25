@@ -21,3 +21,11 @@ export const useApproveJournalist = () => {
     onSuccess: () => qc.invalidateQueries({ queryKey: userKeys.all }),
   })
 }
+
+export const useDeactivateJournalist = () => {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (id: string) => userApi.deactivate(id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: userKeys.all }),
+  })
+}

@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { toast } from 'vibe-toast'
 import RegisterForm from '@/components/auth/RegisterForm'
 import { useRegister } from '@/services/auth/auth.queries'
@@ -32,13 +33,18 @@ const RegisterPage = () => {
 
       <div className="animate-in fade-in-0 slide-in-from-bottom-2 relative w-full max-w-sm duration-500">
         <div className="mb-8 flex flex-col items-center text-center">
-          <span className="flex size-9 items-center justify-center rounded-[6px] bg-primary font-mono text-xs font-medium text-primary-foreground">
-            ITP
-          </span>
+          <Image
+            src="/logo-blue.png"
+            alt="Indonesia Tanpa Polusi"
+            width={143}
+            height={48}
+            className="h-10 w-auto sm:h-12"
+            priority
+          />
           <p className="mt-4 font-mono text-xs tracking-[0.08em] text-muted-foreground uppercase">
             Newsroom
           </p>
-          <h1 className="mt-1.5 font-editorial text-4xl tracking-tight text-foreground">Create your account</h1>
+          <h1 className="mt-1.5 font-tilt-warp text-4xl tracking-tight text-foreground">Create your account</h1>
           <p className="mt-2 text-sm text-muted-foreground">Join the newsroom to start publishing.</p>
         </div>
 

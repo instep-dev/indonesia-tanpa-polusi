@@ -39,7 +39,7 @@ const SuperAdminTopbar = () => {
               alt="Indonesia Tanpa Polusi"
               width={143}
               height={48}
-              className="h-7 w-auto"
+              className="h-10 w-auto sm:h-12"
               priority
             />
             <span className="font-mono text-xs tracking-[0.08em] text-muted-foreground uppercase">

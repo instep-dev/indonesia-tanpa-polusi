@@ -107,7 +107,7 @@ const EditArticleView = ({ articleId }: { articleId: string }) => {
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="font-mono text-xs tracking-[0.08em] text-muted-foreground uppercase">Editing</p>
-            <h1 className="mt-1.5 font-editorial text-4xl tracking-tight text-foreground">Edit Article</h1>
+            <h1 className="mt-1.5 font-tilt-warp text-4xl tracking-tight text-foreground">Edit Article</h1>
           </div>
           <ArticleStatusBadge status={article.status} />
         </div>

@@ -25,7 +25,7 @@ const DashboardView = () => {
       <div className="animate-in fade-in-0 slide-in-from-bottom-2 flex flex-col gap-6 duration-500 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="font-mono text-xs tracking-[0.08em] text-muted-foreground uppercase">Workspace</p>
-          <h1 className="mt-1.5 font-editorial text-4xl tracking-tight text-foreground sm:text-[2.75rem]">
+          <h1 className="mt-1.5 font-tilt-warp text-4xl tracking-tight text-foreground sm:text-[2.75rem]">
             My Articles
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">

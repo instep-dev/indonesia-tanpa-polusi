@@ -43,7 +43,7 @@ const SuperAdminDashboardView = () => {
     <div className="mx-auto max-w-6xl px-6 py-10 sm:px-8 sm:py-14">
       <div className="animate-in fade-in-0 slide-in-from-bottom-2 duration-500">
         <p className="font-mono text-xs tracking-[0.08em] text-muted-foreground uppercase">Review</p>
-        <h1 className="mt-1.5 font-editorial text-4xl tracking-tight text-foreground sm:text-[2.75rem]">
+        <h1 className="mt-1.5 font-tilt-warp text-4xl tracking-tight text-foreground sm:text-[2.75rem]">
           All Articles
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
