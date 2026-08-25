@@ -131,6 +131,8 @@ model Article {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  isMain Boolean @default(false)
 }
 
 model ArticleImage {

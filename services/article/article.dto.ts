@@ -49,6 +49,7 @@ export type ArticleDto = {
   images: ArticleImageDto[]
   createdAt: string
   updatedAt: string
+  isMain: boolean
 }
 
 export type ArticlePage = {

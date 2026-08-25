@@ -62,6 +62,11 @@ export const articleApi = {
     return res.data
   },
 
+  updateMainArticles: async (articleIds: string[]): Promise<ArticleDto[]> => {
+    const res = await http.put<ArticleDto[]>('/articles/main', { articleIds })
+    return res.data
+  },
+
   addImage: async (
     id: string,
     body: { url: string; caption?: string; order?: number },

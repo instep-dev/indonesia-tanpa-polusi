@@ -54,6 +54,7 @@ export const mapArticle = (article: ArticleWithRelations): ArticleDto => ({
     })),
   createdAt: article.createdAt.toISOString(),
   updatedAt: article.updatedAt.toISOString(),
+  isMain: article.isMain,
 })
 
 export const articleInclude = {

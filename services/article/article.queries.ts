@@ -124,3 +124,13 @@ export const useReviewArticle = (id: string) => {
     },
   })
 }
+
+export const useUpdateMainArticles = () => {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (articleIds: string[]) => articleApi.updateMainArticles(articleIds),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: articleKeys.all })
+    },
+  })
+}

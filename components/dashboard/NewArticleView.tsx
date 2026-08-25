@@ -148,7 +148,7 @@ const NewArticleView = () => {
 
             <div className="grid gap-4 sm:grid-cols-3">
               <div className="space-y-2">
-                <Label htmlFor="reportUrl">Report Link (PDF)</Label>
+                <Label htmlFor="reportUrl">Report Link</Label>
                 <Input
                   id="reportUrl"
                   value={reportUrl}
