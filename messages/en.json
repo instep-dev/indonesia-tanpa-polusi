@@ -29,7 +29,9 @@
         "heading": "Our Stories",
         "body": "Behind the industrial development lies a rarely heard true story. Our Stories presents the voices of residents living alongside the Captive Coal-Fired Power Plant, from their struggles with air pollution that triggers acute respiratory infections (ARI), to the loss of livelihoods as farmers and fishermen, to the loss of land due to land grabbing. These stories serve as a reminder that every policy has a real impact on people's lives.",
         "cards": [
-          { "quote": "Why must we fall ill for electricity we don't even get to enjoy?" },
+          {
+            "quote": "Why must we fall ill for electricity we don't even get to enjoy?"
+          },
           { "quote": "When the sea is polluted, life itself is taken away." }
         ]
       },
@@ -68,14 +70,21 @@
           },
           "about": {
             "heading": "About Us",
-            "body": ["Koalisi Sulawesi Tanpa Polusi (SULOSI) is a civil society coalition comprising various environmental organizations, legal aid groups, citizen communities, academics, and individuals united by the shared goal of promoting cleaner energy development in Sulawesi.", "The coalition's primary focus is to reduce pollution impacts from coal-fired power plants, particularly \"captive\" plants supplying electricity to nickel processing industrial zones and to advocate for the protection of the rights of affected communities."]
+            "body": [
+              "Koalisi Sulawesi Tanpa Polusi (SULOSI) is a civil society coalition comprising various environmental organizations, legal aid groups, citizen communities, academics, and individuals united by the shared goal of promoting cleaner energy development in Sulawesi.",
+              "The coalition's primary focus is to reduce pollution impacts from coal-fired power plants, particularly \"captive\" plants supplying electricity to nickel processing industrial zones and to advocate for the protection of the rights of affected communities."
+            ]
           },
           "ourStories": {
             "heading": "Our Stories",
             "body": "Behind the industrial development lies a rarely heard true story. Our Stories presents the voices of residents living alongside the Captive Coal-Fired Power Plant, from their struggles with air pollution that triggers acute respiratory infections (ARI), to the loss of livelihoods as farmers and fishermen, to the loss of land due to land grabbing. These stories serve as a reminder that every policy has a real impact on people's lives.",
             "cards": [
-              { "quote": "They used the pretext of \"greening,\" but I suspect it's actually for \"darkening\"! It might become a new place for the nickel industry." },
-              { "quote": "They claim to be serious about the energy transition. They say they care about the climate. They say they want to protect the forests. Yet, at the same time, coal-fired power plants are still belching smoke." }
+              {
+                "quote": "They used the pretext of \"greening,\" but I suspect it's actually for \"darkening\"! It might become a new place for the nickel industry."
+              },
+              {
+                "quote": "They claim to be serious about the energy transition. They say they care about the climate. They say they want to protect the forests. Yet, at the same time, coal-fired power plants are still belching smoke."
+              }
             ]
           },
           "news": {
@@ -91,14 +100,21 @@
           },
           "about": {
             "heading": "About Us",
-            "body": ["Koalisi Maluku Utara Tanpa Polusi is a civil society coalition comprising various environmental organizations, legal aid groups, citizen communities, academics, and individuals united by the shared goal of promoting cleaner energy development in Sulawesi.", "The coalition's primary focus is to reduce pollution impacts from coal-fired power plants, particularly \"captive\" plants supplying electricity to nickel processing industrial zones and to advocate for the protection of the rights of affected communities."]
+            "body": [
+              "Koalisi Maluku Utara Tanpa Polusi is a civil society coalition comprising various environmental organizations, legal aid groups, citizen communities, academics, and individuals united by the shared goal of promoting cleaner energy development in Sulawesi.",
+              "The coalition's primary focus is to reduce pollution impacts from coal-fired power plants, particularly \"captive\" plants supplying electricity to nickel processing industrial zones and to advocate for the protection of the rights of affected communities."
+            ]
           },
           "ourStories": {
             "heading": "Our Stories",
             "body": "Behind the industrial development lies a rarely heard true story. Our Stories presents the voices of residents living alongside the Captive Coal-Fired Power Plant, from their struggles with air pollution that triggers acute respiratory infections (ARI), to the loss of livelihoods as farmers and fishermen, to the loss of land due to land grabbing. These stories serve as a reminder that every policy has a real impact on people's lives.",
             "cards": [
-              { "quote": "Deteriorating air quality, contaminated water sources, and an increased risk of health problems are realities faced by many communities living near industrial zones and extractive activity sites." },
-              { "quote": "When the air being breathed is no longer clean and water sources become increasingly contaminated, the impact is felt directly by residents, especially vulnerable groups such as children, the elderly, and those with respiratory conditions." }
+              {
+                "quote": "Deteriorating air quality, contaminated water sources, and an increased risk of health problems are realities faced by many communities living near industrial zones and extractive activity sites."
+              },
+              {
+                "quote": "When the air being breathed is no longer clean and water sources become increasingly contaminated, the impact is felt directly by residents, especially vulnerable groups such as children, the elderly, and those with respiratory conditions."
+              }
             ]
           },
           "news": {
@@ -114,14 +130,21 @@
           },
           "about": {
             "heading": "About Us",
-            "body": ["Koalisi Kalimantan Utara Tanpa Polusi is a civil society coalition comprising various environmental organizations, legal aid groups, citizen communities, academics, and individuals united by the shared goal of promoting cleaner energy development in Sulawesi.", "The coalition's primary focus is to reduce pollution impacts from coal-fired power plants, particularly \"captive\" plants supplying electricity to nickel processing industrial zones and to advocate for the protection of the rights of affected communities."]
+            "body": [
+              "Koalisi Kalimantan Utara Tanpa Polusi is a civil society coalition comprising various environmental organizations, legal aid groups, citizen communities, academics, and individuals united by the shared goal of promoting cleaner energy development in Sulawesi.",
+              "The coalition's primary focus is to reduce pollution impacts from coal-fired power plants, particularly \"captive\" plants supplying electricity to nickel processing industrial zones and to advocate for the protection of the rights of affected communities."
+            ]
           },
           "ourStories": {
             "heading": "Our Stories",
             "body": "Behind the industrial development lies a rarely heard true story. Our Stories presents the voices of residents living alongside the Captive Coal-Fired Power Plant, from their struggles with air pollution that triggers acute respiratory infections (ARI), to the loss of livelihoods as farmers and fishermen, to the loss of land due to land grabbing. These stories serve as a reminder that every policy has a real impact on people's lives.",
             "cards": [
-              { "quote": "For the people of North Kalimantan, the sea, forests, and land are not merely natural resources whose economic value can be quantified." },
-              { "quote": "When this living space changes or is destroyed, what is lost is not merely the landscape, but also a way of life that has been built up over decades or even centuries." }
+              {
+                "quote": "For the people of North Kalimantan, the sea, forests, and land are not merely natural resources whose economic value can be quantified."
+              },
+              {
+                "quote": "When this living space changes or is destroyed, what is lost is not merely the landscape, but also a way of life that has been built up over decades or even centuries."
+              }
             ]
           },
           "news": {
@@ -153,17 +176,17 @@
         "cards": [
           {
             "title": "Report",
-            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            "description": "Read the supporting report for background, evidence, and key findings.",
             "cta": "Access the report"
           },
           {
             "title": "Press Release",
-            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            "description": "Review the official statement and context for this campaign.",
             "cta": "Access to the Press Release"
           },
           {
             "title": "Visuals",
-            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            "description": "Browse the campaign visuals and downloadable materials.",
             "cta": "Visual Documentations"
           }
         ]
