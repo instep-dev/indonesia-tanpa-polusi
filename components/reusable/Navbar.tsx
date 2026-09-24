@@ -55,6 +55,27 @@ const Navbar = ({ currentLocale, dict }: NavbarProps) => {
     return pathname === target || pathname.startsWith(`${target}/`);
   };
 
+  const getLogoSrc = (): string => {
+    if (pathname.startsWith(`/${currentLocale}/sulawesi`)) {
+      return overHero
+        ? "/updated-logos/Sulosi/logo-sulosi-blue.png"
+        : "/updated-logos/Sulosi/logo-sulosi-yellow.png";
+    }
+    if (pathname.startsWith(`/${currentLocale}/maluku-utara`)) {
+      return overHero
+        ? "/updated-logos/Malut/logo-malut-blue.png"
+        : "/updated-logos/Malut/logo-malut-yellow.png";
+    }
+    if (pathname.startsWith(`/${currentLocale}/kalimantan-utara`)) {
+      return overHero
+        ? "/updated-logos/Kaltara/logo-kaltara-blue.png"
+        : "/updated-logos/Kaltara/logo-kaltara-yellow.png";
+    }
+    return overHero
+      ? "/updated-logos/Indonesia/logo-navbar-white.png"
+      : "/updated-logos/Indonesia/logo-navbar-blue.png";
+  };
+
   return (
     <header className="fixed inset-x-0 top-0 z-50 w-full">
       <motion.div
@@ -83,11 +104,7 @@ const Navbar = ({ currentLocale, dict }: NavbarProps) => {
           {/* 2038 x 684 */}
           <Link href={`/${currentLocale}`} className="flex items-center gap-2">
             <Image
-              src={
-                overHero
-                  ? "/updated-logos/Indonesia/logo-navbar-white.png"
-                  : "/updated-logos/Indonesia/logo-navbar-blue.png"
-              }
+              src={getLogoSrc()}
               alt="Indonesia Tanpa Polusi"
               width={143}
               height={48}
