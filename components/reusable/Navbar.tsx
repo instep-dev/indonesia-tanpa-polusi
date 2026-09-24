@@ -1,57 +1,59 @@
-'use client'
+"use client";
 
-import Image from 'next/image'
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { useEffect, useState } from 'react'
-import { motion } from 'framer-motion'
-import { List, MagnifyingGlass, X } from '@phosphor-icons/react'
-import LangToggle from '@/components/reusable/LangToggle'
-import { cn } from '@/libs/utils'
-import { navLinks, type NavLinkKey } from '@/data/data'
-import type { Dictionary, Locale } from '@/i18n/getDictionary'
+import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import { List, MagnifyingGlass, X } from "@phosphor-icons/react";
+import LangToggle from "@/components/reusable/LangToggle";
+import { cn } from "@/libs/utils";
+import { navLinks, type NavLinkKey } from "@/data/data";
+import type { Dictionary, Locale } from "@/i18n/getDictionary";
 
 type NavbarProps = {
-  currentLocale: Locale
-  dict: Dictionary['marketing']['nav']
-}
+  currentLocale: Locale;
+  dict: Dictionary["marketing"]["nav"];
+};
 
 // Navbar sits fixed on top of every marketing page. While the page's hero
 // section (id="hero-viewport") occupies the strip under the navbar, it
 // renders white-on-transparent to sit on top of the hero photo/video. Once
 // the hero scrolls past, it flips to navy-on-white so it stays readable
 // against the plain white sections below.
-const NAVBAR_HEIGHT = 96
+const NAVBAR_HEIGHT = 96;
 
 const Navbar = ({ currentLocale, dict }: NavbarProps) => {
-  const [open, setOpen] = useState(false)
-  const [overHero, setOverHero] = useState(true)
-  const pathname = usePathname()
+  const [open, setOpen] = useState(false);
+  const [overHero, setOverHero] = useState(true);
+  const pathname = usePathname();
 
   useEffect(() => {
-    const target = document.getElementById('hero-viewport')
+    const target = document.getElementById("hero-viewport");
     if (!target) {
-      setOverHero(false)
-      return
+      setOverHero(false);
+      return;
     }
 
-    setOverHero(true)
+    setOverHero(true);
     const observer = new IntersectionObserver(
       ([entry]) => setOverHero(entry.isIntersecting),
-      { rootMargin: `-${NAVBAR_HEIGHT}px 0px 0px 0px`, threshold: 0 },
-    )
-    observer.observe(target)
-    return () => observer.disconnect()
-  }, [pathname])
+      { rootMargin: `-${NAVBAR_HEIGHT}px 0px 0px 0px`, threshold: 0 }
+    );
+    observer.observe(target);
+    return () => observer.disconnect();
+  }, [pathname]);
 
   const isLinkActive = (key: NavLinkKey, href: string): boolean => {
-    const target = `/${currentLocale}${href}`
+    const target = `/${currentLocale}${href}`;
     // Next doesn't add a trailing slash to the home route — /en, not /en/.
-    if (href === '/') return pathname === `/${currentLocale}` || pathname === target
+    if (href === "/")
+      return pathname === `/${currentLocale}` || pathname === target;
     // Both the list page and detail pages live under /news.
-    if (key === 'latestNews' && pathname.startsWith(`/${currentLocale}/news`)) return true
-    return pathname === target || pathname.startsWith(`${target}/`)
-  }
+    if (key === "latestNews" && pathname.startsWith(`/${currentLocale}/news`))
+      return true;
+    return pathname === target || pathname.startsWith(`${target}/`);
+  };
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 w-full">
@@ -59,7 +61,7 @@ const Navbar = ({ currentLocale, dict }: NavbarProps) => {
         className="absolute inset-0 border-b border-foreground/10 bg-background shadow-sm"
         initial={false}
         animate={{ opacity: overHero ? 0 : 1, y: overHero ? -16 : 0 }}
-        transition={{ type: 'spring', bounce: 0.5, duration: 0.6 }}
+        transition={{ type: "spring", bounce: 0.5, duration: 0.6 }}
       />
 
       <div
@@ -78,40 +80,45 @@ const Navbar = ({ currentLocale, dict }: NavbarProps) => {
               : "bg-transparent border border-transparent shadow-none rounded-none px-0 py-0"
           )}
         >
+          {/* 2038 x 684 */}
           <Link href={`/${currentLocale}`} className="flex items-center gap-2">
             <Image
-              src={overHero ? '/logo-white.png' : '/logo-blue.png'}
+              src={
+                overHero
+                  ? "/updated-logos/Indonesia/logo-navbar-white.png"
+                  : "/updated-logos/Indonesia/logo-navbar-blue.png"
+              }
               alt="Indonesia Tanpa Polusi"
               width={143}
               height={48}
-              className="h-10 w-auto sm:h-12"
+              className="h-14 w-auto sm:h-16"
               priority
             />
           </Link>
 
           <nav
             className={cn(
-              'hidden items-center gap-6 text-lg font-bold transition-colors lg:flex',
-              overHero ? 'text-white' : 'text-brand-navy',
+              "hidden items-center gap-6 text-lg font-bold transition-colors lg:flex",
+              overHero ? "text-white" : "text-brand-navy"
             )}
           >
             {navLinks.map((link) => {
-              const active = isLinkActive(link.key, link.href)
+              const active = isLinkActive(link.key, link.href);
               return (
                 <Link
                   key={link.key}
                   href={`/${currentLocale}${link.href}`}
-                  aria-current={active ? 'page' : undefined}
+                  aria-current={active ? "page" : undefined}
                   className={cn(
-                    'underline-offset-8 decoration-2',
+                    "underline-offset-8 decoration-2",
                     active
-                      ? 'text-brand-yellow underline'
-                      : 'hover:text-brand-yellow',
+                      ? "text-brand-yellow underline"
+                      : "hover:text-brand-yellow"
                   )}
                 >
                   {dict[link.key]}
                 </Link>
-              )
+              );
             })}
           </nav>
 
@@ -137,7 +144,10 @@ const Navbar = ({ currentLocale, dict }: NavbarProps) => {
 
           <button
             onClick={() => setOpen((v) => !v)}
-            className={cn('p-2 transition-colors lg:hidden', overHero ? 'text-white' : 'text-brand-navy')}
+            className={cn(
+              "p-2 transition-colors lg:hidden",
+              overHero ? "text-white" : "text-brand-navy"
+            )}
             aria-label="Toggle menu"
           >
             {open ? <X size={24} /> : <List size={24} />}
@@ -148,21 +158,21 @@ const Navbar = ({ currentLocale, dict }: NavbarProps) => {
           <div className="mt-4 rounded-lg bg-brand-navy/90 px-6 py-4 backdrop-blur-sm sm:px-10 lg:hidden">
             <nav className="flex flex-col gap-4 text-lg font-bold text-white">
               {navLinks.map((link) => {
-                const active = isLinkActive(link.key, link.href)
+                const active = isLinkActive(link.key, link.href);
                 return (
                   <Link
                     key={link.key}
                     href={`/${currentLocale}${link.href}`}
                     onClick={() => setOpen(false)}
-                    aria-current={active ? 'page' : undefined}
+                    aria-current={active ? "page" : undefined}
                     className={cn(
-                      'underline-offset-8 decoration-2',
-                      active ? 'text-brand-yellow underline' : undefined,
+                      "underline-offset-8 decoration-2",
+                      active ? "text-brand-yellow underline" : undefined
                     )}
                   >
                     {dict[link.key]}
                   </Link>
-                )
+                );
               })}
             </nav>
             <div className="mt-4 flex items-center gap-3">
@@ -186,7 +196,7 @@ const Navbar = ({ currentLocale, dict }: NavbarProps) => {
         )}
       </div>
     </header>
-  )
-}
+  );
+};
 
-export default Navbar
+export default Navbar;

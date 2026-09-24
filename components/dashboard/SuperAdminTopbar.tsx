@@ -1,41 +1,44 @@
-'use client'
+"use client";
 
-import Link from 'next/link'
-import Image from 'next/image'
-import { useRouter } from 'next/navigation'
-import { toast } from 'vibe-toast'
-import { SignOut, Newspaper, Users } from '@phosphor-icons/react'
-import { superAdminAuthStore } from '@/services/super-admin/super-admin-auth.store'
-import { useSuperAdminLogout } from '@/services/super-admin/super-admin-auth.queries'
-import { useJournalists } from '@/services/user/user.queries'
-import { Button } from '@/components/ui/button'
-import { Skeleton } from '@/components/ui/skeleton'
+import Link from "next/link";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { toast } from "vibe-toast";
+import { SignOut, Newspaper, Users } from "@phosphor-icons/react";
+import { superAdminAuthStore } from "@/services/super-admin/super-admin-auth.store";
+import { useSuperAdminLogout } from "@/services/super-admin/super-admin-auth.queries";
+import { useJournalists } from "@/services/user/user.queries";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const SuperAdminTopbar = () => {
-  const router = useRouter()
-  const superAdmin = superAdminAuthStore((s) => s.superAdmin)
-  const bootstrapped = superAdminAuthStore((s) => s.bootstrapped)
-  const logout = useSuperAdminLogout()
-  const { data: journalists } = useJournalists(bootstrapped)
-  const pendingCount = journalists?.filter((j) => !j.approvedAt).length ?? 0
+  const router = useRouter();
+  const superAdmin = superAdminAuthStore((s) => s.superAdmin);
+  const bootstrapped = superAdminAuthStore((s) => s.bootstrapped);
+  const logout = useSuperAdminLogout();
+  const { data: journalists } = useJournalists(bootstrapped);
+  const pendingCount = journalists?.filter((j) => !j.approvedAt).length ?? 0;
 
   const handleLogout = async () => {
     try {
-      await logout.mutateAsync()
-      toast.success('Signed out')
-      router.push('/super-admin/auth/login')
+      await logout.mutateAsync();
+      toast.success("Signed out");
+      router.push("/super-admin/auth/login");
     } catch {
-      toast.error('Sign out failed')
+      toast.error("Sign out failed");
     }
-  }
+  };
 
   return (
     <header className="sticky top-0 z-40 border-b bg-background/85 backdrop-blur-sm">
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6 sm:px-8">
         <div className="flex items-center gap-6">
-          <Link href="/super-admin/dashboard" className="flex items-center gap-2.5">
+          <Link
+            href="/super-admin/dashboard"
+            className="flex items-center gap-2.5"
+          >
             <Image
-              src="/logo-blue.png"
+              src="/updated-logos/Indonesia/logo-navbar-blue.png"
               alt="Indonesia Tanpa Polusi"
               width={143}
               height={48}
@@ -48,7 +51,12 @@ const SuperAdminTopbar = () => {
           </Link>
 
           <nav className="hidden items-center gap-1 sm:flex">
-            <Button variant="ghost" size="sm" nativeButton={false} render={<Link href="/super-admin/dashboard" />}>
+            <Button
+              variant="ghost"
+              size="sm"
+              nativeButton={false}
+              render={<Link href="/super-admin/dashboard" />}
+            >
               <Newspaper className="size-3.5" /> Articles
             </Button>
             <Button
@@ -77,13 +85,18 @@ const SuperAdminTopbar = () => {
           ) : (
             <Skeleton className="hidden h-4 w-32 sm:block" />
           )}
-          <Button variant="ghost" size="sm" onClick={handleLogout} disabled={logout.isPending}>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleLogout}
+            disabled={logout.isPending}
+          >
             <SignOut className="size-3.5" /> Sign out
           </Button>
         </div>
       </div>
     </header>
-  )
-}
+  );
+};
 
-export default SuperAdminTopbar
+export default SuperAdminTopbar;

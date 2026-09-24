@@ -1,28 +1,28 @@
-'use client'
+"use client";
 
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import Image from 'next/image'
-import { toast } from 'vibe-toast'
-import LoginForm from '@/components/auth/LoginForm'
-import { useLogin } from '@/services/auth/auth.queries'
-import { Card, CardContent } from '@/components/ui/card'
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
+import { toast } from "vibe-toast";
+import LoginForm from "@/components/auth/LoginForm";
+import { useLogin } from "@/services/auth/auth.queries";
+import { Card, CardContent } from "@/components/ui/card";
 
 const LoginPage = () => {
-  const router = useRouter()
-  const { mutate, isPending } = useLogin()
+  const router = useRouter();
+  const { mutate, isPending } = useLogin();
 
   const handleSubmit = (values: { email: string; password: string }) => {
     mutate(values, {
       onSuccess: () => {
-        toast.success('Signed in successfully')
-        router.push('/dashboard')
+        toast.success("Signed in successfully");
+        router.push("/dashboard");
       },
       onError: () => {
-        toast.error('Invalid email or password')
-      },
-    })
-  }
+        toast.error("Invalid email or password");
+      }
+    });
+  };
 
   return (
     <div className="workspace-canvas relative flex min-h-screen items-center justify-center bg-background px-6 py-12 text-foreground">
@@ -34,18 +34,22 @@ const LoginPage = () => {
       <div className="animate-in fade-in-0 slide-in-from-bottom-2 relative w-full max-w-sm duration-500">
         <div className="mb-8 flex flex-col items-center text-center">
           <Image
-            src="/logo-blue.png"
+            src="/updated-logos/Indonesia/logo-blue-transparent.png"
             alt="Indonesia Tanpa Polusi"
-            width={143}
-            height={48}
-            className="h-10 w-auto sm:h-12"
+            width={160}
+            height={140}
+            className="h-20 w-auto sm:h-24"
             priority
           />
           <p className="mt-4 font-mono text-xs tracking-[0.08em] text-muted-foreground uppercase">
             Newsroom
           </p>
-          <h1 className="mt-1.5 font-tilt-warp text-4xl tracking-tight text-foreground">Welcome back</h1>
-          <p className="mt-2 text-sm text-muted-foreground">Sign in to manage your coverage.</p>
+          <h1 className="mt-1.5 font-tilt-warp text-4xl tracking-tight text-foreground">
+            Welcome back
+          </h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Sign in to manage your coverage.
+          </p>
         </div>
 
         <Card>
@@ -55,14 +59,17 @@ const LoginPage = () => {
         </Card>
 
         <p className="mt-6 text-center text-sm text-muted-foreground">
-          Belum punya akun?{' '}
-          <Link href="/auth/register" className="font-medium text-foreground underline underline-offset-4">
+          Belum punya akun?{" "}
+          <Link
+            href="/auth/register"
+            className="font-medium text-foreground underline underline-offset-4"
+          >
             Daftar
           </Link>
         </p>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default LoginPage
+export default LoginPage;
