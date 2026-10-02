@@ -15,6 +15,7 @@ import ArticleTable from '@/components/dashboard/ArticleTable'
 import ConfirmDialog from '@/components/dashboard/ConfirmDialog'
 import ArticlePreviewDialog from '@/components/dashboard/ArticlePreviewDialog'
 import type { ArticleDto } from '@/services/article/article.dto'
+import { displayTitle } from '@/libs/articleLocale'
 
 const SuperAdminDashboardView = () => {
   const bootstrapped = superAdminAuthStore((s) => s.bootstrapped)
@@ -39,8 +40,9 @@ const SuperAdminDashboardView = () => {
 
   const filteredPublished = useMemo(() => {
     return publishedArticles.filter((a) => {
-      const title = (a.sourceLocale === 'id' ? a.titleId : a.titleEn).toLowerCase()
-      return title.includes(searchQuery.toLowerCase())
+      // Search both languages, so an English-only search finds an Indonesian-first article too.
+      const haystack = `${a.titleId} ${a.titleEn}`.toLowerCase()
+      return haystack.includes(searchQuery.toLowerCase())
     })
   }, [publishedArticles, searchQuery])
 
@@ -97,8 +99,7 @@ const SuperAdminDashboardView = () => {
   }
 
   const pendingTitle = pendingDelete
-    ? (pendingDelete.sourceLocale === 'id' ? pendingDelete.titleId : pendingDelete.titleEn) ||
-      'This article'
+    ? displayTitle(pendingDelete) || 'This article'
     : ''
 
   return (
@@ -124,7 +125,7 @@ const SuperAdminDashboardView = () => {
           {[0, 1, 2].map((index) => {
             const article = mainArticles[index]
             const title = article
-              ? (article.sourceLocale === 'id' ? article.titleId : article.titleEn)
+              ? displayTitle(article)
               : null
             const image = article?.coverImage
 
@@ -266,7 +267,7 @@ const SuperAdminDashboardView = () => {
             ) : (
               <div className="divide-y border rounded-xl overflow-y-auto max-h-[350px] bg-background font-sans">
                 {filteredPublished.map((article) => {
-                  const title = (article.sourceLocale === 'id' ? article.titleId : article.titleEn) || 'Untitled'
+                  const title = displayTitle(article) || 'Untitled'
                   const isAssigned = mainArticles.some((m) => m.id === article.id)
 
                   return (

@@ -16,6 +16,9 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       { protocol: "https", hostname: "indonesiatanpapolusi.org", pathname: "/articles/**" },
       { protocol: "https", hostname: "media.indonesiatanpapolusi.org", pathname: "/articles/**" },
+      // CMS-managed site content (hero/about/logo images) uploaded by super-admins.
+      { protocol: "https", hostname: "indonesiatanpapolusi.org", pathname: "/site/**" },
+      { protocol: "https", hostname: "media.indonesiatanpapolusi.org", pathname: "/site/**" },
     ],
     // Next's image optimizer defaults to Content-Disposition: attachment as
     // a security precaution — some mobile Chromium builds (Android

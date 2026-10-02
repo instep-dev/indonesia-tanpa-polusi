@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { toast } from 'vibe-toast'
-import { Warning, ArrowLeft, Trash, Eye } from '@phosphor-icons/react'
+import { Warning, ArrowLeft, Trash, Eye, PencilSimple } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Textarea } from '@/components/ui/textarea'
@@ -17,17 +17,12 @@ import ArticleContentPreview from '@/components/dashboard/ArticleContentPreview'
 import ConfirmDialog from '@/components/dashboard/ConfirmDialog'
 import ArticlePreviewDialog from '@/components/dashboard/ArticlePreviewDialog'
 import { superAdminAuthStore } from '@/services/super-admin/super-admin-auth.store'
+import { LOCALE_NAMES, displayTitle, missingLanguages } from '@/libs/articleLocale'
 import {
   useArticle,
   useReviewArticle,
   useDeleteArticleAsAdmin,
 } from '@/services/article/article.queries'
-
-const TRANSLATION_STATUS_LABELS: Record<string, string> = {
-  PENDING: 'Pending',
-  DONE: 'Done',
-  FAILED: 'Failed',
-}
 
 const formatDateTime = (value: string) =>
   new Date(value).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })
@@ -43,6 +38,7 @@ const ArticleReviewView = ({ articleId }: { articleId: string }) => {
   const [showRejectForm, setShowRejectForm] = useState(false)
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [previewOpen, setPreviewOpen] = useState(false)
+  const [approveAnywayOpen, setApproveAnywayOpen] = useState(false)
 
   if (isLoading || !article) {
     return (
@@ -51,6 +47,15 @@ const ArticleReviewView = ({ articleId }: { articleId: string }) => {
         <Skeleton className="h-64 w-full rounded-xl" />
       </div>
     )
+  }
+
+  const incomplete = missingLanguages(article)
+  const incompleteNames = incomplete.map((locale) => LOCALE_NAMES[locale]).join(' and ')
+
+  // One language empty is allowed (readers get the other language), but the reviewer should know.
+  const handleApproveClick = () => {
+    if (incomplete.length > 0) setApproveAnywayOpen(true)
+    else void handleApprove()
   }
 
   const handleApprove = async () => {
@@ -83,7 +88,7 @@ const ArticleReviewView = ({ articleId }: { articleId: string }) => {
     })
   }
 
-  const articleTitle = (article.sourceLocale === 'id' ? article.titleId : article.titleEn) || 'This article'
+  const articleTitle = displayTitle(article) || 'This article'
 
   return (
     <div className="mx-auto max-w-6xl px-6 py-10 sm:px-8 sm:py-14">
@@ -118,13 +123,13 @@ const ArticleReviewView = ({ articleId }: { articleId: string }) => {
         </Alert>
       )}
 
-      {!article.deletedAt && article.translationStatus === 'FAILED' && (
+      {!article.deletedAt && incomplete.length > 0 && (
         <Alert className="mt-6 border-[#F3E4B5] bg-[#FBF3DB] text-[#956400] [&_svg]:text-[#956400]">
           <Warning size={16} />
           <AlertDescription className="text-[#956400]/80">
-            Auto-translation failed. The {article.sourceLocale === 'id' ? 'English' : 'Indonesian'} version
-            below is empty — reject this article and ask the author to translate it manually, or approve
-            knowing one language will be blank on the site.
+            The {incompleteNames} version is empty or incomplete, so readers of that language will see the
+            other language instead. Use <strong>Edit</strong> to fill it in (the editor can translate it for
+            you), or approve knowing that.
           </AlertDescription>
         </Alert>
       )}
@@ -156,8 +161,12 @@ const ArticleReviewView = ({ articleId }: { articleId: string }) => {
                 <p className="mt-0.5">{article.sourceLocale === 'id' ? 'Bahasa Indonesia' : 'English'}</p>
               </div>
               <div>
-                <p className="text-xs text-muted-foreground">Translation</p>
-                <p className="mt-0.5">{TRANSLATION_STATUS_LABELS[article.translationStatus]}</p>
+                <p className="text-xs text-muted-foreground">Languages</p>
+                <p className="mt-0.5">
+                  {(['id', 'en'] as const)
+                    .map((locale) => `${LOCALE_NAMES[locale]} ${incomplete.includes(locale) ? '✗ missing' : '✓'}`)
+                    .join(' · ')}
+                </p>
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">Created</p>
@@ -233,9 +242,18 @@ const ArticleReviewView = ({ articleId }: { articleId: string }) => {
           <div className="border-t px-6 py-4">
             {article.status !== 'PENDING_REVIEW' ? (
               <div className="flex items-center justify-between gap-3">
-                <Button variant="outline" onClick={() => setPreviewOpen(true)}>
-                  <Eye className="size-4" /> Preview
-                </Button>
+                <div className="flex gap-3">
+                  <Button variant="outline" onClick={() => setPreviewOpen(true)}>
+                    <Eye className="size-4" /> Preview
+                  </Button>
+                  <Button
+                    nativeButton={false}
+                    variant="outline"
+                    render={<Link href={`/super-admin/articles/${articleId}/edit`} />}
+                  >
+                    <PencilSimple className="size-4" /> Edit
+                  </Button>
+                </div>
                 <Button
                   variant="ghost"
                   onClick={() => setConfirmOpen(true)}
@@ -250,6 +268,13 @@ const ArticleReviewView = ({ articleId }: { articleId: string }) => {
                 <div className="flex gap-3">
                   <Button variant="outline" onClick={() => setPreviewOpen(true)}>
                     <Eye className="size-4" /> Preview
+                  </Button>
+                  <Button
+                    nativeButton={false}
+                    variant="outline"
+                    render={<Link href={`/super-admin/articles/${articleId}/edit`} />}
+                  >
+                    <PencilSimple className="size-4" /> Edit
                   </Button>
                   <Button
                     variant="ghost"
@@ -268,7 +293,7 @@ const ArticleReviewView = ({ articleId }: { articleId: string }) => {
                   >
                     Reject
                   </Button>
-                  <Button onClick={handleApprove} disabled={reviewArticle.isPending}>
+                  <Button onClick={handleApproveClick} disabled={reviewArticle.isPending}>
                     {reviewArticle.isPending ? 'Publishing...' : 'Approve & Publish'}
                   </Button>
                 </div>
@@ -300,6 +325,19 @@ const ArticleReviewView = ({ articleId }: { articleId: string }) => {
           </div>
         )}
       </Card>
+
+      <ConfirmDialog
+        open={approveAnywayOpen}
+        onOpenChange={setApproveAnywayOpen}
+        title="Publish with a missing language?"
+        description={`The ${incompleteNames} version is empty or incomplete. Readers of that language will see the other language until it is filled in.`}
+        confirmLabel="Approve anyway"
+        isPending={reviewArticle.isPending}
+        onConfirm={() => {
+          setApproveAnywayOpen(false)
+          void handleApprove()
+        }}
+      />
 
       <ConfirmDialog
         open={confirmOpen}

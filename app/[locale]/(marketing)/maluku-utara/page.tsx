@@ -1,11 +1,23 @@
-import { getDictionary, type Locale } from '@/i18n/getDictionary'
+import type { Metadata } from 'next'
+import type { Locale } from '@/i18n/getDictionary'
 import RegionPage from '@/components/marketing/RegionPage'
-import { regionStories } from '@/data/data'
+import { getPageMetadata, getSiteDictionary, getSiteValues, getStories } from '@/libs/siteContent'
 
-const MalukuUtaraPage = async ({ params }: { params: Promise<{ locale: string }> }) => {
+type MalukuUtaraPageProps = { params: Promise<{ locale: string }> }
+
+export const generateMetadata = async ({ params }: MalukuUtaraPageProps): Promise<Metadata> => {
+  const { locale } = await params
+  return getPageMetadata('malukuUtara', locale === 'en' ? 'en' : 'id')
+}
+
+const MalukuUtaraPage = async ({ params }: MalukuUtaraPageProps) => {
   const { locale } = await params
   const validLocale: Locale = locale === 'en' ? 'en' : 'id'
-  const dict = await getDictionary(validLocale)
+  const [dict, values, stories] = await Promise.all([
+    getSiteDictionary(validLocale),
+    getSiteValues(validLocale),
+    getStories('stories.malukuUtara', validLocale),
+  ])
 
   return (
     <RegionPage
@@ -13,7 +25,9 @@ const MalukuUtaraPage = async ({ params }: { params: Promise<{ locale: string }>
       regionSlug="malukuUtara"
       dict={dict.marketing.home.regions.malukuUtara}
       newsListDict={dict.marketing.home.news}
-      stories={regionStories.malukuUtara}
+      stories={stories}
+      heroImage={values['media.regions.malukuUtara.heroImage']}
+      aboutImage={values['media.regions.malukuUtara.aboutImage']}
     />
   )
 }

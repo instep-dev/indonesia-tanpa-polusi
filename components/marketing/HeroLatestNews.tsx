@@ -2,15 +2,16 @@ import type { Dictionary } from "@/i18n/getDictionary";
 
 type HeroLatestNewsProps = {
   dict: Dictionary["marketing"]["latestNews"];
+  image: string;
 };
 
-const HeroLatestNews = ({ dict }: HeroLatestNewsProps) => (
+const HeroLatestNews = ({ dict, image }: HeroLatestNewsProps) => (
   <section className="relative w-full">
     <div
       id="hero-viewport"
       className="relative h-[520px] w-full overflow-hidden bg-neutral-500 sm:h-[600px] lg:h-[680px]"
       style={{
-        backgroundImage: "url(/aksi-pltu-captive.jpg)",
+        backgroundImage: `url("${image}")`,
         backgroundSize: "cover",
         backgroundPosition: "center"
       }}
@@ -19,7 +20,7 @@ const HeroLatestNews = ({ dict }: HeroLatestNewsProps) => (
       <div className="absolute inset-0 mx-auto max-w-6xl pointer-events-none">
         <div className="absolute bottom-12 left-0 right-0 px-6 sm:bottom-16 sm:px-10 lg:px-20 xl:px-0 pointer-events-auto z-30">
           <h1 className="text-3xl font-tilt-warp leading-tight text-brand-yellow sm:text-4xl lg:text-5xl">
-            Aksi Tuntutan di Monas
+            {dict.hero.heading}
           </h1>
           <p className="mt-4 max-w-4xl text-sm text-white sm:text-2xl">
             {dict.hero.subtitle}

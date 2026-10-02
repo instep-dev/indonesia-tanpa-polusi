@@ -24,6 +24,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Skeleton } from '@/components/ui/skeleton'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import type { UserDto } from '@/services/auth/auth.dto'
+import { displayTitle } from '@/libs/articleLocale'
 
 const ALL_STATUSES = 'all'
 const PENDING_STATUS = 'pending'
@@ -420,7 +421,7 @@ const JournalistsView = () => {
                 ) : (
                   <div className="divide-y rounded-xl border overflow-y-auto max-h-[310px] w-full max-w-full overflow-x-hidden bg-background font-sans">
                     {journalistArticles.map((article) => {
-                      const title = (article.sourceLocale === 'id' ? article.titleId : article.titleEn) || 'Untitled'
+                      const title = displayTitle(article) || 'Untitled'
                       const date = new Date(article.publishedAt || article.createdAt).toLocaleDateString()
 
                       return (

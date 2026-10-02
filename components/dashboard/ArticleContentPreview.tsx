@@ -18,10 +18,22 @@ const SANITIZE_OPTIONS: sanitizeHtml.IOptions = {
   },
 }
 
-const ArticleContentPreview = ({ content }: { content: unknown }) => {
+type ArticleContentPreviewProps = {
+  content: unknown
+  /** Shown when there is no text. Defaults to English (used by the dashboards). */
+  emptyText?: string
+  /** Shown when the content can't be rendered. */
+  errorText?: string
+}
+
+const ArticleContentPreview = ({
+  content,
+  emptyText = 'No content.',
+  errorText = 'Could not render content.',
+}: ArticleContentPreviewProps) => {
   const hasContent = content && typeof content === 'object' && Object.keys(content).length > 0
   if (!hasContent) {
-    return <p className="text-sm text-foreground/40">No content.</p>
+    return <p className="text-sm text-foreground/40">{emptyText}</p>
   }
 
   let html = ''
@@ -29,7 +41,7 @@ const ArticleContentPreview = ({ content }: { content: unknown }) => {
     const rawHtml = generateHTML(content as Parameters<typeof generateHTML>[0], EXTENSIONS)
     html = sanitizeHtml(rawHtml, SANITIZE_OPTIONS)
   } catch {
-    return <p className="text-sm text-red-500">Could not render content.</p>
+    return <p className="text-sm text-red-500">{errorText}</p>
   }
 
   return (

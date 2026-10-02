@@ -1,19 +1,21 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { buttonVariants } from '@/components/reusable/Button'
-import { homeNewsCards } from '@/data/data'
 import type { Dictionary, Locale } from '@/i18n/getDictionary'
 
 import type { ArticleDto } from '@/services/article/article.dto'
+import { pickLocale } from '@/libs/localizeArticle'
 
 const LatestNews = ({
   currentLocale,
   dict,
   articles,
+  fallbackCover,
 }: {
   currentLocale: Locale
   dict: Dictionary['marketing']['home']['news']
   articles: ArticleDto[]
+  fallbackCover: string
 }) => {
   if (articles.length === 0) return null
 
@@ -36,11 +38,11 @@ const LatestNews = ({
 
         <div className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {articles.map((article) => {
-            const title = currentLocale === 'id' ? article.titleId : article.titleEn
-            const image = article.coverImage || '/news1.jpg'
+            const { title, titleLocale } = pickLocale(article, currentLocale)
+            const image = article.coverImage || fallbackCover
             const source = article.region
               ? (currentLocale === 'id' ? article.region.nameId : article.region.nameEn)
-              : (currentLocale === 'id' ? 'ARTIKEL UMUM' : 'GENERAL ARTICLE')
+              : dict.generalLabel
             const href = `/news/${article.slug}`
 
             return (
@@ -60,7 +62,12 @@ const LatestNews = ({
                     <span className="mt-3 block text-xs font-medium uppercase tracking-wide text-foreground/50">
                       {source}
                     </span>
-                    <h3 className="mt-1 text-xl font-bold text-foreground line-clamp-2">{title}</h3>
+                    <h3
+                      lang={titleLocale === currentLocale ? undefined : titleLocale}
+                      className="mt-1 text-xl font-bold text-foreground line-clamp-2"
+                    >
+                      {title}
+                    </h3>
                   </div>
                   <Link
                     href={`/${currentLocale}${href}`}

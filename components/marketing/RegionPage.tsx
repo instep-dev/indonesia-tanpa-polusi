@@ -1,15 +1,10 @@
 import type { Dictionary, Locale } from '@/i18n/getDictionary'
-import type { RegionKey, RegionStoryCard } from '@/data/data'
+import type { RegionKey } from '@/data/data'
+import type { StoryItem } from '@/libs/contentMerge'
 import HeroRegion from './HeroRegion'
 import AboutRegion from './AboutRegion'
 import OurStories from '@/components/reusable/OurStories'
 import LatestNewsList from './LatestNewsList'
-
-const REGION_HERO_IMAGES: Record<RegionKey, string> = {
-  sulawesi: '/sulawesi.jpg',
-  malukuUtara: '/maluku_utara.jpg',
-  kalimantanUtara: '/kaltara.jpeg',
-}
 
 const REGION_DB_SLUGS: Record<RegionKey, string> = {
   sulawesi: 'sulawesi',
@@ -22,13 +17,23 @@ type RegionPageProps = {
   regionSlug: RegionKey
   dict: Dictionary['marketing']['home']['regions'][RegionKey]
   newsListDict: Dictionary['marketing']['home']['news']
-  stories: RegionStoryCard[]
+  stories: StoryItem[]
+  heroImage: string
+  aboutImage: string
 }
 
-const RegionPage = ({ currentLocale, regionSlug, dict, newsListDict, stories }: RegionPageProps) => (
+const RegionPage = ({
+  currentLocale,
+  regionSlug,
+  dict,
+  newsListDict,
+  stories,
+  heroImage,
+  aboutImage,
+}: RegionPageProps) => (
   <div>
-    <HeroRegion dict={dict} image={REGION_HERO_IMAGES[regionSlug]} />
-    <AboutRegion dict={dict.about} />
+    <HeroRegion dict={dict} image={heroImage} />
+    <AboutRegion dict={dict.about} image={aboutImage} />
     <OurStories dict={dict.ourStories} cards={stories} />
 
     <section className="bg-background px-6 py-16 sm:px-10 lg:px-20">

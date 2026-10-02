@@ -1,11 +1,16 @@
+import { cache } from 'react'
+import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import { Aperture, HourglassMedium, Stack } from '@phosphor-icons/react/dist/ssr'
-import { getDictionary, type Locale } from '@/i18n/getDictionary'
+import type { Locale } from '@/i18n/getDictionary'
+import { getSiteDictionary } from '@/libs/siteContent'
 import { db } from '@/libs/db'
 import { mapArticle, articleInclude } from '@/libs/mapArticle'
 import ArticleContentPreview from '@/components/dashboard/ArticleContentPreview'
 import { cn } from '@/libs/utils'
+import { pickLocale } from '@/libs/localizeArticle'
+import { buildArticleMetadata } from '@/libs/articleMetadata'
 
 type NewsDetailPageProps = {
   params: Promise<{ locale: string; slug: string }>
@@ -17,24 +22,33 @@ type NewsDetailPageProps = {
 // cover image after publishing) never show up on the public page.
 export const dynamic = 'force-dynamic'
 
-const cardIcons = [Stack, HourglassMedium, Aperture]
-
-const NewsDetailPage = async ({ params }: NewsDetailPageProps) => {
-  const { locale, slug } = await params
-  const validLocale: Locale = locale === 'en' ? 'en' : 'id'
-  const dict = await getDictionary(validLocale)
-  const { newsDetail } = dict.marketing
-
+// generateMetadata and the page both need the article: one query per request. A
+// missing/unpublished slug calls notFound() before anything renders, so crawlers
+// get a real 404 (not a 200 with an empty page).
+const getPublishedArticle = cache(async (slug: string) => {
   const record = await db.article.findFirst({
     where: { slug, status: 'PUBLISHED', deletedAt: null },
     include: articleInclude,
   })
   if (!record) notFound()
+  return mapArticle(record)
+})
 
-  const article = mapArticle(record)
-  const title = validLocale === 'id' ? article.titleId : article.titleEn
-  const excerpt = validLocale === 'id' ? article.excerptId : article.excerptEn
-  const content = validLocale === 'id' ? article.contentId : article.contentEn
+export const generateMetadata = async ({ params }: NewsDetailPageProps): Promise<Metadata> => {
+  const { locale, slug } = await params
+  return buildArticleMetadata(await getPublishedArticle(slug), locale === 'en' ? 'en' : 'id')
+}
+
+const NewsDetailPage = async ({ params }: NewsDetailPageProps) => {
+  const { locale, slug } = await params
+  const validLocale: Locale = locale === 'en' ? 'en' : 'id'
+  const dict = await getSiteDictionary(validLocale)
+  const { newsDetail } = dict.marketing
+
+  const article = await getPublishedArticle(slug)
+  // If this language was never written/translated, show the other one (marked with `lang`).
+  const { title, excerpt, content, titleLocale, excerptLocale, contentLocale } = pickLocale(article, validLocale)
+  const langOf = (locale: Locale) => (locale === validLocale ? undefined : locale)
 
   const cards = [
     { ...newsDetail.about.cards[0], url: article.reportUrl, Icon: Stack },
@@ -59,17 +73,23 @@ const NewsDetailPage = async ({ params }: NewsDetailPageProps) => {
 
         <div className="mt-auto bg-[#33477d]/85 px-6 py-10 sm:px-10 sm:py-12 lg:px-20 lg:py-16 z-20">
           <div className="mx-auto max-w-6xl">
-            <h1 className="text-3xl font-extrabold leading-tight text-brand-yellow sm:text-4xl">
+            <h1 lang={langOf(titleLocale)} className="text-3xl font-extrabold leading-tight text-brand-yellow sm:text-4xl">
               {title}
             </h1>
-            <p className="mt-4 max-w-4xl text-base text-white sm:text-2xl">{excerpt}</p>
+            <p lang={langOf(excerptLocale)} className="mt-4 max-w-4xl text-base text-white sm:text-2xl">{excerpt}</p>
           </div>
         </div>
       </section>
 
       <section className="bg-background px-6 py-16 sm:px-10 lg:px-20">
         <div className="mx-auto max-w-6xl">
-          <ArticleContentPreview content={content} />
+          <div lang={langOf(contentLocale)}>
+            <ArticleContentPreview
+              content={content}
+              emptyText={newsDetail.noContent}
+              errorText={newsDetail.contentError}
+            />
+          </div>
         </div>
       </section>
 

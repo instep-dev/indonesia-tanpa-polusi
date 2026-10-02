@@ -117,8 +117,15 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
     return NextResponse.json({ error: 'sourceLocale must be "id" or "en"' }, { status: 400 })
   }
 
-  const title = body.sourceLocale === 'id' ? body.titleId : body.titleEn
-  const slug = await generateUniqueArticleSlug(title || 'untitled')
+  // The article can be written in either language (or both): at least one title is needed,
+  // and the slug comes from the source language's title (falling back to the other one).
+  const sourceTitle = body.sourceLocale === 'id' ? body.titleId : body.titleEn
+  const otherTitle = body.sourceLocale === 'id' ? body.titleEn : body.titleId
+  const title = sourceTitle?.trim() || otherTitle?.trim()
+  if (!title) {
+    return NextResponse.json({ error: 'Add a title in at least one language' }, { status: 400 })
+  }
+  const slug = await generateUniqueArticleSlug(title)
 
   const article = await db.article.create({
     data: {

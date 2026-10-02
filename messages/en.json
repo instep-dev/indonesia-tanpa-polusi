@@ -8,7 +8,10 @@
       "kalimantanUtara": "North Kalimantan",
       "contactUs": "Contact Us",
       "searchPlaceholder": "Search",
-      "login": "Login"
+      "login": "Login",
+      "logoAlt": "Indonesia Tanpa Polusi",
+      "toggleMenu": "Toggle menu",
+      "switchLanguage": "Switch to"
     },
     "home": {
       "hero": {
@@ -39,6 +42,7 @@
         "heading": "Latest News",
         "intro": "Find more information about the latest media coverage, press releases, reports, and publications from the Indonesia Tanpa Polusi Coalition.",
         "viewAllCta": "Click to see all news",
+        "generalLabel": "GENERAL ARTICLE",
         "readCta": "Click to read news",
         "searchPlaceholder": "Search news…",
         "loading": "Loading news…",
@@ -163,13 +167,28 @@
     "latestNews": {
       "hero": {
         "title": "Our Actions & Updates",
+        "heading": "Aksi Tuntutan di Monas",
         "subtitle": "Stay informed with the latest news, campaigns, and updates from Indonesia Tanpa Polusi coalition."
       }
+    },
+    "notFound": {
+      "title": "Page not found",
+      "body": "The page you're looking for doesn't exist or may have been moved.",
+      "backCta": "Back to home"
+    },
+    "seo": {
+      "home": { "title": "Indonesia Tanpa Polusi", "description": "Indonesia Tanpa Polusi" },
+      "sulawesi": { "title": "Indonesia Tanpa Polusi", "description": "Indonesia Tanpa Polusi" },
+      "malukuUtara": { "title": "Indonesia Tanpa Polusi", "description": "Indonesia Tanpa Polusi" },
+      "kalimantanUtara": { "title": "Indonesia Tanpa Polusi", "description": "Indonesia Tanpa Polusi" },
+      "news": { "title": "Indonesia Tanpa Polusi", "description": "Indonesia Tanpa Polusi" }
     },
     "newsDetail": {
       "notFoundTitle": "News not found",
       "notFoundBody": "The article you're looking for doesn't exist or may have been removed.",
       "backCta": "Back to Latest News",
+      "noContent": "No content.",
+      "contentError": "Could not render content.",
       "about": {
         "heading": "About this News",
         "description": "We value transparency, accountability, and communication with you, our stakeholders, in this effort to make the best we can for our community.",

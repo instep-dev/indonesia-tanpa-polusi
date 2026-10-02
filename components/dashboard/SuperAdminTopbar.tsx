@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { toast } from "vibe-toast";
-import { SignOut, Newspaper, Users } from "@phosphor-icons/react";
+import { SignOut, Newspaper, Users, PencilSimpleLine } from "@phosphor-icons/react";
 import { superAdminAuthStore } from "@/services/super-admin/super-admin-auth.store";
 import { useSuperAdminLogout } from "@/services/super-admin/super-admin-auth.queries";
 import { useJournalists } from "@/services/user/user.queries";
@@ -58,6 +58,14 @@ const SuperAdminTopbar = () => {
               render={<Link href="/super-admin/dashboard" />}
             >
               <Newspaper className="size-3.5" /> Articles
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              nativeButton={false}
+              render={<Link href="/super-admin/content" />}
+            >
+              <PencilSimpleLine className="size-3.5" /> Content
             </Button>
             <Button
               variant="ghost"

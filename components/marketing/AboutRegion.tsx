@@ -2,14 +2,15 @@ import Image from 'next/image'
 
 type AboutRegionProps = {
   dict: { heading: string; body: string[] }
+  image: string
 }
 
-const AboutRegion = ({ dict }: AboutRegionProps) => (
+const AboutRegion = ({ dict, image }: AboutRegionProps) => (
   <section id="about" className="bg-background px-6 py-16 sm:px-10 lg:px-20">
     <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-3 lg:items-start">
       <div className="rounded-sm border-1 shadow-md/20 lg:col-span-1">
         <div className="relative aspect-square w-full overflow-hidden rounded-sm bg-neutral-400 h-full">
-          <Image src="/about.jpg" alt="" fill className="object-cover" />
+          <Image src={image} alt="" fill className="object-cover" />
         </div>
       </div>
 
@@ -18,8 +19,8 @@ const AboutRegion = ({ dict }: AboutRegionProps) => (
           {dict.heading}
         </h2>
         <div className="mt-6 space-y-4 text-base text-foreground/80 sm:text-lg">
-          {dict.body.map((paragraph) => (
-            <p key={paragraph}>{paragraph}</p>
+          {dict.body.map((paragraph, index) => (
+            <p key={index}>{paragraph}</p>
           ))}
         </div>
       </div>

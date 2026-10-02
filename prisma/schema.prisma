@@ -144,3 +144,62 @@ model ArticleImage {
   order     Int      @default(0)
   createdAt DateTime @default(now())
 }
+
+// ─── CMS: Site content ────────────────────────────────────────────────────
+// Editable public-site copy/media. One row per field declared in
+// data/content-registry.ts; a missing row means "use the built-in default".
+
+model SiteContent {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  valueId     String?  @db.Text
+  valueEn     String?  @db.Text
+  updatedById String?
+  updatedAt   DateTime @updatedAt
+}
+
+// Repeatable site-content items (stories, contact socials, ...) grouped by
+// collection. `data` is validated against the registry for that collection.
+model ContentItem {
+  id         String    @id @default(cuid())
+  collection String
+  order      Int       @default(0)
+  data       Json
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  deletedAt  DateTime?
+
+  @@index([collection, order])
+}
+
+// ─── CMS: change history + draft preview ──────────────────────────────────
+
+// One row per CMS change (a field edit, a list-item change, a region rename...),
+// written in the same transaction as the change itself. `snapshot` is the state
+// AFTER the change, so any revision can be restored. Drafts (status DRAFT) are
+// unpublished edits that only show up in preview mode.
+model ContentRevision {
+  id            String   @id @default(cuid())
+  kind          String // 'field' | 'item' | 'collection' | 'region'
+  targetKey     String // field key | item id | collection id | region id
+  collection    String? // set for items
+  status        String   @default("PUBLISHED") // PUBLISHED | DRAFT
+  action        String // SAVE | RESET | CREATE | UPDATE | DELETE | REORDER | RESTORE | IMPORT
+  snapshot      Json
+  createdById   String
+  createdByName String // snapshot of the editor's name/email, so it survives account changes
+  createdAt     DateTime @default(now())
+
+  @@index([kind, targetKey, createdAt])
+  @@index([status, createdAt])
+}
+
+// Single-use, short-lived token that lets the super-admin's browser enter
+// draft-preview mode on the public site (opaque token, only its hash is stored).
+model ContentPreviewToken {
+  id           String   @id @default(cuid())
+  tokenHash    String   @unique
+  superAdminId String
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+}

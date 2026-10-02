@@ -27,6 +27,7 @@ import { cn } from '@/libs/utils'
 import ArticleStatusBadge from '@/components/dashboard/ArticleStatusBadge'
 import { useRegions } from '@/services/region/region.queries'
 import type { ArticleDto, ArticleStatus } from '@/services/article/article.dto'
+import { displayTitle } from '@/libs/articleLocale'
 
 const NO_REGION = 'none'
 const ALL_REGIONS = 'all'
@@ -97,7 +98,7 @@ const ArticleTable = ({
     () => [
       {
         id: 'title',
-        accessorFn: (row) => (row.sourceLocale === 'id' ? row.titleId : row.titleEn) || '(untitled)',
+        accessorFn: (row) => displayTitle(row) || '(untitled)',
         header: 'Title',
         cell: ({ getValue, row }) => (
           <span

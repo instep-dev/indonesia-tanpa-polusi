@@ -6,7 +6,7 @@ import type { Locale } from '@/i18n/getDictionary'
 
 const LOCALES: Locale[] = ['en', 'id']
 
-const LangToggle = ({ currentLocale }: { currentLocale: Locale }) => {
+const LangToggle = ({ currentLocale, label }: { currentLocale: Locale; label: string }) => {
   const pathname = usePathname()
   const router = useRouter()
 
@@ -21,7 +21,7 @@ const LangToggle = ({ currentLocale }: { currentLocale: Locale }) => {
     <button
       onClick={handleSwitch}
       className="rounded-lg bg-brand-navy px-3 py-2.5 text-sm font-semibold uppercase text-white transition-colors hover:bg-brand-navy/90 cursor-pointer"
-      aria-label={`Switch to ${nextLocale}`}
+      aria-label={`${label} ${nextLocale}`}
     >
       {currentLocale}
     </button>

@@ -15,7 +15,7 @@ const customJestConfig = {
   // testMatch (glob-based) breaks when rootDir contains literal parentheses
   // (this repo lives under a "(Instep-consulting)" folder) — testRegex is
   // matched against the resolved absolute path as a plain RegExp instead.
-  testRegex: '[\\\\/]test[\\\\/].*\\.test\\.ts$',
+  testRegex: '[\\\\/]test[\\\\/].*\\.test\\.tsx?$',
   reporters: [
     'default',
     [
@@ -40,4 +40,16 @@ const customJestConfig = {
   ],
 }
 
-module.exports = createJestConfig(customJestConfig)
+// next/jest builds transformIgnorePatterns with its own allow-list of ESM packages
+// to transform (`(geist|next/dist/client|...)`). The server-side Tiptap HTML converter
+// (@tiptap/html/server) depends on happy-dom, which ships as ESM only, so add it to
+// that allow-list in the generated config.
+const ESM_PACKAGES = ['happy-dom']
+
+module.exports = async () => {
+  const config = await createJestConfig(customJestConfig)()
+  config.transformIgnorePatterns = config.transformIgnorePatterns.map((pattern) =>
+    pattern.replace('(geist|', `(${ESM_PACKAGES.join('|')}|geist|`),
+  )
+  return config
+}

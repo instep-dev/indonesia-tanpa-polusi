@@ -1,9 +1,22 @@
 import type { Dictionary } from '@/i18n/getDictionary'
 
+// Let the browser sniff the format unless the extension tells us for sure — a
+// wrong `type` makes browsers skip a perfectly playable source.
+const videoMimeType = (src: string): string | undefined => {
+  const path = src.split('?')[0].toLowerCase()
+  if (path.endsWith('.mp4')) return 'video/mp4'
+  if (path.endsWith('.webm')) return 'video/webm'
+  return undefined
+}
+
 const Hero = ({
   dict,
+  videoSrc,
+  ctaHref,
 }: {
   dict: Dictionary['marketing']['home']
+  videoSrc: string
+  ctaHref: string
 }) => {
   const { title, subtitle, cta } = dict.hero
 
@@ -11,6 +24,7 @@ const Hero = ({
     <section className="relative w-full">
       <div id="hero-viewport" className="relative w-full overflow-hidden bg-neutral-500 h-screen">
         <video
+          key={videoSrc}
           className="absolute inset-0 h-full w-full object-cover"
           autoPlay
           loop
@@ -18,7 +32,7 @@ const Hero = ({
           playsInline
           preload="auto"
         >
-          <source src="/heros.compressed.mp4" type="video/mp4" />
+          <source src={videoSrc} type={videoMimeType(videoSrc)} />
         </video>
         <div className='bg-black/30 absolute inset-0 z-10' />
 
@@ -29,7 +43,7 @@ const Hero = ({
             </h1>
             <p className="mt-4 max-w-2xl text-sm text-white sm:text-lg">{subtitle}</p>
             <a
-              href="#about"
+              href={ctaHref}
               className="mt-6 inline-block rounded-full bg-brand-yellow px-6 py-2.5 text-sm font-semibold text-brand-navy transition hover:opacity-90"
             >
               {cta}

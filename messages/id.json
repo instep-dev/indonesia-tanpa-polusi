@@ -8,7 +8,10 @@
       "kalimantanUtara": "Kalimantan Utara",
       "contactUs": "Hubungi Kami",
       "searchPlaceholder": "Cari",
-      "login": "Masuk"
+      "login": "Masuk",
+      "logoAlt": "Indonesia Tanpa Polusi",
+      "toggleMenu": "Buka/tutup menu",
+      "switchLanguage": "Ganti ke"
     },
     "home": {
       "hero": {
@@ -41,6 +44,7 @@
         "heading": "Berita Terbaru",
         "intro": "Temukan informasi lebih lanjut tentang liputan media terbaru, siaran pers, laporan, dan publikasi dari Koalisi Indonesia Tanpa Polusi.",
         "viewAllCta": "Lihat semua berita",
+        "generalLabel": "ARTIKEL UMUM",
         "readCta": "Baca berita",
         "searchPlaceholder": "Cari berita…",
         "loading": "Memuat berita…",
@@ -165,13 +169,28 @@
     "latestNews": {
       "hero": {
         "title": "Aksi & Berita Terbaru Kami",
+        "heading": "Aksi Tuntutan di Monas",
         "subtitle": "Tetap terinformasi dengan berita terbaru, kampanye, dan update dari koalisi Indonesia Tanpa Polusi."
       }
+    },
+    "notFound": {
+      "title": "Halaman tidak ditemukan",
+      "body": "Halaman yang kamu cari tidak ada atau mungkin sudah dipindahkan.",
+      "backCta": "Kembali ke beranda"
+    },
+    "seo": {
+      "home": { "title": "Indonesia Tanpa Polusi", "description": "Indonesia Tanpa Polusi" },
+      "sulawesi": { "title": "Indonesia Tanpa Polusi", "description": "Indonesia Tanpa Polusi" },
+      "malukuUtara": { "title": "Indonesia Tanpa Polusi", "description": "Indonesia Tanpa Polusi" },
+      "kalimantanUtara": { "title": "Indonesia Tanpa Polusi", "description": "Indonesia Tanpa Polusi" },
+      "news": { "title": "Indonesia Tanpa Polusi", "description": "Indonesia Tanpa Polusi" }
     },
     "newsDetail": {
       "notFoundTitle": "Berita tidak ditemukan",
       "notFoundBody": "Artikel yang kamu cari tidak ada atau mungkin sudah dihapus.",
       "backCta": "Kembali ke Berita Terbaru",
+      "noContent": "Tidak ada konten.",
+      "contentError": "Konten tidak dapat ditampilkan.",
       "about": {
         "heading": "Tentang Berita Ini",
         "description": "Kami menjunjung transparansi, akuntabilitas, dan komunikasi dengan Anda, para pemangku kepentingan kami, dalam upaya memberikan yang terbaik untuk komunitas kami.",

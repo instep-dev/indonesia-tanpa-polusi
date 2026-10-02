@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import { LOCALE_HEADER } from './libs/localeHeaderName'
 
 const LOCALES = ['en', 'id'] as const
 type Locale = (typeof LOCALES)[number]
@@ -64,7 +65,11 @@ export const proxy = (request: NextRequest): NextResponse | undefined => {
     return NextResponse.redirect(request.nextUrl)
   }
 
-  return NextResponse.next()
+  // Expose the URL's locale to server components that get no `params`
+  // (not-found pages, the root layout's <html lang>).
+  const requestHeaders = new Headers(request.headers)
+  requestHeaders.set(LOCALE_HEADER, pathname.split('/')[1])
+  return NextResponse.next({ request: { headers: requestHeaders } })
 }
 
 export const config = {

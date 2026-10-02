@@ -1,11 +1,35 @@
 import Link from 'next/link'
-import { InstagramLogo } from '@phosphor-icons/react/dist/ssr'
+import {
+  EnvelopeSimple,
+  FacebookLogo,
+  InstagramLogo,
+  LinkedinLogo,
+  TiktokLogo,
+  WhatsappLogo,
+  XLogo,
+  YoutubeLogo,
+} from '@phosphor-icons/react/dist/ssr'
+import type { Icon } from '@phosphor-icons/react'
+import type { SocialPlatform } from '@/data/content-registry'
 import type { Dictionary } from '@/i18n/getDictionary'
+import type { ContactCollage, SocialItem } from '@/libs/contentMerge'
 import Image from 'next/image'
+
+const PLATFORM_ICONS: Record<SocialPlatform, Icon> = {
+  instagram: InstagramLogo,
+  facebook: FacebookLogo,
+  x: XLogo,
+  youtube: YoutubeLogo,
+  tiktok: TiktokLogo,
+  whatsapp: WhatsappLogo,
+  linkedin: LinkedinLogo,
+  email: EnvelopeSimple,
+}
 
 type ContactInfo = {
   email: string
-  socials: { handle: string; href: string }[]
+  socials: SocialItem[]
+  collage: ContactCollage
 }
 
 const ContactUs = ({
@@ -30,17 +54,20 @@ const ContactUs = ({
         <div className="mt-6">
           <h3 className="text-lg font-bold text-brand-navy">{dict.socialLabel}</h3>
           <ul className="mt-2 space-y-1">
-            {contact.socials.map((social) => (
-              <li key={social.handle}>
-                <Link
-                  href={social.href}
-                  className="flex items-center gap-2 text-brand-navy hover:text-[#4E88C9]"
-                >
-                  <InstagramLogo size={18} weight="fill" />
-                  <span>{social.handle}</span>
-                </Link>
-              </li>
-            ))}
+            {contact.socials.map((social) => {
+              const PlatformIcon = PLATFORM_ICONS[social.platform]
+              return (
+                <li key={social.id}>
+                  <Link
+                    href={social.href}
+                    className="flex items-center gap-2 text-brand-navy hover:text-[#4E88C9]"
+                  >
+                    <PlatformIcon size={18} weight="fill" />
+                    <span>{social.handle}</span>
+                  </Link>
+                </li>
+              )
+            })}
           </ul>
         </div>
       </div>
@@ -49,23 +76,23 @@ const ContactUs = ({
         <div className="grid gap-4">
           <div className="rounded-sm border-1 shadow-md/20">
             <div className="relative aspect-[4/3] w-full overflow-hidden rounded-sm bg-neutral-500">
-              <Image src={'/footer.jpeg'} alt={''} fill className="object-cover" />
+              <Image src={contact.collage[0]} alt={''} fill className="object-cover" />
             </div>
           </div>
           <div className="rounded-sm border-1 shadow-md/20">
             <div className="relative aspect-[4/3] w-full overflow-hidden rounded-sm bg-neutral-500">
-              <Image src={'/portrait.jpeg'} alt={''} fill className="object-cover" />
+              <Image src={contact.collage[1]} alt={''} fill className="object-cover" />
             </div>
           </div>
           <div className="rounded-sm border-1 shadow-md/20">
             <div className="relative aspect-[4/3] w-full overflow-hidden rounded-sm bg-neutral-500">
-              <Image src={'/maluku.jpg'} alt={''} fill className="object-cover" />
+              <Image src={contact.collage[2]} alt={''} fill className="object-cover" />
             </div>
           </div>
         </div>
         <div className="flex rounded-sm border-1 shadow-md/20 sm:h-full">
           <div className="relative aspect-[4/3] w-full flex-1 overflow-hidden rounded-sm bg-neutral-500 sm:aspect-auto">
-            <Image src={'/portrait1.jpeg'} alt={''} fill className="object-cover" />
+            <Image src={contact.collage[3]} alt={''} fill className="object-cover" />
           </div>
         </div>
       </div>

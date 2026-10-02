@@ -54,3 +54,8 @@ CLAUDE-altered.md
 
 
 
+
+# Playwright e2e
+/e2e/.results
+/e2e/__screenshots__
+/playwright-report

@@ -7,6 +7,7 @@ import { buttonVariants } from '@/components/reusable/Button'
 import { usePublishedArticles } from '@/services/article/article.queries'
 import { usePublicArticlesStream } from '@/services/article/article.sse'
 import type { Locale } from '@/i18n/getDictionary'
+import { pickLocale } from '@/libs/localizeArticle'
 
 type LatestNewsListDict = {
   searchPlaceholder: string
@@ -112,8 +113,8 @@ const LatestNewsList = ({
       {!isPending && !isError && articles.length > 0 && (
         <div className="mt-10 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
           {articles.map((article) => {
-            const title = locale === 'id' ? article.titleId : article.titleEn
-            const excerpt = locale === 'id' ? article.excerptId : article.excerptEn
+            // A missing translation falls back to the other language (marked with `lang`).
+            const { title, excerpt, titleLocale, excerptLocale } = pickLocale(article, locale)
 
             return (
               <article key={article.id} className="flex flex-col">
@@ -124,8 +125,8 @@ const LatestNewsList = ({
                   />
                 </div>
                 <div className="mt-4 flex flex-1 flex-col">
-                  <h3 className="text-lg font-bold text-foreground">{title}</h3>
-                  <p className="mt-2 line-clamp-3 text-sm text-foreground/70">{excerpt}</p>
+                  <h3 lang={titleLocale === locale ? undefined : titleLocale} className="text-lg font-bold text-foreground">{title}</h3>
+                  <p lang={excerptLocale === locale ? undefined : excerptLocale} className="mt-2 line-clamp-3 text-sm text-foreground/70">{excerpt}</p>
                   <Link
                     href={`/${locale}/news/${article.slug}`}
                     className={`${buttonVariants({ variant: 'yellow' })} mt-4 self-start`}

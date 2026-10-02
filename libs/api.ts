@@ -13,9 +13,15 @@ export const http = axios.create({
   headers: { 'Content-Type': 'application/json' },
 })
 
-// Attach access token (journalist OR super admin — whichever has a token)
+// Attach access token (journalist OR super admin — whichever has a token).
+// On /super-admin pages the super admin token takes priority, so a journalist
+// session in the same browser can't shadow it (e.g. CMS uploads).
 http.interceptors.request.use((config) => {
-  const token = authStore.getState().accessToken ?? superAdminAuthStore.getState().accessToken
+  const onSuperAdminPage =
+    typeof window !== 'undefined' && window.location.pathname.startsWith('/super-admin')
+  const token = onSuperAdminPage
+    ? (superAdminAuthStore.getState().accessToken ?? authStore.getState().accessToken)
+    : (authStore.getState().accessToken ?? superAdminAuthStore.getState().accessToken)
   if (token) config.headers.Authorization = `Bearer ${token}`
 
   return config

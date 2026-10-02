@@ -44,11 +44,53 @@ export const GET = async (request: NextRequest, { params }: RouteContext): Promi
   return NextResponse.json({ error: 'Not found' }, { status: 404 })
 }
 
-// PATCH — author edits their own DRAFT or REJECTED article.
+// Only the fields present in the body are written.
+const editableFields = (body: UpdateArticleBody) => ({
+  ...(body.titleId !== undefined ? { titleId: body.titleId } : {}),
+  ...(body.titleEn !== undefined ? { titleEn: body.titleEn } : {}),
+  ...(body.excerptId !== undefined ? { excerptId: body.excerptId } : {}),
+  ...(body.excerptEn !== undefined ? { excerptEn: body.excerptEn } : {}),
+  ...(body.contentId !== undefined ? { contentId: body.contentId as object } : {}),
+  ...(body.contentEn !== undefined ? { contentEn: body.contentEn as object } : {}),
+  ...(body.sourceLocale !== undefined ? { sourceLocale: body.sourceLocale } : {}),
+  ...(body.regionId !== undefined ? { regionId: body.regionId } : {}),
+  ...(body.coverImage !== undefined ? { coverImage: body.coverImage } : {}),
+  ...(body.reportUrl !== undefined ? { reportUrl: body.reportUrl } : {}),
+  ...(body.pressReleaseUrl !== undefined ? { pressReleaseUrl: body.pressReleaseUrl } : {}),
+  ...(body.visualUrl !== undefined ? { visualUrl: body.visualUrl } : {}),
+})
+
+// PATCH — dual-purpose:
+//  - Journalist: edits their own DRAFT or REJECTED article.
+//  - SuperAdmin ("fix mode"): edits ANY article that has not been deleted, in any
+//    status — e.g. to fill in or correct a translation, even on a published
+//    article. It never changes the status or the author, and (unlike a journalist
+//    edit) does not send a REJECTED article back to DRAFT.
 export const PATCH = async (request: NextRequest, { params }: RouteContext): Promise<NextResponse> => {
   const { id } = await params
   const auth = await validateAccessToken(request, db)
-  if (!auth.ok) return auth.response
+  if (!auth.ok) {
+    const adminAuth = await validateSuperAdminAccessToken(request, db)
+    if (!adminAuth.ok) return auth.response
+
+    const target = await db.article.findUnique({ where: { id } })
+    if (!target) return NextResponse.json({ error: 'Not found' }, { status: 404 })
+    if (target.deletedAt) {
+      return NextResponse.json({ error: 'This article has been deleted' }, { status: 409 })
+    }
+
+    const adminBody = await parseJsonBody<UpdateArticleBody>(request)
+    if (!adminBody.ok) return adminBody.response
+
+    const fixed = await db.article.update({
+      where: { id },
+      data: editableFields(adminBody.body),
+      include: articleInclude,
+    })
+
+    broadcastArticlesChanged()
+    return NextResponse.json<ArticleDto>(mapArticle(fixed))
+  }
 
   const approved = await requireApprovedUser(auth.userId)
   if (!approved.ok) return approved.response
@@ -75,18 +117,7 @@ export const PATCH = async (request: NextRequest, { params }: RouteContext): Pro
   const updated = await db.article.update({
     where: { id },
     data: {
-      ...(body.titleId !== undefined ? { titleId: body.titleId } : {}),
-      ...(body.titleEn !== undefined ? { titleEn: body.titleEn } : {}),
-      ...(body.excerptId !== undefined ? { excerptId: body.excerptId } : {}),
-      ...(body.excerptEn !== undefined ? { excerptEn: body.excerptEn } : {}),
-      ...(body.contentId !== undefined ? { contentId: body.contentId as object } : {}),
-      ...(body.contentEn !== undefined ? { contentEn: body.contentEn as object } : {}),
-      ...(body.sourceLocale !== undefined ? { sourceLocale: body.sourceLocale } : {}),
-      ...(body.regionId !== undefined ? { regionId: body.regionId } : {}),
-      ...(body.coverImage !== undefined ? { coverImage: body.coverImage } : {}),
-      ...(body.reportUrl !== undefined ? { reportUrl: body.reportUrl } : {}),
-      ...(body.pressReleaseUrl !== undefined ? { pressReleaseUrl: body.pressReleaseUrl } : {}),
-      ...(body.visualUrl !== undefined ? { visualUrl: body.visualUrl } : {}),
+      ...editableFields(body),
       // Editing a REJECTED article resets it back to DRAFT for a fresh review cycle.
       ...(article.status === 'REJECTED' ? { status: 'DRAFT', rejectionReason: null } : {}),
     },

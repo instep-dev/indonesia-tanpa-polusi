@@ -1,14 +1,14 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Warning, Trash, ArrowLeft } from '@phosphor-icons/react'
+import { toast } from 'vibe-toast'
+import { Warning, Trash, ArrowLeft, Info } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
 import { Separator } from '@/components/ui/separator'
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -16,43 +16,38 @@ import RegionSelect from '@/components/dashboard/RegionSelect'
 import CoverImageUploader from '@/components/dashboard/CoverImageUploader'
 import ArticleGallery from '@/components/dashboard/ArticleGallery'
 import ArticleStatusBadge from '@/components/dashboard/ArticleStatusBadge'
+import BilingualArticleFields from '@/components/dashboard/BilingualArticleFields'
+import type { BilingualArticleValues } from '@/components/dashboard/BilingualArticleFields'
 import ConfirmDialog from '@/components/dashboard/ConfirmDialog'
-import TiptapEditor from '@/components/dashboard/TiptapEditor'
 import { authStore } from '@/services/auth/auth.store'
+import { superAdminAuthStore } from '@/services/super-admin/super-admin-auth.store'
 import {
   useArticle,
   useUpdateArticle,
   useDeleteArticle,
   useSubmitArticleForReview,
 } from '@/services/article/article.queries'
+import type { ArticleDto } from '@/services/article/article.dto'
+import { LOCALE_NAMES, missingLanguages } from '@/libs/articleLocale'
+import { getApiErrorMessage } from '@/libs/getApiErrorMessage'
 
-const EditArticleView = ({ articleId }: { articleId: string }) => {
-  const router = useRouter()
-  const bootstrapped = authStore((s) => s.bootstrapped)
+type EditArticleViewProps = {
+  articleId: string
+  /**
+   * `journalist` (default): the author edits their own DRAFT/REJECTED article and can submit it.
+   * `super-admin`: fixes any article — including published ones and translations — but cannot submit/delete drafts here.
+   */
+  actor?: 'journalist' | 'super-admin'
+}
+
+// Loads the article, then hands it to a form that is keyed by the article's id.
+// The form's state is initialised once per article, so later refetches (e.g. a
+// cover-image upload, which saves immediately) can never overwrite what is being typed.
+const EditArticleView = ({ articleId, actor = 'journalist' }: EditArticleViewProps) => {
+  const journalistReady = authStore((s) => s.bootstrapped)
+  const adminReady = superAdminAuthStore((s) => s.bootstrapped)
+  const bootstrapped = actor === 'super-admin' ? adminReady : journalistReady
   const { data: article, isLoading } = useArticle(articleId, bootstrapped)
-  const updateArticle = useUpdateArticle(articleId)
-  const deleteArticle = useDeleteArticle()
-  const submitForReview = useSubmitArticleForReview(articleId)
-
-  const [title, setTitle] = useState('')
-  const [excerpt, setExcerpt] = useState('')
-  const [regionId, setRegionId] = useState<string | null>(null)
-  const [content, setContent] = useState<unknown>({})
-  const [reportUrl, setReportUrl] = useState('')
-  const [pressReleaseUrl, setPressReleaseUrl] = useState('')
-  const [visualUrl, setVisualUrl] = useState('')
-  const [confirmOpen, setConfirmOpen] = useState(false)
-
-  useEffect(() => {
-    if (!article) return
-    setTitle(article.sourceLocale === 'id' ? article.titleId : article.titleEn)
-    setExcerpt(article.sourceLocale === 'id' ? article.excerptId : article.excerptEn)
-    setRegionId(article.regionId)
-    setContent(article.sourceLocale === 'id' ? article.contentId : article.contentEn)
-    setReportUrl(article.reportUrl || '')
-    setPressReleaseUrl(article.pressReleaseUrl || '')
-    setVisualUrl(article.visualUrl || '')
-  }, [article])
 
   if (isLoading || !article) {
     return (
@@ -63,26 +58,63 @@ const EditArticleView = ({ articleId }: { articleId: string }) => {
     )
   }
 
-  const editable = article.status === 'DRAFT' || article.status === 'REJECTED'
+  return <EditArticleForm key={article.id} article={article} actor={actor} />
+}
 
-  const handleSave = async () => {
-    await updateArticle.mutateAsync({
-      titleId: article.sourceLocale === 'id' ? title : undefined,
-      titleEn: article.sourceLocale === 'en' ? title : undefined,
-      excerptId: article.sourceLocale === 'id' ? excerpt : undefined,
-      excerptEn: article.sourceLocale === 'en' ? excerpt : undefined,
-      contentId: article.sourceLocale === 'id' ? content : undefined,
-      contentEn: article.sourceLocale === 'en' ? content : undefined,
-      regionId,
-      reportUrl: reportUrl || null,
-      pressReleaseUrl: pressReleaseUrl || null,
-      visualUrl: visualUrl || null,
-    })
+const EditArticleForm = ({ article, actor }: { article: ArticleDto; actor: 'journalist' | 'super-admin' }) => {
+  const router = useRouter()
+  const isAdmin = actor === 'super-admin'
+  const articleId = article.id
+  const updateArticle = useUpdateArticle(articleId)
+  const deleteArticle = useDeleteArticle()
+  const submitForReview = useSubmitArticleForReview(articleId)
+
+  const [values, setValues] = useState<BilingualArticleValues>({
+    titleId: article.titleId,
+    titleEn: article.titleEn,
+    excerptId: article.excerptId,
+    excerptEn: article.excerptEn,
+    contentId: article.contentId,
+    contentEn: article.contentEn,
+  })
+  const [regionId, setRegionId] = useState<string | null>(article.regionId)
+  const [reportUrl, setReportUrl] = useState(article.reportUrl || '')
+  const [pressReleaseUrl, setPressReleaseUrl] = useState(article.pressReleaseUrl || '')
+  const [visualUrl, setVisualUrl] = useState(article.visualUrl || '')
+  const [confirmOpen, setConfirmOpen] = useState(false)
+
+  const editable = isAdmin ? !article.deletedAt : article.status === 'DRAFT' || article.status === 'REJECTED'
+  const backHref = isAdmin ? `/super-admin/articles/${articleId}` : '/dashboard'
+  const incomplete = missingLanguages(article)
+
+  const handleSave = async (): Promise<boolean> => {
+    try {
+      await updateArticle.mutateAsync({
+        ...values,
+        regionId,
+        reportUrl: reportUrl || null,
+        pressReleaseUrl: pressReleaseUrl || null,
+        visualUrl: visualUrl || null,
+      })
+      return true
+    } catch (error) {
+      toast.error(getApiErrorMessage(error, 'Failed to save the article'))
+      return false
+    }
+  }
+
+  const handleSaveClick = async () => {
+    if (await handleSave()) toast.success('Saved')
   }
 
   const handleSubmitForReview = async () => {
-    await handleSave()
-    await submitForReview.mutateAsync()
+    if (!(await handleSave())) return
+    try {
+      await submitForReview.mutateAsync()
+      toast.success('Submitted for review')
+    } catch (error) {
+      toast.error(getApiErrorMessage(error, 'Failed to submit the article'))
+    }
   }
 
   const confirmDelete = async () => {
@@ -99,14 +131,16 @@ const EditArticleView = ({ articleId }: { articleId: string }) => {
           size="sm"
           className="-ml-2.5 mb-3"
           render={
-            <Link href="/dashboard">
+            <Link href={backHref}>
               <ArrowLeft className="size-3.5" /> Back
             </Link>
           }
         />
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="font-mono text-xs tracking-[0.08em] text-muted-foreground uppercase">Editing</p>
+            <p className="font-mono text-xs tracking-[0.08em] text-muted-foreground uppercase">
+              {isAdmin ? 'Editing as super admin' : 'Editing'}
+            </p>
             <h1 className="mt-1.5 font-tilt-warp text-4xl tracking-tight text-foreground">Edit Article</h1>
           </div>
           <ArticleStatusBadge status={article.status} />
@@ -116,38 +150,38 @@ const EditArticleView = ({ articleId }: { articleId: string }) => {
       {article.status === 'REJECTED' && article.rejectionReason && (
         <Alert className="mt-6 border-[#F5D0CF] bg-[#FDEBEC] text-[#9F2F2D] [&_svg]:text-[#9F2F2D]">
           <Warning size={16} />
-          <AlertTitle>Rejected — editing will resubmit for a fresh review.</AlertTitle>
+          <AlertTitle>
+            {isAdmin ? 'Rejected' : 'Rejected — editing will resubmit for a fresh review.'}
+          </AlertTitle>
           <AlertDescription className="text-[#9F2F2D]/80">{article.rejectionReason}</AlertDescription>
         </Alert>
       )}
 
-      {article.status === 'PENDING_REVIEW' && article.translationStatus === 'FAILED' && (
+      {isAdmin && article.status === 'PUBLISHED' && (
+        <Alert className="mt-6 border-[#BFD9EE] bg-[#E1F3FE] text-[#1F6C9F] [&_svg]:text-[#1F6C9F]">
+          <Info size={16} />
+          <AlertTitle>This article is live</AlertTitle>
+          <AlertDescription className="text-[#1F6C9F]/80">
+            Changes you save appear on the public website immediately.
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {incomplete.length > 0 && article.status !== 'DRAFT' && (
         <Alert className="mt-6 border-[#F3E4B5] bg-[#FBF3DB] text-[#956400] [&_svg]:text-[#956400]">
           <Warning size={16} />
           <AlertDescription className="text-[#956400]/80">
-            Auto-translation failed for this article. A reviewer will need to fill in the other
-            language manually.
+            The {incomplete.map((locale) => LOCALE_NAMES[locale]).join(' and ')} version is empty or incomplete.
+            Readers of that language will see the other language until it is filled in.
           </AlertDescription>
         </Alert>
       )}
 
       <Card className="animate-in fade-in-0 slide-in-from-bottom-2 mt-8 duration-700">
         <CardContent className="flex flex-col gap-7">
-          <div className="space-y-2">
-            <Label htmlFor="title">Title ({article.sourceLocale.toUpperCase()})</Label>
-            <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} disabled={!editable} />
-          </div>
+          <BilingualArticleFields values={values} onChange={setValues} disabled={!editable} />
 
-          <div className="space-y-2">
-            <Label htmlFor="excerpt">Excerpt ({article.sourceLocale.toUpperCase()})</Label>
-            <Textarea
-              id="excerpt"
-              value={excerpt}
-              onChange={(e) => setExcerpt(e.target.value)}
-              disabled={!editable}
-              rows={3}
-            />
-          </div>
+          <Separator />
 
           <div className="space-y-2">
             <Label>Region</Label>
@@ -201,43 +235,40 @@ const EditArticleView = ({ articleId }: { articleId: string }) => {
             <Label>Gallery</Label>
             <ArticleGallery articleId={articleId} images={article.images} editable={editable} />
           </div>
-
-          <Separator />
-
-          <div className="space-y-2">
-            <Label>Content ({article.sourceLocale.toUpperCase()})</Label>
-            {editable ? (
-              <TiptapEditor content={content} onChange={setContent} />
-            ) : (
-              <div className="rounded-lg border p-4 text-sm text-muted-foreground">
-                Content is locked while the article is {article.status.replace('_', ' ').toLowerCase()}.
-              </div>
-            )}
-          </div>
         </CardContent>
 
         {editable && (
           <div className="flex flex-wrap items-center justify-between gap-3 border-t px-6 py-4">
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={() => setConfirmOpen(true)}
-              disabled={article.status !== 'DRAFT' || deleteArticle.isPending}
-              className="text-[#9F2F2D] hover:bg-[#FDEBEC] hover:text-[#9F2F2D]"
-            >
-              <Trash className="size-4" /> Delete draft
-            </Button>
+            {isAdmin ? (
+              <span />
+            ) : (
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => setConfirmOpen(true)}
+                disabled={article.status !== 'DRAFT' || deleteArticle.isPending}
+                className="text-[#9F2F2D] hover:bg-[#FDEBEC] hover:text-[#9F2F2D]"
+              >
+                <Trash className="size-4" /> Delete draft
+              </Button>
+            )}
 
             <div className="flex gap-3">
-              <Button variant="outline" onClick={handleSave} disabled={updateArticle.isPending}>
+              <Button
+                variant={isAdmin ? 'default' : 'outline'}
+                onClick={handleSaveClick}
+                disabled={updateArticle.isPending}
+              >
                 {updateArticle.isPending ? 'Saving...' : 'Save Changes'}
               </Button>
-              <Button
-                onClick={handleSubmitForReview}
-                disabled={submitForReview.isPending || updateArticle.isPending}
-              >
-                {submitForReview.isPending ? 'Submitting...' : 'Submit for Review'}
-              </Button>
+              {!isAdmin && (
+                <Button
+                  onClick={handleSubmitForReview}
+                  disabled={submitForReview.isPending || updateArticle.isPending}
+                >
+                  {submitForReview.isPending ? 'Submitting...' : 'Submit for Review'}
+                </Button>
+              )}
             </div>
           </div>
         )}

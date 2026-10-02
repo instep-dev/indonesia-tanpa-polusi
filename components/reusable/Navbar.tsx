@@ -10,10 +10,12 @@ import LangToggle from "@/components/reusable/LangToggle";
 import { cn } from "@/libs/utils";
 import { navLinks, type NavLinkKey } from "@/data/data";
 import type { Dictionary, Locale } from "@/i18n/getDictionary";
+import type { NavLogos } from "@/libs/contentMerge";
 
 type NavbarProps = {
   currentLocale: Locale;
   dict: Dictionary["marketing"]["nav"];
+  logos: NavLogos;
 };
 
 // Navbar sits fixed on top of every marketing page. While the page's hero
@@ -23,7 +25,7 @@ type NavbarProps = {
 // against the plain white sections below.
 const NAVBAR_HEIGHT = 96;
 
-const Navbar = ({ currentLocale, dict }: NavbarProps) => {
+const Navbar = ({ currentLocale, dict, logos }: NavbarProps) => {
   const [open, setOpen] = useState(false);
   const [overHero, setOverHero] = useState(true);
   const pathname = usePathname();
@@ -55,25 +57,16 @@ const Navbar = ({ currentLocale, dict }: NavbarProps) => {
     return pathname === target || pathname.startsWith(`${target}/`);
   };
 
+  // Which logo set applies is decided by the section of the site we're in.
   const getLogoSrc = (): string => {
-    if (pathname.startsWith(`/${currentLocale}/sulawesi`)) {
-      return overHero
-        ? "/updated-logos/Sulosi/logo-sulosi-blue.png"
-        : "/updated-logos/Sulosi/logo-sulosi-yellow.png";
-    }
-    if (pathname.startsWith(`/${currentLocale}/maluku-utara`)) {
-      return overHero
-        ? "/updated-logos/Malut/logo-malut-blue.png"
-        : "/updated-logos/Malut/logo-malut-yellow.png";
-    }
-    if (pathname.startsWith(`/${currentLocale}/kalimantan-utara`)) {
-      return overHero
-        ? "/updated-logos/Kaltara/logo-kaltara-blue.png"
-        : "/updated-logos/Kaltara/logo-kaltara-yellow.png";
-    }
-    return overHero
-      ? "/updated-logos/Indonesia/logo-navbar-white.png"
-      : "/updated-logos/Indonesia/logo-navbar-blue.png";
+    const logoSet = pathname.startsWith(`/${currentLocale}/sulawesi`)
+      ? logos.sulawesi
+      : pathname.startsWith(`/${currentLocale}/maluku-utara`)
+        ? logos.malukuUtara
+        : pathname.startsWith(`/${currentLocale}/kalimantan-utara`)
+          ? logos.kalimantanUtara
+          : logos.default;
+    return overHero ? logoSet.overHero : logoSet.scrolled;
   };
 
   return (
@@ -105,7 +98,7 @@ const Navbar = ({ currentLocale, dict }: NavbarProps) => {
           <Link href={`/${currentLocale}`} className="flex items-center gap-2">
             <Image
               src={getLogoSrc()}
-              alt="Indonesia Tanpa Polusi"
+              alt={dict.logoAlt}
               width={143}
               height={48}
               className="h-14 w-auto sm:h-16"
@@ -150,7 +143,7 @@ const Navbar = ({ currentLocale, dict }: NavbarProps) => {
             >
               <MagnifyingGlass size={18} />
             </button>
-            <LangToggle currentLocale={currentLocale} />
+            <LangToggle currentLocale={currentLocale} label={dict.switchLanguage} />
             <Link
               href="/auth/login"
               className="rounded-lg bg-brand-navy px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-navy/90"
@@ -165,7 +158,7 @@ const Navbar = ({ currentLocale, dict }: NavbarProps) => {
               "p-2 transition-colors lg:hidden",
               overHero ? "text-white" : "text-brand-navy"
             )}
-            aria-label="Toggle menu"
+            aria-label={dict.toggleMenu}
           >
             {open ? <X size={24} /> : <List size={24} />}
           </button>
@@ -200,7 +193,7 @@ const Navbar = ({ currentLocale, dict }: NavbarProps) => {
               >
                 <MagnifyingGlass size={18} />
               </button>
-              <LangToggle currentLocale={currentLocale} />
+              <LangToggle currentLocale={currentLocale} label={dict.switchLanguage} />
               <Link
                 href="/auth/login"
                 onClick={() => setOpen(false)}

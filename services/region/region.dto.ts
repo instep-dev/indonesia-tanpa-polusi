@@ -4,3 +4,8 @@ export type RegionDto = {
   nameId: string
   nameEn: string
 }
+
+export type UpdateRegionBody = {
+  nameId: string
+  nameEn: string
+}

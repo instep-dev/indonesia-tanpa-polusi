@@ -8,15 +8,25 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert'
+import { toast } from 'vibe-toast'
 import RegionSelect from '@/components/dashboard/RegionSelect'
-import TiptapEditor from '@/components/dashboard/TiptapEditor'
+import BilingualArticleFields from '@/components/dashboard/BilingualArticleFields'
+import type { BilingualArticleValues } from '@/components/dashboard/BilingualArticleFields'
 import { authStore } from '@/services/auth/auth.store'
 import { useCreateArticle } from '@/services/article/article.queries'
-import type { SourceLocale } from '@/services/article/article.dto'
+import { deriveSourceLocale } from '@/libs/articleLocale'
+import { getApiErrorMessage } from '@/libs/getApiErrorMessage'
+
+const EMPTY_VALUES: BilingualArticleValues = {
+  titleId: '',
+  titleEn: '',
+  excerptId: '',
+  excerptEn: '',
+  contentId: {},
+  contentEn: {},
+}
 
 const NewArticleView = () => {
   const router = useRouter()
@@ -24,11 +34,8 @@ const NewArticleView = () => {
   const bootstrapped = authStore((s) => s.bootstrapped)
   const createArticle = useCreateArticle()
 
-  const [sourceLocale, setSourceLocale] = useState<SourceLocale>('id')
-  const [title, setTitle] = useState('')
-  const [excerpt, setExcerpt] = useState('')
+  const [values, setValues] = useState<BilingualArticleValues>(EMPTY_VALUES)
   const [regionId, setRegionId] = useState<string | null>(null)
-  const [content, setContent] = useState<unknown>({})
   const [reportUrl, setReportUrl] = useState('')
   const [pressReleaseUrl, setPressReleaseUrl] = useState('')
   const [visualUrl, setVisualUrl] = useState('')
@@ -63,21 +70,25 @@ const NewArticleView = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    const article = await createArticle.mutateAsync({
-      sourceLocale,
-      titleId: sourceLocale === 'id' ? title : undefined,
-      titleEn: sourceLocale === 'en' ? title : undefined,
-      excerptId: sourceLocale === 'id' ? excerpt : undefined,
-      excerptEn: sourceLocale === 'en' ? excerpt : undefined,
-      contentId: sourceLocale === 'id' ? content : undefined,
-      contentEn: sourceLocale === 'en' ? content : undefined,
-      regionId,
-      reportUrl: reportUrl || null,
-      pressReleaseUrl: pressReleaseUrl || null,
-      visualUrl: visualUrl || null,
-    })
+    if (!values.titleId.trim() && !values.titleEn.trim()) {
+      toast.error('Add a title in at least one language')
+      return
+    }
 
-    router.push(`/dashboard/articles/${article.id}`)
+    try {
+      const article = await createArticle.mutateAsync({
+        sourceLocale: deriveSourceLocale(values),
+        ...values,
+        regionId,
+        reportUrl: reportUrl || null,
+        pressReleaseUrl: pressReleaseUrl || null,
+        visualUrl: visualUrl || null,
+      })
+
+      router.push(`/dashboard/articles/${article.id}`)
+    } catch (error) {
+      toast.error(getApiErrorMessage(error, 'Failed to save the draft'))
+    }
   }
 
   return (
@@ -96,50 +107,17 @@ const NewArticleView = () => {
         />
         <p className="font-mono text-xs tracking-[0.08em] text-muted-foreground uppercase">Compose</p>
         <h1 className="mt-1.5 font-tilt-warp text-4xl tracking-tight text-foreground">New Article</h1>
-        <p className="mt-2 text-sm text-muted-foreground">Write a new article for the coalition.</p>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Write a new article for the coalition, in Indonesian, English, or both.
+        </p>
       </div>
 
       <Card className="animate-in fade-in-0 slide-in-from-bottom-2 mt-8 duration-700">
         <form onSubmit={handleSubmit}>
           <CardContent className="flex flex-col gap-7">
-            <div className="space-y-2">
-              <Label htmlFor="locale">Language</Label>
-              <p className="text-xs text-muted-foreground">
-                Write in one language — the other will be auto-translated when you submit for review.
-              </p>
-              <Select
-                value={sourceLocale}
-                onValueChange={(v) => setSourceLocale((v as SourceLocale) ?? 'id')}
-              >
-                <SelectTrigger id="locale" className="w-full sm:w-56">
-                  <SelectValue>
-                    {(v: string | null) => (v === 'en' ? 'English' : 'Bahasa Indonesia')}
-                  </SelectValue>
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="id">Bahasa Indonesia</SelectItem>
-                  <SelectItem value="en">English</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            <BilingualArticleFields values={values} onChange={setValues} />
 
             <Separator />
-
-            <div className="space-y-2">
-              <Label htmlFor="title">Title</Label>
-              <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} required />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="excerpt">Excerpt</Label>
-              <Textarea
-                id="excerpt"
-                value={excerpt}
-                onChange={(e) => setExcerpt(e.target.value)}
-                required
-                rows={3}
-              />
-            </div>
 
             <div className="space-y-2">
               <Label>Region</Label>
@@ -174,11 +152,6 @@ const NewArticleView = () => {
                   placeholder="https://..."
                 />
               </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Content</Label>
-              <TiptapEditor content={content} onChange={setContent} />
             </div>
           </CardContent>
 
