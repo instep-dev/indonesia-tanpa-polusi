@@ -42,6 +42,13 @@ export const proxy = (request: NextRequest): NextResponse | undefined => {
     if (!refreshToken) {
       return NextResponse.redirect(new URL('/super-admin/auth/login', request.url))
     }
+    // "/super-admin" itself has no page — without this the dynamic [locale] route would take
+    // "super-admin" for a language and show the public front page to a signed-in admin.
+    // Done here (not in a page) so it is a real HTTP redirect: the admin area has a loading
+    // boundary, under which a page-level redirect() could only be a client-side one.
+    if (pathname === '/super-admin' || pathname === '/super-admin/') {
+      return NextResponse.redirect(new URL('/super-admin/dashboard', request.url))
+    }
     return NextResponse.next()
   }
 

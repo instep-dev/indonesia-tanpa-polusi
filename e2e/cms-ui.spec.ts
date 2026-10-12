@@ -60,6 +60,12 @@ test.describe('sign in', () => {
     await expect(page.getByRole('heading', { name: 'All Articles' })).toBeVisible()
   })
 
+  test('typing /super-admin while signed in opens the dashboard, not the public front page', async () => {
+    await page.goto('/super-admin')
+    await expect(page).toHaveURL(/\/super-admin\/dashboard/)
+    await expect(page.getByRole('heading', { name: 'All Articles' })).toBeVisible()
+  })
+
   test('the content index links to every editable page', async () => {
     await page.goto('/super-admin/content')
     await expect(page.getByRole('heading', { name: 'Content', exact: true })).toBeVisible()

@@ -36,6 +36,20 @@ test.beforeAll(async ({ request }) => {
 })
 
 test.describe('access control', () => {
+  test('/super-admin itself leads to the CMS: login when signed out, dashboard when signed in (never the front page)', async ({ request }) => {
+    const signedOut = await request.get('/super-admin', { maxRedirects: 0 })
+    expect(signedOut.status()).toBe(307)
+    expect(signedOut.headers().location).toContain('/super-admin/auth/login')
+
+    // any session cookie gets past the proxy (it only checks the cookie exists); the page then redirects
+    const signedIn = await request.get('/super-admin', { maxRedirects: 0, headers: { cookie: 'super_admin_refresh_token=x' } })
+    expect(signedIn.status()).toBe(307)
+    expect(signedIn.headers().location).toContain('/super-admin/dashboard')
+
+    const slash = await request.get('/super-admin/', { maxRedirects: 0, headers: { cookie: 'super_admin_refresh_token=x' } })
+    expect([307, 308]).toContain(slash.status())
+  })
+
   test('every admin endpoint refuses a request with no token', async ({ request }) => {
     const calls = [
       request.get('/api/site-content?page=home'),
