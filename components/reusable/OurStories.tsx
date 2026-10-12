@@ -1,5 +1,6 @@
 import type { StoryItem } from '@/libs/contentMerge'
 import Image from 'next/image'
+import { shouldSkipImageOptimization } from '@/libs/imageHosts'
 
 const OurStories = ({
   dict,
@@ -22,7 +23,7 @@ const OurStories = ({
           <div key={card.id} className="flex flex-col overflow-hidden rounded-sm border-1 border-slate-200 shadow-md/20">
             <div className="aspect-square w-full bg-neutral-500 relative">
               {card.imageUrl && (
-                <Image src={card.imageUrl} alt={''} fill className='w-full h-full object-cover absolute inset-0 ' />
+                <Image src={card.imageUrl} unoptimized={shouldSkipImageOptimization(card.imageUrl)} alt={''} fill className='w-full h-full object-cover absolute inset-0 ' />
               )}
             </div>
             <div className="flex flex-1 flex-col justify-between bg-brand-navy p-5 relative z-30">

@@ -7,13 +7,15 @@ import userEvent from '@testing-library/user-event'
 import RevisionList from '@/components/dashboard/RevisionList'
 import type { ContentRevisionDto } from '@/services/content-revision/content-revision.dto'
 
-const mockMutate = jest.fn()
+const mockMutateAsync = jest.fn()
 let mockPending = false
 
 jest.mock('@/services/content-revision/content-revision.queries', () => ({
-  useRestoreRevision: () => ({ mutate: mockMutate, isPending: mockPending }),
+  useRestoreRevision: () => ({ mutateAsync: mockMutateAsync, isPending: mockPending }),
 }))
 jest.mock('vibe-toast', () => ({ toast: { success: jest.fn(), error: jest.fn() } }))
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const { toast } = require('vibe-toast') as { toast: { success: jest.Mock; error: jest.Mock } }
 jest.mock('@/components/dashboard/ConfirmDialog', () => ({
   __esModule: true,
   default: ({ open, description, onOpenChange, onConfirm }: { open: boolean; description: string; onOpenChange: (open: boolean) => void; onConfirm: () => void }) =>
@@ -47,7 +49,10 @@ const revisions = [
 ]
 
 beforeEach(() => {
-  mockMutate.mockReset()
+  mockMutateAsync.mockReset()
+  mockMutateAsync.mockResolvedValue(undefined)
+  toast.success.mockClear()
+  toast.error.mockClear()
   mockPending = false
 })
 
@@ -85,11 +90,53 @@ describe('RevisionList', () => {
 
     await user.click(screen.getAllByRole('button', { name: /Restore this version/ })[0])
     await user.click(screen.getByRole('button', { name: 'Cancel' }))
-    expect(mockMutate).not.toHaveBeenCalled()
+    expect(mockMutateAsync).not.toHaveBeenCalled()
 
     await user.click(screen.getAllByRole('button', { name: /Restore this version/ })[0])
     await user.click(screen.getByRole('button', { name: 'Confirm restore' }))
-    await waitFor(() => expect(mockMutate).toHaveBeenCalledWith('r2', expect.anything()))
+    await waitFor(() => expect(mockMutateAsync).toHaveBeenCalledWith('r2'))
+  })
+
+  it('confirms with a message and closes after a successful restore', async () => {
+    const user = userEvent.setup()
+    const onRestored = jest.fn()
+    render(<RevisionList revisions={revisions} onRestored={onRestored} />)
+
+    await user.click(screen.getAllByRole('button', { name: /Restore this version/ })[0])
+    await user.click(screen.getByRole('button', { name: 'Confirm restore' }))
+
+    await waitFor(() => expect(toast.success).toHaveBeenCalledWith('Restored — the public site is updated'))
+    expect(onRestored).toHaveBeenCalledTimes(1)
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
+  })
+
+  it('still reports success when the list is gone by the time the restore finishes (the page re-mounts on restore)', async () => {
+    const user = userEvent.setup()
+    let finish: () => void = () => {}
+    mockMutateAsync.mockReturnValue(new Promise<void>((resolve) => { finish = resolve }))
+    const { unmount } = render(<RevisionList revisions={revisions} />)
+
+    await user.click(screen.getAllByRole('button', { name: /Restore this version/ })[0])
+    await user.click(screen.getByRole('button', { name: 'Confirm restore' }))
+    unmount() // the editor around the list is re-mounted while the request is in flight
+    finish()
+
+    await waitFor(() => expect(toast.success).toHaveBeenCalledWith('Restored — the public site is updated'))
+  })
+
+  it('shows an error and keeps the dialog flow usable when the restore fails', async () => {
+    const user = userEvent.setup()
+    const onRestored = jest.fn()
+    mockMutateAsync.mockRejectedValue(new Error('boom'))
+    render(<RevisionList revisions={revisions} onRestored={onRestored} />)
+
+    await user.click(screen.getAllByRole('button', { name: /Restore this version/ })[0])
+    await user.click(screen.getByRole('button', { name: 'Confirm restore' }))
+
+    await waitFor(() => expect(toast.error).toHaveBeenCalled())
+    expect(toast.success).not.toHaveBeenCalled()
+    expect(onRestored).not.toHaveBeenCalled()
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
   })
 
   it('warns that unsaved edits are lost only when the page has some', async () => {

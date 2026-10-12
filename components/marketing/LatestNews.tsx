@@ -5,6 +5,7 @@ import type { Dictionary, Locale } from '@/i18n/getDictionary'
 
 import type { ArticleDto } from '@/services/article/article.dto'
 import { pickLocale } from '@/libs/localizeArticle'
+import { shouldSkipImageOptimization } from '@/libs/imageHosts'
 
 const LatestNews = ({
   currentLocale,
@@ -51,6 +52,7 @@ const LatestNews = ({
                   <div className="relative aspect-video w-full overflow-hidden rounded-sm">
                     <Image
                       src={image}
+                      unoptimized={shouldSkipImageOptimization(image)}
                       alt={title}
                       fill
                       className="object-cover"

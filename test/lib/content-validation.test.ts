@@ -8,11 +8,11 @@ describe('validateValue', () => {
     }
   })
 
-  it('accepts local paths and uploaded https images only', () => {
+  // The full catalogue of accepted/rejected image URL kinds is in image-urls.test.ts.
+  it('accepts public/ paths and https images from any host, never javascript:/data:/plain http', () => {
     expect(validateValue('image', '/about.jpg')).toBeNull()
     expect(validateValue('image', 'https://media.indonesiatanpapolusi.org/site/admin_1/a.jpg')).toBeNull()
-    expect(validateValue('image', 'https://media.indonesiatanpapolusi.org/articles/u/a.jpg')).toBeNull()
-    expect(validateValue('image', 'https://evil.example/other/a.jpg')).not.toBeNull()
+    expect(validateValue('image', 'https://images.unsplash.com/photo-123?w=1200')).toBeNull()
     expect(validateValue('image', 'http://media.indonesiatanpapolusi.org/site/a.jpg')).not.toBeNull()
     expect(validateValue('image', '//evil.example/a.jpg')).not.toBeNull()
     expect(validateValue('image', 'javascript:alert(1)')).not.toBeNull()
@@ -67,7 +67,7 @@ describe('validateItemData', () => {
     expect(validateItemData(stories, { quote: { id: 'a', en: 'a' }, name: '', imageUrl: '' }).ok).toBe(false)
     expect(validateItemData(stories, { quote: { id: '', en: '' }, name: 'A', imageUrl: '' }).ok).toBe(false)
     expect(
-      validateItemData(stories, { quote: { id: 'a', en: 'a' }, name: 'A', imageUrl: 'https://evil.example/x.jpg' }).ok,
+      validateItemData(stories, { quote: { id: 'a', en: 'a' }, name: 'A', imageUrl: 'javascript:alert(1)' }).ok,
     ).toBe(false)
     expect(validateItemData(stories, 'nope').ok).toBe(false)
   })

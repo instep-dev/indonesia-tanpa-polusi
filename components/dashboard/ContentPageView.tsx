@@ -107,24 +107,28 @@ const ContentPageEditor = ({ page, data }: ContentPageEditorProps) => {
 
   // Opens the public page with the drafts applied. The window is opened synchronously
   // (inside the click) so the browser doesn't treat it as a pop-up, then pointed at the link.
-  const openPreview = (locale: 'en' | 'id') => {
+  // Preview shows what is SAVED, so drafts are saved first.
+  //
+  // Promise-based on purpose: saving refetches the page's data, which re-mounts this
+  // editor (see the `key` on <ContentPageEditor>). TanStack Query drops the per-call
+  // callbacks of `mutate()` once the component is gone, which left the new tab blank
+  // forever; awaiting `mutateAsync` keeps working across the re-mount.
+  const handlePreview = async (locale: 'en' | 'id') => {
     const tab = window.open('', '_blank')
-    createPreview.mutate(previewPathFor(page.slug, locale), {
-      onSuccess: (url) => {
-        if (tab) tab.location.href = url
-        else window.location.href = url
-      },
-      onError: (error) => {
-        tab?.close()
-        toast.error(getApiErrorMessage(error, 'Could not open the preview'))
-      },
-    })
-  }
+    const needsSave = draftPlan.toSave.length > 0 || draftPlan.toDiscard.length > 0 || dirty
 
-  // Preview shows what is SAVED, so unsaved typing is saved as a draft first.
-  const handlePreview = (locale: 'en' | 'id') => {
-    if (draftPlan.toSave.length === 0 && draftPlan.toDiscard.length === 0 && !dirty) return openPreview(locale)
-    handleSaveDraft(() => openPreview(locale))
+    try {
+      if (needsSave) {
+        await saveDrafts.mutateAsync({ save: draftPlan.toSave, discard: draftPlan.toDiscard })
+        toast.success('Draft saved — only visible in preview, not on the public site')
+      }
+      const url = await createPreview.mutateAsync(previewPathFor(page.slug, locale))
+      if (tab) tab.location.assign(url)
+      else window.location.assign(url)
+    } catch (error) {
+      tab?.close()
+      toast.error(getApiErrorMessage(error, needsSave ? 'Failed to save the draft' : 'Could not open the preview'))
+    }
   }
 
   const statusText = dirty

@@ -1,12 +1,10 @@
 import type { CollectionDef, FieldType } from '@/data/content-registry'
+import { isAcceptableImageUrl } from '@/libs/imageHosts'
 
 const MAX_TEXT = 300
 const MAX_TEXTAREA = 4000
 const MAX_PARAGRAPHS = 12000
 const MAX_URL = 2000
-
-// Paths next/image is allow-listed for (see next.config.ts remotePatterns).
-const UPLOADED_IMAGE_PATHS = ['/site/', '/articles/']
 
 const isLocalPath = (value: string): boolean => /^\/(?!\/)\S*$/.test(value)
 
@@ -35,10 +33,8 @@ export const validateValue = (type: FieldType, raw: string): string | null => {
 
     case 'image': {
       if (raw.length > MAX_URL) return 'URL is too long'
-      if (isLocalPath(raw)) return null
-      const url = parseHttpsUrl(raw)
-      if (url && UPLOADED_IMAGE_PATHS.some((prefix) => url.pathname.startsWith(prefix))) return null
-      return 'Use an uploaded image (upload it with the image picker)'
+      if (isAcceptableImageUrl(raw)) return null
+      return 'Must be a /path from the site or an https:// image URL (or upload one with the image picker)'
     }
 
     case 'video':

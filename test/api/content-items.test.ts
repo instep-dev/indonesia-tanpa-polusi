@@ -5,6 +5,7 @@ import { POST as restoreRoute } from '@/app/api/content-items/[id]/restore/route
 import { prismaMock } from '../prisma-singleton'
 import { makeRequest, params } from '../helpers'
 import { makeSuperAdmin, makeSuperAdminAccessToken } from '../fixtures'
+import { ACCEPTED_IMAGE_URLS, REJECTED_IMAGE_URLS } from '../image-urls'
 
 const asAdmin = () => {
   prismaMock.superAdminAccessToken.findUnique.mockResolvedValue(makeSuperAdminAccessToken())
@@ -76,7 +77,27 @@ describe('POST /api/content-items', () => {
     asAdmin()
     expect((await post({ collection: 'nope', data: story })).status).toBe(404)
     expect((await post({ collection: 'stories.home', data: { ...story, name: '' } })).status).toBe(400)
-    expect((await post({ collection: 'stories.home', data: { ...story, imageUrl: 'https://evil.example/x.jpg' } })).status).toBe(400)
+    expect((await post({ collection: 'stories.home', data: { ...story, imageUrl: 'javascript:alert(1)' } })).status).toBe(400)
+    expect(prismaMock.contentItem.create).not.toHaveBeenCalled()
+  })
+
+  it.each(ACCEPTED_IMAGE_URLS)('accepts a story photo that is: %s', async (_label, imageUrl) => {
+    asAdmin()
+    prismaMock.contentItem.findMany.mockResolvedValue([])
+    prismaMock.$transaction.mockResolvedValue([row({ data: { ...story, imageUrl } })])
+
+    const res = await post({ collection: 'stories.home', data: { ...story, imageUrl } })
+
+    expect(res.status).toBe(201)
+    expect(prismaMock.contentItem.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({ data: { ...story, imageUrl } }),
+    })
+  })
+
+  it.each(REJECTED_IMAGE_URLS)('rejects a story photo that is a %s', async (_label, imageUrl) => {
+    asAdmin()
+
+    expect((await post({ collection: 'stories.home', data: { ...story, imageUrl } })).status).toBe(400)
     expect(prismaMock.contentItem.create).not.toHaveBeenCalled()
   })
 

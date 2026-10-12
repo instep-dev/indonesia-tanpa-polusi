@@ -28,19 +28,21 @@ const RevisionList = ({ revisions, describe, showDiff = false, pageDirty = false
   const restore = useRestoreRevision()
   const [pending, setPending] = useState<ContentRevisionDto | null>(null)
 
-  const handleRestore = () => {
+  // Promise-based on purpose: a restore refreshes the page's data, which re-mounts the
+  // editor this list lives in. TanStack Query drops the per-call callbacks of `mutate()`
+  // once the component is gone, so the "Restored" message used to never appear;
+  // awaiting `mutateAsync` still completes after the re-mount.
+  const handleRestore = async () => {
     if (!pending) return
-    restore.mutate(pending.id, {
-      onSuccess: () => {
-        toast.success('Restored — the public site is updated')
-        setPending(null)
-        onRestored?.()
-      },
-      onError: (error) => {
-        toast.error(getApiErrorMessage(error, 'Could not restore this version'))
-        setPending(null)
-      },
-    })
+    try {
+      await restore.mutateAsync(pending.id)
+      toast.success('Restored — the public site is updated')
+      setPending(null)
+      onRestored?.()
+    } catch (error) {
+      toast.error(getApiErrorMessage(error, 'Could not restore this version'))
+      setPending(null)
+    }
   }
 
   if (revisions.length === 0) {

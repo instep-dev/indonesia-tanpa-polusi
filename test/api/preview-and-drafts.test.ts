@@ -77,14 +77,25 @@ describe('GET /api/preview/enter', () => {
 
   it('turns on preview mode, burns the token and redirects to the page', async () => {
     prismaMock.contentPreviewToken.findUnique.mockResolvedValue(liveToken())
+    prismaMock.contentPreviewToken.deleteMany.mockResolvedValue({ count: 1 })
 
     const res = await enter('?token=abc&path=/en/sulawesi')
 
     expect(prismaMock.contentPreviewToken.findUnique).toHaveBeenCalledWith({ where: { tokenHash: sha256('abc') } })
-    expect(prismaMock.contentPreviewToken.delete).toHaveBeenCalledWith({ where: { id: 'tok_1' } })
+    expect(prismaMock.contentPreviewToken.deleteMany).toHaveBeenCalledWith({ where: { id: 'tok_1' } })
     expect(enable).toHaveBeenCalledTimes(1)
     expect(res.status).toBe(307)
     expect(res.headers.get('location')).toBe('http://localhost/en/sulawesi')
+  })
+
+  it('answers "expired" (not a 500) when a double-click already used the token', async () => {
+    prismaMock.contentPreviewToken.findUnique.mockResolvedValue(liveToken())
+    prismaMock.contentPreviewToken.deleteMany.mockResolvedValue({ count: 0 })
+
+    const res = await enter('?token=abc&path=/en/sulawesi')
+
+    expect(res.status).toBe(401)
+    expect(enable).not.toHaveBeenCalled()
   })
 
   it('refuses unknown, expired or malformed links without enabling preview', async () => {

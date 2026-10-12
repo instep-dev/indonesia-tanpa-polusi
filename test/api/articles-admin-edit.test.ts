@@ -6,6 +6,7 @@ import { POST as submit } from '@/app/api/articles/[id]/submit/route'
 import { prismaMock } from '../prisma-singleton'
 import { makeRequest, params } from '../helpers'
 import { makeAccessToken, makeArticle, makeSuperAdminAccessToken, makeUser } from '../fixtures'
+import { ACCEPTED_IMAGE_URLS, REJECTED_IMAGE_URLS } from '../image-urls'
 
 // Super-admin "fix mode": edit any article (e.g. correct or fill in a translation),
 // without becoming its author or changing where it is in the review flow.
@@ -106,7 +107,7 @@ describe('PATCH /api/articles/[id] — journalist rules are unchanged', () => {
 describe('gallery routes — super admin', () => {
   const add = () =>
     addImage(
-      makeRequest('/api/articles/article_1/images', { method: 'POST', body: { url: 'https://media.example/a.jpg' }, token: 't' }),
+      makeRequest('/api/articles/article_1/images', { method: 'POST', body: { url: 'https://media.indonesiatanpapolusi.org/articles/admin_1/a.jpg' }, token: 't' }),
       params({ id: 'article_1' }),
     )
   const remove = () =>
@@ -142,6 +143,89 @@ describe('gallery routes — super admin', () => {
     prismaMock.article.findUnique.mockResolvedValue(makeArticle({ authorId: 'user_1', status: 'PUBLISHED' }))
     expect((await add()).status).toBe(409)
     expect((await remove()).status).toBe(409)
+  })
+
+  const addUrl = (url: string) =>
+    addImage(
+      makeRequest('/api/articles/article_1/images', { method: 'POST', body: { url }, token: 't' }),
+      params({ id: 'article_1' }),
+    )
+
+  describe.each(ACCEPTED_IMAGE_URLS)('gallery image: %s', (_label, url) => {
+    it('is accepted', async () => {
+      asSuperAdmin()
+      prismaMock.article.findUnique.mockResolvedValue(makeArticle({ status: 'PUBLISHED', authorId: 'someone_else' }))
+      prismaMock.articleImage.create.mockResolvedValue({ id: 'img_1', articleId: 'article_1', url, caption: null, order: 0, createdAt: new Date() })
+
+      expect((await addUrl(url)).status).toBe(201)
+      expect(prismaMock.articleImage.create).toHaveBeenCalledWith({ data: expect.objectContaining({ url }) })
+    })
+  })
+
+  it.each(REJECTED_IMAGE_URLS)('refuses a gallery image that is a %s', async (_label, url) => {
+    asSuperAdmin()
+    prismaMock.article.findUnique.mockResolvedValue(makeArticle({ status: 'PUBLISHED', authorId: 'someone_else' }))
+
+    expect((await addUrl(url)).status).toBe(400)
+    expect(prismaMock.articleImage.create).not.toHaveBeenCalled()
+  })
+
+  it('refuses a javascript: link when fixing an article', async () => {
+    asSuperAdmin()
+    prismaMock.article.findUnique.mockResolvedValue(makeArticle({ status: 'PUBLISHED', authorId: 'someone_else' }))
+    expect((await patch({ reportUrl: 'javascript:alert(1)' })).status).toBe(400)
+    expect(prismaMock.article.update).not.toHaveBeenCalled()
+  })
+
+  it.each(ACCEPTED_IMAGE_URLS)('super admin can set the cover image to: %s', async (_label, coverImage) => {
+    asSuperAdmin()
+    prismaMock.article.findUnique.mockResolvedValue(makeArticle({ status: 'PUBLISHED', authorId: 'someone_else' }))
+    prismaMock.article.update.mockResolvedValue(makeArticle())
+
+    expect((await patch({ coverImage })).status).toBe(200)
+    expect(prismaMock.article.update).toHaveBeenCalledWith(expect.objectContaining({ data: { coverImage } }))
+  })
+
+  it.each(REJECTED_IMAGE_URLS)('super admin cannot set the cover image to a %s', async (_label, coverImage) => {
+    asSuperAdmin()
+    prismaMock.article.findUnique.mockResolvedValue(makeArticle({ status: 'PUBLISHED', authorId: 'someone_else' }))
+
+    expect((await patch({ coverImage })).status).toBe(400)
+    expect(prismaMock.article.update).not.toHaveBeenCalled()
+  })
+
+  it.each(ACCEPTED_IMAGE_URLS)('a journalist can set their draft cover image to: %s', async (_label, coverImage) => {
+    asJournalist()
+    prismaMock.article.findUnique.mockResolvedValue(makeArticle({ authorId: 'user_1', status: 'DRAFT' }))
+    prismaMock.article.update.mockResolvedValue(makeArticle())
+
+    expect((await patch({ coverImage })).status).toBe(200)
+  })
+
+  it.each(REJECTED_IMAGE_URLS)('a journalist cannot set their cover image to a %s', async (_label, coverImage) => {
+    asJournalist()
+    prismaMock.article.findUnique.mockResolvedValue(makeArticle({ authorId: 'user_1', status: 'DRAFT' }))
+
+    expect((await patch({ coverImage })).status).toBe(400)
+    expect(prismaMock.article.update).not.toHaveBeenCalled()
+  })
+
+  it('lets a journalist keep an older article\'s existing cover while editing something else', async () => {
+    asJournalist()
+    const legacy = 'http://legacy.example/old-cover.jpg'
+    prismaMock.article.findUnique.mockResolvedValue(makeArticle({ authorId: 'user_1', status: 'DRAFT', coverImage: legacy }))
+    prismaMock.article.update.mockResolvedValue(makeArticle())
+
+    expect((await patch({ titleEn: 'New title', coverImage: legacy })).status).toBe(200)
+  })
+
+  it('allows removing the cover image (null or empty)', async () => {
+    asSuperAdmin()
+    prismaMock.article.findUnique.mockResolvedValue(makeArticle({ status: 'PUBLISHED', authorId: 'someone_else', coverImage: '/news1.jpg' }))
+    prismaMock.article.update.mockResolvedValue(makeArticle())
+
+    expect((await patch({ coverImage: null })).status).toBe(200)
+    expect((await patch({ coverImage: '' })).status).toBe(200)
   })
 
   it('rejects anonymous callers', async () => {
@@ -184,5 +268,34 @@ describe('POST /api/articles — bilingual titles', () => {
 
     const res = await createBody({ sourceLocale: 'id', titleEn: 'English only', excerptEn: 'Summary' })
     expect(res.status).toBe(201)
+  })
+
+  it.each(ACCEPTED_IMAGE_URLS)('accepts a new article whose cover image is: %s', async (_label, coverImage) => {
+    asJournalist()
+    prismaMock.article.findFirst.mockResolvedValue(null)
+    prismaMock.article.create.mockResolvedValue(makeArticle())
+
+    const res = await createBody({ sourceLocale: 'en', titleEn: 'With a cover', coverImage })
+    expect(res.status).toBe(201)
+    expect(prismaMock.article.create).toHaveBeenCalledWith(
+      expect.objectContaining({ data: expect.objectContaining({ coverImage }) }),
+    )
+  })
+
+  it.each(REJECTED_IMAGE_URLS)('refuses a new article whose cover image is a %s', async (_label, coverImage) => {
+    asJournalist()
+
+    const res = await createBody({ sourceLocale: 'en', titleEn: 'With a cover', coverImage })
+    expect(res.status).toBe(400)
+    expect(prismaMock.article.create).not.toHaveBeenCalled()
+  })
+
+  it('accepts a new article without any cover image', async () => {
+    asJournalist()
+    prismaMock.article.findFirst.mockResolvedValue(null)
+    prismaMock.article.create.mockResolvedValue(makeArticle())
+
+    expect((await createBody({ sourceLocale: 'en', titleEn: 'No cover' })).status).toBe(201)
+    expect((await createBody({ sourceLocale: 'en', titleEn: 'Null cover', coverImage: null })).status).toBe(201)
   })
 })

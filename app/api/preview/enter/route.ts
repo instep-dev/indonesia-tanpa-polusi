@@ -21,7 +21,10 @@ export const GET = async (request: NextRequest): Promise<NextResponse> => {
   const row = await db.contentPreviewToken.findUnique({ where: { tokenHash: hashToken(token) } })
   if (!row || row.expiresAt < new Date()) return expired()
 
-  await db.contentPreviewToken.delete({ where: { id: row.id } })
+  // deleteMany (not delete) so a double-click that loses the race answers "expired"
+  // instead of throwing on the already-removed row.
+  const consumed = await db.contentPreviewToken.deleteMany({ where: { id: row.id } })
+  if (consumed.count === 0) return expired()
   ;(await draftMode()).enable()
 
   return NextResponse.redirect(new URL(path, request.url))

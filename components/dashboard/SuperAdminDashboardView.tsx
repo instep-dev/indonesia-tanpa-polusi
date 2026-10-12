@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { ClipboardText, Plus, Trash, ArrowClockwise, MagnifyingGlass } from '@phosphor-icons/react'
 import { toast } from 'vibe-toast'
 import { superAdminAuthStore } from '@/services/super-admin/super-admin-auth.store'
+import { shouldSkipImageOptimization } from '@/libs/imageHosts'
 import { useAllArticlesAdmin, useDeleteArticleAsAdmin, useUpdateMainArticles } from '@/services/article/article.queries'
 import { useArticlesStream } from '@/services/article/article.sse'
 import { Card, CardContent } from '@/components/ui/card'
@@ -137,6 +138,7 @@ const SuperAdminDashboardView = () => {
                       <div className="relative size-16 shrink-0 rounded-lg overflow-hidden border">
                         <Image
                           src={image || '/news1.jpg'}
+                          unoptimized={shouldSkipImageOptimization(image || '/news1.jpg')}
                           alt={title || ''}
                           fill
                           className="object-cover"

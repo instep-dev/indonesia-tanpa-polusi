@@ -38,6 +38,56 @@ describe('POST /api/super-admin/auth/login', () => {
 
     expect(res.status).toBe(401)
   })
+
+  it.each([{}, { email: 'admin@example.com' }, { email: 42, password: 'x' }, { email: 'a@b.c', password: ['x'] }])(
+    'answers 400 (not a crash) for a malformed body: %j',
+    async (body) => {
+      const res = await login(makeRequest('/api/super-admin/auth/login', { method: 'POST', body }))
+      expect(res.status).toBe(400)
+      expect(prismaMock.superAdmin.findUnique).not.toHaveBeenCalled()
+    },
+  )
+
+  it('rate-limits repeated attempts for the same email', async () => {
+    prismaMock.superAdmin.findUnique.mockResolvedValue(makeSuperAdmin())
+    const attempt = () =>
+      login(
+        makeRequest('/api/super-admin/auth/login', {
+          method: 'POST',
+          body: { email: 'brute-force@example.com', password: 'wrong-password' },
+        }),
+      )
+
+    for (let i = 0; i < 10; i++) expect((await attempt()).status).toBe(401)
+    expect((await attempt()).status).toBe(429)
+  })
+
+  it('never locks out an admin who signs in successfully, however often', async () => {
+    prismaMock.superAdmin.findUnique.mockResolvedValue(makeSuperAdmin())
+    prismaMock.superAdminAccessToken.create.mockResolvedValue({} as never)
+    prismaMock.superAdminRefreshToken.create.mockResolvedValue({} as never)
+    const signIn = () =>
+      login(
+        makeRequest('/api/super-admin/auth/login', {
+          method: 'POST',
+          body: { email: 'admin@example.com', password: PLAIN_PASSWORD },
+        }),
+      )
+
+    for (let i = 0; i < 15; i++) expect((await signIn()).status).toBe(200)
+  })
+
+  it('forgets earlier typos once the right password is used', async () => {
+    prismaMock.superAdmin.findUnique.mockResolvedValue(makeSuperAdmin())
+    prismaMock.superAdminAccessToken.create.mockResolvedValue({} as never)
+    prismaMock.superAdminRefreshToken.create.mockResolvedValue({} as never)
+    const attempt = (password: string) =>
+      login(makeRequest('/api/super-admin/auth/login', { method: 'POST', body: { email: 'typo@example.com', password } }))
+
+    for (let i = 0; i < 9; i++) expect((await attempt('wrong')).status).toBe(401)
+    expect((await attempt(PLAIN_PASSWORD)).status).toBe(200) // success wipes the 9 failures…
+    for (let i = 0; i < 9; i++) expect((await attempt('wrong')).status).toBe(401) // …so 9 more are still allowed
+  })
 })
 
 describe('POST /api/super-admin/auth/refresh', () => {

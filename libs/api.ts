@@ -29,10 +29,17 @@ http.interceptors.request.use((config) => {
 
 // Silent refresh + race condition queue
 let isRefreshing = false
-let refreshQueue: Array<(token: string) => void> = []
+type QueuedRetry = { onRefreshed: (token: string) => void; onFailed: (reason: unknown) => void }
+let refreshQueue: QueuedRetry[] = []
 
 const processQueue = (newToken: string) => {
-  refreshQueue.forEach((cb) => cb(newToken))
+  refreshQueue.forEach(({ onRefreshed }) => onRefreshed(newToken))
+  refreshQueue = []
+}
+
+// A failed refresh must settle the waiting requests too, otherwise they hang forever.
+const failQueue = (reason: unknown) => {
+  refreshQueue.forEach(({ onFailed }) => onFailed(reason))
   refreshQueue = []
 }
 
@@ -40,23 +47,33 @@ http.interceptors.response.use(
   (res) => res,
   async (error) => {
     const original = error.config
-    const isRefreshCall = original?.url?.includes('/auth/refresh')
+    // No request config means a non-HTTP failure (e.g. the request was never built) — nothing to retry.
+    if (!original) return Promise.reject(error)
+    // login / register / refresh, for journalists and super admins alike.
+    const isAuthCall = /\/auth\/(login|register|refresh)(\?|$)/.test(original.url ?? '')
 
-    // The refresh endpoints' own 401s are not "an expired access token" —
-    // they mean there's no valid session at all (e.g. AuthProvider's bootstrap
-    // probe on a logged-out visitor). Retrying them here would recursively
-    // call refresh again and, on failure, force-redirect a user who may not
-    // even be trying to be logged in. Let the caller (AuthProvider) handle it.
-    if (error.response?.status !== 401 || original._retry || isRefreshCall) {
+    // These endpoints' own 401s are not "an expired access token":
+    //  - refresh: there is no valid session at all (e.g. AuthProvider's bootstrap
+    //    probe on a logged-out visitor). Retrying would recursively call refresh
+    //    again and, on failure, force-redirect a user who may not even be trying
+    //    to be logged in.
+    //  - login: a wrong password. Treating it as an expired session would run a
+    //    refresh that cannot succeed and then redirect to the (journalist) login
+    //    page, so the "Invalid email or password" message never showed.
+    // Let the caller handle them.
+    if (error.response?.status !== 401 || original._retry || isAuthCall) {
       return Promise.reject(error)
     }
     original._retry = true
 
     if (isRefreshing) {
-      return new Promise((resolve) => {
-        refreshQueue.push((token: string) => {
-          original.headers.Authorization = `Bearer ${token}`
-          resolve(http(original))
+      return new Promise((resolve, reject) => {
+        refreshQueue.push({
+          onRefreshed: (token: string) => {
+            original.headers.Authorization = `Bearer ${token}`
+            resolve(http(original))
+          },
+          onFailed: reject,
         })
       })
     }
@@ -86,6 +103,7 @@ http.interceptors.response.use(
       original.headers.Authorization = `Bearer ${data.accessToken}`
       return http(original)
     } catch {
+      failQueue(error)
       if (isSuperAdmin) {
         superAdminAuthStore.getState().clear()
         if (typeof window !== 'undefined') window.location.href = '/super-admin/auth/login'

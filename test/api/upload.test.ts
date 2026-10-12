@@ -3,7 +3,7 @@ import { POST } from '@/app/api/upload/route'
 import { uploadImageToR2 } from '@/libs/r2'
 import { orientation } from 'exifr'
 import { prismaMock } from '../prisma-singleton'
-import { makeAccessToken, makeSuperAdminAccessToken } from '../fixtures'
+import { makeAccessToken, makeSuperAdminAccessToken, makeUser } from '../fixtures'
 
 jest.mock('@/libs/r2', () => ({ uploadImageToR2: jest.fn().mockResolvedValue('https://media.example/uploaded.jpg') }))
 jest.mock('exifr', () => ({ orientation: jest.fn().mockResolvedValue(undefined) }))
@@ -30,9 +30,10 @@ const upload = (fields: { folder?: string; token?: string; file?: File }) => {
   )
 }
 
-const asJournalist = () => {
+const asJournalist = ({ approved = true } = {}) => {
   prismaMock.accessToken.findUnique.mockResolvedValue(makeAccessToken())
   prismaMock.superAdminAccessToken.findUnique.mockResolvedValue(null)
+  prismaMock.user.findUnique.mockResolvedValue(makeUser({ approvedAt: approved ? new Date() : null }))
 }
 const asSuperAdmin = () => {
   prismaMock.accessToken.findUnique.mockResolvedValue(null)
@@ -58,6 +59,13 @@ describe('POST /api/upload', () => {
     const res = await upload({ token: 't' })
     expect(res.status).toBe(201)
     expect(uploadImageToR2).toHaveBeenCalledWith(expect.anything(), 'image/jpeg', 'articles/user_1')
+  })
+
+  it('refuses uploads from a journalist who is not approved yet', async () => {
+    asJournalist({ approved: false })
+    const res = await upload({ token: 't' })
+    expect(res.status).toBe(403)
+    expect(uploadImageToR2).not.toHaveBeenCalled()
   })
 
   it('does not let journalists write to the site folder', async () => {

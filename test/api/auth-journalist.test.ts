@@ -102,6 +102,41 @@ describe('POST /api/auth/login', () => {
   })
 })
 
+describe('POST /api/auth/login — input handling', () => {
+  it.each([{}, { email: 'journalist@example.com' }, { email: 42, password: 'x' }])(
+    'answers 400 (not a crash) for a malformed body: %j',
+    async (body) => {
+      const res = await login(makeRequest('/api/auth/login', { method: 'POST', body }))
+      expect(res.status).toBe(400)
+      expect(prismaMock.user.findUnique).not.toHaveBeenCalled()
+    },
+  )
+
+  it('rate-limits repeated attempts for the same email', async () => {
+    prismaMock.user.findUnique.mockResolvedValue(makeUser())
+    const attempt = () =>
+      login(
+        makeRequest('/api/auth/login', {
+          method: 'POST',
+          body: { email: 'brute-force@example.com', password: 'wrong-password' },
+        }),
+      )
+
+    for (let i = 0; i < 10; i++) expect((await attempt()).status).toBe(401)
+    expect((await attempt()).status).toBe(429)
+  })
+})
+
+describe('POST /api/auth/register — input handling', () => {
+  it('answers 400 when email or password is missing or not text', async () => {
+    for (const body of [{}, { email: 'a@b.c' }, { email: 'a@b.c', password: 123 }]) {
+      const res = await register(makeRequest('/api/auth/register', { method: 'POST', body }))
+      expect(res.status).toBe(400)
+    }
+    expect(prismaMock.user.create).not.toHaveBeenCalled()
+  })
+})
+
 describe('POST /api/auth/refresh', () => {
   it('rotates the refresh token and issues a new access token', async () => {
     const existing = makeRefreshToken()

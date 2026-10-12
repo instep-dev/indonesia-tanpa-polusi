@@ -10,6 +10,7 @@ import { mapArticle, articleInclude } from '@/libs/mapArticle'
 import ArticleContentPreview from '@/components/dashboard/ArticleContentPreview'
 import { cn } from '@/libs/utils'
 import { pickLocale } from '@/libs/localizeArticle'
+import { shouldSkipImageOptimization } from '@/libs/imageHosts'
 import { buildArticleMetadata } from '@/libs/articleMetadata'
 
 type NewsDetailPageProps = {
@@ -62,6 +63,7 @@ const NewsDetailPage = async ({ params }: NewsDetailPageProps) => {
         {article.coverImage && (
           <Image
             src={article.coverImage}
+            unoptimized={shouldSkipImageOptimization(article.coverImage)}
             alt={title}
             fill
             priority

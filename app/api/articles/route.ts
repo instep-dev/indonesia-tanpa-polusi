@@ -7,6 +7,7 @@ import { generateUniqueArticleSlug } from '@/libs/generateSlug'
 import { broadcastArticlesChanged } from '@/libs/sse'
 import { parseJsonBody } from '@/libs/parseJsonBody'
 import { requireApprovedUser } from '@/libs/requireApprovedUser'
+import { validateArticleLinks } from '@/libs/articleInput'
 import type { ArticleDto, ArticlePage, ArticleStatus, CreateArticleBody } from '@/services/article/article.dto'
 
 const VALID_STATUSES: ArticleStatus[] = ['DRAFT', 'PENDING_REVIEW', 'PUBLISHED', 'REJECTED']
@@ -125,6 +126,10 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
   if (!title) {
     return NextResponse.json({ error: 'Add a title in at least one language' }, { status: 400 })
   }
+
+  const linkError = validateArticleLinks(body)
+  if (linkError) return NextResponse.json({ error: linkError }, { status: 400 })
+
   const slug = await generateUniqueArticleSlug(title)
 
   const article = await db.article.create({

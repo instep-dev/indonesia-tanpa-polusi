@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { db } from '@/libs/db'
 import { validateAccessToken, validateSuperAdminAccessToken } from '@/libs/validateToken'
+import { requireApprovedUser } from '@/libs/requireApprovedUser'
 import { uploadImageToR2 } from '@/libs/r2'
 import { MAX_UPLOAD_SIZE_BYTES, MAX_UPLOAD_SIZE_MB } from '@/libs/uploadLimits'
 import { Jimp } from 'jimp'
@@ -31,6 +32,13 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
     const journalist = await validateAccessToken(request, db)
     const superAdmin = journalist.ok ? null : await validateSuperAdminAccessToken(request, db)
     if (!journalist.ok && !superAdmin?.ok) return journalist.response
+
+    // Same gate as creating/editing an article: a journalist still waiting for
+    // approval must not be able to push files into the bucket either.
+    if (journalist.ok) {
+      const approved = await requireApprovedUser(journalist.userId)
+      if (!approved.ok) return approved.response
+    }
 
     const formData = await request.formData()
     const file = formData.get('file')

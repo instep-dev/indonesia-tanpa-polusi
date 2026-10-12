@@ -2,6 +2,7 @@ import { GET, PUT } from '@/app/api/site-content/route'
 import { prismaMock } from '../prisma-singleton'
 import { makeRequest } from '../helpers'
 import { makeSuperAdmin, makeSuperAdminAccessToken } from '../fixtures'
+import { ACCEPTED_IMAGE_URLS, REJECTED_IMAGE_URLS } from '../image-urls'
 
 const asAdmin = () => {
   prismaMock.superAdminAccessToken.findUnique.mockResolvedValue(makeSuperAdminAccessToken())
@@ -79,17 +80,58 @@ describe('PUT /api/site-content', () => {
     expect(prismaMock.siteContent.upsert).not.toHaveBeenCalled()
   })
 
-  it('rejects invalid values (non-https video, foreign image, javascript: link)', async () => {
+  it('rejects invalid values (non-https video, non-https image, javascript: link)', async () => {
     asAdmin()
     for (const field of [
       { key: 'media.home.hero.video', valueId: 'http://cdn.example.com/a.mp4', valueEn: '' },
-      { key: 'media.home.about.image', valueId: 'https://evil.example/x.jpg', valueEn: '' },
+      { key: 'media.home.about.image', valueId: 'http://cdn.example.com/x.jpg', valueEn: '' },
       { key: 'media.home.hero.ctaHref', valueId: 'javascript:alert(1)', valueEn: '' },
     ]) {
       const res = await put({ fields: [field] }, 't')
       expect(res.status).toBe(400)
     }
     expect(prismaMock.siteContent.upsert).not.toHaveBeenCalled()
+  })
+
+  it.each(ACCEPTED_IMAGE_URLS)('accepts an image field set to: %s', async (_label, url) => {
+    asAdmin()
+    prismaMock.$transaction.mockResolvedValue([])
+
+    const res = await put({ fields: [{ key: 'media.home.about.image', valueId: url, valueEn: '' }] }, 't')
+
+    expect(res.status).toBe(200)
+    expect(prismaMock.siteContent.upsert).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { key: 'media.home.about.image' }, update: expect.objectContaining({ valueId: url }) }),
+    )
+  })
+
+  it.each(REJECTED_IMAGE_URLS)('rejects an image field set to a %s', async (_label, url) => {
+    asAdmin()
+
+    const res = await put({ fields: [{ key: 'media.home.about.image', valueId: url, valueEn: '' }] }, 't')
+
+    expect(res.status).toBe(400)
+    expect(prismaMock.siteContent.upsert).not.toHaveBeenCalled()
+  })
+
+  it('applies external URLs to the logo, collage and fallback-cover image fields too', async () => {
+    asAdmin()
+    prismaMock.$transaction.mockResolvedValue([])
+    const url = 'https://res.cloudinary.com/demo/image/upload/sample.jpg'
+
+    const res = await put(
+      {
+        fields: [
+          { key: 'media.logos.default.overHero', valueId: url, valueEn: '' },
+          { key: 'media.contact.collage1', valueId: url, valueEn: '' },
+          { key: 'media.home.news.fallbackCover', valueId: url, valueEn: '' },
+        ],
+      },
+      't',
+    )
+
+    expect(res.status).toBe(200)
+    expect(prismaMock.siteContent.upsert).toHaveBeenCalledTimes(3)
   })
 
   it('rejects malformed bodies', async () => {

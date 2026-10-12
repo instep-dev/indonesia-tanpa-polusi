@@ -4,7 +4,7 @@ import { db } from '@/libs/db'
 import { validateSuperAdminAccessToken } from '@/libs/validateToken'
 import { mapContentItem } from '@/libs/mapContentItem'
 import { collectionsById } from '@/data/content-registry'
-import { getActor, revisionOps } from '@/libs/revisions'
+import { getActor, pruneRevisions, revisionOps } from '@/libs/revisions'
 import type { ContentItemDto } from '@/services/content-item/content-item.dto'
 
 // POST /api/content-items/[id]/restore — SuperAdmin brings a removed item back
@@ -46,5 +46,6 @@ export const POST = async (
       },
     ]),
   ])
+  await pruneRevisions([{ kind: 'item', targetKey: id }])
   return NextResponse.json<ContentItemDto>(mapContentItem(restored as Awaited<ReturnType<typeof db.contentItem.update>>))
 }

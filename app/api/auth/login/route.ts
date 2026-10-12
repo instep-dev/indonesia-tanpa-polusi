@@ -1,7 +1,13 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import bcrypt from 'bcryptjs'
 import { db } from '@/libs/db'
+import {
+  clearFailedLogins,
+  isLoginRateLimited,
+  parseCredentials,
+  recordFailedLogin,
+  verifyPassword,
+} from '@/libs/credentials'
 import { generateToken, hashToken } from '@/libs/validateToken'
 import { parseJsonBody } from '@/libs/parseJsonBody'
 import { mapUser } from '@/libs/mapUser'
@@ -11,12 +17,20 @@ import type { AuthResponse, LoginBody } from '@/services/auth/auth.dto'
 export const POST = async (request: NextRequest): Promise<NextResponse> => {
   const parsed = await parseJsonBody<LoginBody>(request)
   if (!parsed.ok) return parsed.response
-  const { email, password } = parsed.body
+  const credentials = parseCredentials(parsed.body)
+  if (!credentials) return NextResponse.json({ error: 'Email and password are required' }, { status: 400 })
+  const { email, password } = credentials
+
+  if (isLoginRateLimited(request, email)) {
+    return NextResponse.json({ error: 'Too many login attempts. Try again later.' }, { status: 429 })
+  }
 
   const user = await db.user.findUnique({ where: { email } })
-  if (!user || !(await bcrypt.compare(password, user.password))) {
+  if (!(await verifyPassword(password, user?.password)) || !user) {
+    recordFailedLogin(request, email)
     return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 })
   }
+  clearFailedLogins(request, email)
 
   const rawAccess = generateToken()
   const rawRefresh = generateToken()

@@ -1,5 +1,6 @@
 import type { Dictionary } from '@/i18n/getDictionary'
 import Image from 'next/image'
+import { shouldSkipImageOptimization } from '@/libs/imageHosts'
 
 const AboutUs = ({
   dict,
@@ -14,7 +15,7 @@ const AboutUs = ({
     <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-3 lg:items-start">
       <div className="rounded-sm border-1 shadow-md/20 lg:col-span-1">
         <div className="relative aspect-square w-full overflow-hidden rounded-sm bg-neutral-400 h-full">
-          <Image src={image} alt={''} fill className="object-cover" />
+          <Image src={image} unoptimized={shouldSkipImageOptimization(image)} alt={''} fill className="object-cover" />
         </div>
       </div>
 

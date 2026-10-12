@@ -29,8 +29,11 @@ export const POST = async (request: NextRequest, { params }: RouteContext): Prom
   if (!parsed.ok) return parsed.response
   const { body } = parsed
 
-  if (body.action !== 'approve' && body.action !== 'reject') {
+  if (!body || (body.action !== 'approve' && body.action !== 'reject')) {
     return NextResponse.json({ error: 'action must be "approve" or "reject"' }, { status: 400 })
+  }
+  if (body.rejectionReason != null && typeof body.rejectionReason !== 'string') {
+    return NextResponse.json({ error: 'rejectionReason must be text' }, { status: 400 })
   }
 
   const updated = await db.article.update({

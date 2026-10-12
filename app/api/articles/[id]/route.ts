@@ -6,6 +6,7 @@ import { mapArticle, articleInclude } from '@/libs/mapArticle'
 import { broadcastArticlesChanged } from '@/libs/sse'
 import { parseJsonBody } from '@/libs/parseJsonBody'
 import { requireApprovedUser } from '@/libs/requireApprovedUser'
+import { validateArticleLinks } from '@/libs/articleInput'
 import type { ArticleDto, UpdateArticleBody } from '@/services/article/article.dto'
 
 type RouteContext = { params: Promise<{ id: string }> }
@@ -81,6 +82,8 @@ export const PATCH = async (request: NextRequest, { params }: RouteContext): Pro
 
     const adminBody = await parseJsonBody<UpdateArticleBody>(request)
     if (!adminBody.ok) return adminBody.response
+    const adminLinkError = validateArticleLinks(adminBody.body, target)
+    if (adminLinkError) return NextResponse.json({ error: adminLinkError }, { status: 400 })
 
     const fixed = await db.article.update({
       where: { id },
@@ -113,6 +116,8 @@ export const PATCH = async (request: NextRequest, { params }: RouteContext): Pro
   const parsed = await parseJsonBody<UpdateArticleBody>(request)
   if (!parsed.ok) return parsed.response
   const { body } = parsed
+  const linkError = validateArticleLinks(body, article)
+  if (linkError) return NextResponse.json({ error: linkError }, { status: 400 })
 
   const updated = await db.article.update({
     where: { id },

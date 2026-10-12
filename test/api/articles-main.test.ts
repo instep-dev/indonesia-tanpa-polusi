@@ -71,6 +71,39 @@ describe('PUT /api/articles/main', () => {
     expect(res.status).toBe(400)
   })
 
+  it('only considers articles that have not been soft-deleted', async () => {
+    prismaMock.superAdminAccessToken.findUnique.mockResolvedValue(makeSuperAdminAccessToken())
+    // a soft-deleted article is filtered out by the query, so it comes back missing
+    prismaMock.article.findMany.mockResolvedValue([])
+
+    const res = await call({ articleIds: ['deleted_art'] }, 'raw-admin-token')
+
+    expect(res.status).toBe(404)
+    expect(prismaMock.article.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({ where: expect.objectContaining({ deletedAt: null }) }),
+    )
+    expect(prismaMock.$transaction).not.toHaveBeenCalled()
+  })
+
+  it('treats a repeated id as one article', async () => {
+    prismaMock.superAdminAccessToken.findUnique.mockResolvedValue(makeSuperAdminAccessToken())
+    prismaMock.article.findMany
+      .mockResolvedValueOnce([makeArticle({ id: 'art_1', status: 'PUBLISHED' })])
+      .mockResolvedValueOnce([makeArticle({ id: 'art_1', status: 'PUBLISHED', isMain: true })])
+    prismaMock.$transaction.mockResolvedValue([])
+
+    const res = await call({ articleIds: ['art_1', 'art_1'] }, 'raw-admin-token')
+
+    expect(res.status).toBe(200)
+  })
+
+  it('returns 400 if articleIds contains non-string values', async () => {
+    prismaMock.superAdminAccessToken.findUnique.mockResolvedValue(makeSuperAdminAccessToken())
+
+    const res = await call({ articleIds: [{ id: 'art_1' }] }, 'raw-admin-token')
+    expect(res.status).toBe(400)
+  })
+
   it('returns 400 if articleIds is empty', async () => {
     prismaMock.superAdminAccessToken.findUnique.mockResolvedValue(makeSuperAdminAccessToken())
 

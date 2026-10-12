@@ -8,6 +8,7 @@ import { motion } from "framer-motion";
 import { List, MagnifyingGlass, X } from "@phosphor-icons/react";
 import LangToggle from "@/components/reusable/LangToggle";
 import { cn } from "@/libs/utils";
+import { shouldSkipImageOptimization } from "@/libs/imageHosts";
 import { navLinks, type NavLinkKey } from "@/data/data";
 import type { Dictionary, Locale } from "@/i18n/getDictionary";
 import type { NavLogos } from "@/libs/contentMerge";
@@ -98,6 +99,7 @@ const Navbar = ({ currentLocale, dict, logos }: NavbarProps) => {
           <Link href={`/${currentLocale}`} className="flex items-center gap-2">
             <Image
               src={getLogoSrc()}
+              unoptimized={shouldSkipImageOptimization(getLogoSrc())}
               alt={dict.logoAlt}
               width={143}
               height={48}

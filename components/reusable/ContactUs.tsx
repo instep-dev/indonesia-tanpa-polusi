@@ -14,6 +14,7 @@ import type { SocialPlatform } from '@/data/content-registry'
 import type { Dictionary } from '@/i18n/getDictionary'
 import type { ContactCollage, SocialItem } from '@/libs/contentMerge'
 import Image from 'next/image'
+import { shouldSkipImageOptimization } from '@/libs/imageHosts'
 
 const PLATFORM_ICONS: Record<SocialPlatform, Icon> = {
   instagram: InstagramLogo,
@@ -76,23 +77,23 @@ const ContactUs = ({
         <div className="grid gap-4">
           <div className="rounded-sm border-1 shadow-md/20">
             <div className="relative aspect-[4/3] w-full overflow-hidden rounded-sm bg-neutral-500">
-              <Image src={contact.collage[0]} alt={''} fill className="object-cover" />
+              <Image src={contact.collage[0]} unoptimized={shouldSkipImageOptimization(contact.collage[0])} alt={''} fill className="object-cover" />
             </div>
           </div>
           <div className="rounded-sm border-1 shadow-md/20">
             <div className="relative aspect-[4/3] w-full overflow-hidden rounded-sm bg-neutral-500">
-              <Image src={contact.collage[1]} alt={''} fill className="object-cover" />
+              <Image src={contact.collage[1]} unoptimized={shouldSkipImageOptimization(contact.collage[1])} alt={''} fill className="object-cover" />
             </div>
           </div>
           <div className="rounded-sm border-1 shadow-md/20">
             <div className="relative aspect-[4/3] w-full overflow-hidden rounded-sm bg-neutral-500">
-              <Image src={contact.collage[2]} alt={''} fill className="object-cover" />
+              <Image src={contact.collage[2]} unoptimized={shouldSkipImageOptimization(contact.collage[2])} alt={''} fill className="object-cover" />
             </div>
           </div>
         </div>
         <div className="flex rounded-sm border-1 shadow-md/20 sm:h-full">
           <div className="relative aspect-[4/3] w-full flex-1 overflow-hidden rounded-sm bg-neutral-500 sm:aspect-auto">
-            <Image src={contact.collage[3]} alt={''} fill className="object-cover" />
+            <Image src={contact.collage[3]} unoptimized={shouldSkipImageOptimization(contact.collage[3])} alt={''} fill className="object-cover" />
           </div>
         </div>
       </div>

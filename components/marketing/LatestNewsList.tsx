@@ -8,6 +8,7 @@ import { usePublishedArticles } from '@/services/article/article.queries'
 import { usePublicArticlesStream } from '@/services/article/article.sse'
 import type { Locale } from '@/i18n/getDictionary'
 import { pickLocale } from '@/libs/localizeArticle'
+import { toCssUrl } from '@/libs/imageHosts'
 
 type LatestNewsListDict = {
   searchPlaceholder: string
@@ -121,7 +122,7 @@ const LatestNewsList = ({
                 <div className="rounded-sm border-1 shadow-md/20">
                   <div
                     className="aspect-video w-full rounded-sm bg-neutral-500 bg-cover bg-center"
-                    style={article.coverImage ? { backgroundImage: `url(${article.coverImage})` } : undefined}
+                    style={article.coverImage ? { backgroundImage: toCssUrl(article.coverImage) } : undefined}
                   />
                 </div>
                 <div className="mt-4 flex flex-1 flex-col">

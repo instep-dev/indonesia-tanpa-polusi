@@ -3,14 +3,15 @@ import type { NextRequest } from 'next/server'
 import { db } from '@/libs/db'
 import { validateAccessToken, validateSuperAdminAccessToken } from '@/libs/validateToken'
 import { parseJsonBody } from '@/libs/parseJsonBody'
+import { isAcceptableImageUrl } from '@/libs/imageHosts'
 import type { ArticleImageDto } from '@/services/article/article.dto'
 
 type RouteContext = { params: Promise<{ id: string }> }
 type AddImageBody = { url: string; caption?: string; order?: number }
 
-// POST /api/articles/[id]/images — attaches an R2-uploaded image to an article's
-// gallery. Upload to R2 happens client-side or via a separate upload endpoint;
-// this only records the resulting URL.
+// POST /api/articles/[id]/images — attaches an image to an article's gallery. The
+// image picker uploads to R2 via a separate endpoint; this only records the URL,
+// which may also be a public/ path or an https image on another site.
 //  - Journalist: their own DRAFT/REJECTED article.
 //  - SuperAdmin: any article that has not been deleted.
 export const POST = async (request: NextRequest, { params }: RouteContext): Promise<NextResponse> => {
@@ -39,6 +40,9 @@ export const POST = async (request: NextRequest, { params }: RouteContext): Prom
   if (!parsed.ok) return parsed.response
   const { body } = parsed
   if (!body.url) return NextResponse.json({ error: 'url is required' }, { status: 400 })
+  if (typeof body.url !== 'string' || body.url.length > 2000 || !isAcceptableImageUrl(body.url)) {
+    return NextResponse.json({ error: 'url must be an https:// image URL or a /path from the site' }, { status: 400 })
+  }
 
   const image = await db.articleImage.create({
     data: {

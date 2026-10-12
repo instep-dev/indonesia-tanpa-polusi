@@ -4,7 +4,7 @@ import { db } from '@/libs/db'
 import { validateSuperAdminAccessToken } from '@/libs/validateToken'
 import { parseJsonBody } from '@/libs/parseJsonBody'
 import { collectionsById } from '@/data/content-registry'
-import { getActor, revisionOps } from '@/libs/revisions'
+import { getActor, pruneRevisions, revisionOps } from '@/libs/revisions'
 import type { ReorderContentItemsBody } from '@/services/content-item/content-item.dto'
 
 // PUT /api/content-items/reorder — SuperAdmin sets the display order of a
@@ -40,5 +40,6 @@ export const PUT = async (request: NextRequest): Promise<NextResponse> => {
       { kind: 'collection', targetKey: collection, collection, action: 'REORDER', snapshot: { ids } },
     ]),
   ])
+  await pruneRevisions([{ kind: 'collection', targetKey: collection }])
   return NextResponse.json({ ok: true })
 }
